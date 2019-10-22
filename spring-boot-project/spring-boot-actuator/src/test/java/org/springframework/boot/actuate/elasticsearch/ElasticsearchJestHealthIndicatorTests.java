@@ -119,17 +119,12 @@ class ElasticsearchJestHealthIndicatorTests {
 		String json;
 		if (responseCode == 200) {
 			json = String.format(
-					"{\"cluster_name\":\"elasticsearch\","
-							+ "\"status\":\"%s\",\"timed_out\":false,\"number_of_nodes\":1,"
-							+ "\"number_of_data_nodes\":1,\"active_primary_shards\":0,"
-							+ "\"active_shards\":0,\"relocating_shards\":0,\"initializing_shards\":0,"
-							+ "\"unassigned_shards\":0,\"delayed_unassigned_shards\":0,"
-							+ "\"number_of_pending_tasks\":0,\"number_of_in_flight_fetch\":0,"
-							+ "\"task_max_waiting_in_queue_millis\":0,\"active_shards_percent_as_number\":100.0}",
+					new StringBuilder().append("{\"cluster_name\":\"elasticsearch\",").append("\"status\":\"%s\",\"timed_out\":false,\"number_of_nodes\":1,").append("\"number_of_data_nodes\":1,\"active_primary_shards\":0,").append("\"active_shards\":0,\"relocating_shards\":0,\"initializing_shards\":0,").append("\"unassigned_shards\":0,\"delayed_unassigned_shards\":0,").append("\"number_of_pending_tasks\":0,\"number_of_in_flight_fetch\":0,").append("\"task_max_waiting_in_queue_millis\":0,\"active_shards_percent_as_number\":100.0}")
+							.toString(),
 					status);
 		}
 		else {
-			json = "{\n  \"error\": \"Server Error\",\n  \"status\": \"" + status + "\"\n}";
+			json = new StringBuilder().append("{\n  \"error\": \"Server Error\",\n  \"status\": \"").append(status).append("\"\n}").toString();
 		}
 		searchResult.setJsonString(json);
 		searchResult.setJsonObject(new JsonParser().parse(json).getAsJsonObject());

@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility used to run a process.
@@ -34,6 +36,8 @@ import java.util.Map;
  * @since 1.1.0
  */
 public class RunProcess {
+
+	private static final Logger logger = LoggerFactory.getLogger(RunProcess.class);
 
 	private static final long JUST_ENDED_LIMIT = 500;
 
@@ -86,6 +90,7 @@ public class RunProcess {
 					return process.waitFor();
 				}
 				catch (InterruptedException ex) {
+					logger.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 					return 1;
 				}
@@ -138,6 +143,7 @@ public class RunProcess {
 				return true;
 			}
 			catch (InterruptedException ex) {
+				logger.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 		}

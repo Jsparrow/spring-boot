@@ -18,10 +18,13 @@ package smoketest.kafka;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class Producer {
 
+	private static final Logger logger = LoggerFactory.getLogger(Producer.class);
 	private final KafkaTemplate<Object, SampleMessage> kafkaTemplate;
 
 	Producer(KafkaTemplate<Object, SampleMessage> kafkaTemplate) {
@@ -30,7 +33,7 @@ public class Producer {
 
 	public void send(SampleMessage message) {
 		this.kafkaTemplate.send("testTopic", message);
-		System.out.println("Sent sample message [" + message + "]");
+		logger.info(new StringBuilder().append("Sent sample message [").append(message).append("]").toString());
 	}
 
 }

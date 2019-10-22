@@ -125,12 +125,12 @@ class H2ConsoleAutoConfigurationTests {
 
 	@Test
 	@ExtendWith(OutputCaptureExtension.class)
-	void dataSourceUrlIsLoggedWhenAvailable(CapturedOutput output) throws BeansException, SQLException {
+	void dataSourceUrlIsLoggedWhenAvailable(CapturedOutput output) throws SQLException {
 		this.context.register(DataSourceAutoConfiguration.class, H2ConsoleAutoConfiguration.class);
 		TestPropertyValues.of("spring.h2.console.enabled:true").applyTo(this.context);
 		this.context.refresh();
 		try (Connection connection = this.context.getBean(DataSource.class).getConnection()) {
-			assertThat(output).contains("Database available at '" + connection.getMetaData().getURL() + "'");
+			assertThat(output).contains(new StringBuilder().append("Database available at '").append(connection.getMetaData().getURL()).append("'").toString());
 		}
 	}
 

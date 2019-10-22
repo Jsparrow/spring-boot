@@ -30,6 +30,8 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
 import org.springframework.beans.factory.BeanCreationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Extension} for working with an optional Couchbase server. Expects a default
@@ -39,6 +41,8 @@ import org.springframework.beans.factory.BeanCreationException;
  * @author Andy Wilkinson
  */
 class LocalCouchbaseServer implements ExecutionCondition, TestExecutionExceptionHandler {
+
+	private static final Logger logger = LoggerFactory.getLogger(LocalCouchbaseServer.class);
 
 	@Override
 	public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
@@ -51,6 +55,7 @@ class LocalCouchbaseServer implements ExecutionCondition, TestExecutionException
 			return ConditionEvaluationResult.enabled("Local Couchbase server available");
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return ConditionEvaluationResult.disabled("Local Couchbase server not available");
 		}
 	}

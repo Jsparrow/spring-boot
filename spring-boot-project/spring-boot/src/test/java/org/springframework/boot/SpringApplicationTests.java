@@ -530,10 +530,10 @@ class SpringApplicationTests {
 				.get("commandLineArgs");
 		assertThat(composite.getPropertySources()).hasSize(2);
 		assertThat(composite.getPropertySources()).first().matches(
-				(source) -> source.getName().equals("springApplicationCommandLineArgs"),
+				(source) -> "springApplicationCommandLineArgs".equals(source.getName()),
 				"is named springApplicationCommandLineArgs");
 		assertThat(composite.getPropertySources()).element(1)
-				.matches((source) -> source.getName().equals("commandLineArgs"), "is named commandLineArgs");
+				.matches((source) -> "commandLineArgs".equals(source.getName()), "is named commandLineArgs");
 	}
 
 	@Test
@@ -1486,7 +1486,7 @@ class SpringApplicationTests {
 		}
 
 		@Override
-		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		public void setApplicationContext(ApplicationContext applicationContext) {
 			this.applicationContext = applicationContext;
 		}
 

@@ -49,9 +49,9 @@ abstract class AbstractJsonMarshalTesterTests {
 
 	private static final String JSON = "{\"name\":\"Spring\",\"age\":123}";
 
-	private static final String MAP_JSON = "{\"a\":" + JSON + "}";
+	private static final String MAP_JSON = new StringBuilder().append("{\"a\":").append(JSON).append("}").toString();
 
-	private static final String ARRAY_JSON = "[" + JSON + "]";
+	private static final String ARRAY_JSON = new StringBuilder().append("[").append(JSON).append("]").toString();
 
 	private static final ExampleObject OBJECT = createExampleObject("Spring", 123);
 

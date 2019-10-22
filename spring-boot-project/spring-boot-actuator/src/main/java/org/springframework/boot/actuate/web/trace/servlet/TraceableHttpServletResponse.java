@@ -50,9 +50,7 @@ final class TraceableHttpServletResponse implements TraceableResponse {
 
 	private Map<String, List<String>> extractHeaders() {
 		Map<String, List<String>> headers = new LinkedHashMap<>();
-		for (String name : this.delegate.getHeaderNames()) {
-			headers.put(name, new ArrayList<>(this.delegate.getHeaders(name)));
-		}
+		this.delegate.getHeaderNames().forEach(name -> headers.put(name, new ArrayList<>(this.delegate.getHeaders(name))));
 		return headers;
 	}
 

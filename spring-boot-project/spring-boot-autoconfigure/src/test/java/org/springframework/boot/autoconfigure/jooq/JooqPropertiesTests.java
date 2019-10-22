@@ -36,6 +36,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link JooqProperties}.
@@ -44,6 +46,7 @@ import static org.mockito.Mockito.verify;
  */
 class JooqPropertiesTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(JooqPropertiesTests.class);
 	private AnnotationConfigApplicationContext context;
 
 	@AfterEach
@@ -99,6 +102,7 @@ class JooqPropertiesTests {
 			given(ds.getConnection()).willReturn(connection);
 		}
 		catch (SQLException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Do nothing
 		}
 		return ds;

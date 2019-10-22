@@ -167,7 +167,7 @@ public final class ConditionEvaluationReport {
 	 * @return the {@link ConditionEvaluationReport} or {@code null}
 	 */
 	public static ConditionEvaluationReport find(BeanFactory beanFactory) {
-		if (beanFactory != null && beanFactory instanceof ConfigurableBeanFactory) {
+		if (beanFactory instanceof ConfigurableBeanFactory) {
 			return ConditionEvaluationReport.get((ConfigurableListableBeanFactory) beanFactory);
 		}
 		return null;
@@ -290,7 +290,7 @@ public final class ConditionEvaluationReport {
 
 		@Override
 		public String toString() {
-			return this.condition.getClass() + " " + this.outcome;
+			return new StringBuilder().append(this.condition.getClass()).append(" ").append(this.outcome).toString();
 		}
 
 	}

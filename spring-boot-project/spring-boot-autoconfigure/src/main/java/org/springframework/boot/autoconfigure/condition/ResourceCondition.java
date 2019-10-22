@@ -89,7 +89,7 @@ public abstract class ResourceCondition extends SpringBootCondition {
 	}
 
 	protected final Builder startConditionMessage() {
-		return ConditionMessage.forCondition("ResourceCondition", "(" + this.name + ")");
+		return ConditionMessage.forCondition("ResourceCondition", new StringBuilder().append("(").append(this.name).append(")").toString());
 	}
 
 }

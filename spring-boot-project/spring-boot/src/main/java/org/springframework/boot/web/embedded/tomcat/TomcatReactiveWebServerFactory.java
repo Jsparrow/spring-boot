@@ -50,6 +50,7 @@ import org.springframework.http.server.reactive.TomcatHttpHandlerAdapter;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import java.util.Collections;
 
 /**
  * {@link ReactiveWebServerFactory} that can be used to create a {@link TomcatWebServer}.
@@ -107,7 +108,7 @@ public class TomcatReactiveWebServerFactory extends AbstractReactiveWebServerFac
 
 	private static List<LifecycleListener> getDefaultLifecycleListeners() {
 		AprLifecycleListener aprLifecycleListener = new AprLifecycleListener();
-		return AprLifecycleListener.isAprAvailable() ? new ArrayList<>(Arrays.asList(aprLifecycleListener))
+		return AprLifecycleListener.isAprAvailable() ? new ArrayList<>(Collections.singletonList(aprLifecycleListener))
 				: new ArrayList<>();
 	}
 
@@ -126,9 +127,7 @@ public class TomcatReactiveWebServerFactory extends AbstractReactiveWebServerFac
 		tomcat.setConnector(connector);
 		tomcat.getHost().setAutoDeploy(false);
 		configureEngine(tomcat.getEngine());
-		for (Connector additionalConnector : this.additionalTomcatConnectors) {
-			tomcat.getService().addConnector(additionalConnector);
-		}
+		this.additionalTomcatConnectors.forEach(additionalConnector -> tomcat.getService().addConnector(additionalConnector));
 		TomcatHttpHandlerAdapter servlet = new TomcatHttpHandlerAdapter(httpHandler);
 		prepareContext(tomcat.getHost(), servlet);
 		return new TomcatWebServer(tomcat, getPort() >= 0);
@@ -136,9 +135,7 @@ public class TomcatReactiveWebServerFactory extends AbstractReactiveWebServerFac
 
 	private void configureEngine(Engine engine) {
 		engine.setBackgroundProcessorDelay(this.backgroundProcessorDelay);
-		for (Valve valve : this.engineValves) {
-			engine.getPipeline().addValve(valve);
-		}
+		this.engineValves.forEach(valve -> engine.getPipeline().addValve(valve));
 	}
 
 	protected void prepareContext(Host host, TomcatHttpHandlerAdapter servlet) {
@@ -195,9 +192,7 @@ public class TomcatReactiveWebServerFactory extends AbstractReactiveWebServerFac
 		}
 		TomcatConnectorCustomizer compression = new CompressionConnectorCustomizer(getCompression());
 		compression.customize(connector);
-		for (TomcatConnectorCustomizer customizer : this.tomcatConnectorCustomizers) {
-			customizer.customize(connector);
-		}
+		this.tomcatConnectorCustomizers.forEach(customizer -> customizer.customize(connector));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -130,14 +130,14 @@ public abstract class Configurations {
 
 	private static List<Configurations> collate(List<Configurations> orderedConfigurations) {
 		LinkedList<Configurations> collated = new LinkedList<>();
-		for (Configurations item : orderedConfigurations) {
+		orderedConfigurations.forEach(item -> {
 			if (collated.isEmpty() || collated.getLast().getClass() != item.getClass()) {
 				collated.add(item);
 			}
 			else {
 				collated.set(collated.size() - 1, collated.getLast().merge(item));
 			}
-		}
+		});
 		return collated;
 	}
 

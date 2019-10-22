@@ -53,7 +53,7 @@ public class HazelcastProperties {
 			return null;
 		}
 		Assert.isTrue(this.config.exists(),
-				() -> "Hazelcast configuration does not exist '" + this.config.getDescription() + "'");
+				() -> new StringBuilder().append("Hazelcast configuration does not exist '").append(this.config.getDescription()).append("'").toString());
 		return this.config;
 	}
 

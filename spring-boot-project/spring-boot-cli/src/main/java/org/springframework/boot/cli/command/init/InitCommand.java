@@ -32,6 +32,7 @@ import org.springframework.boot.cli.command.options.OptionHandler;
 import org.springframework.boot.cli.command.status.ExitStatus;
 import org.springframework.boot.cli.util.Log;
 import org.springframework.util.Assert;
+import java.util.Collections;
 
 /**
  * {@link Command} that initializes a project using Spring initializr.
@@ -119,9 +120,9 @@ public class InitCommand extends OptionParsingCommand {
 
 		@Override
 		protected void options() {
-			this.target = option(Arrays.asList("target"), "URL of the service to use").withRequiredArg()
+			this.target = option(Collections.singletonList("target"), "URL of the service to use").withRequiredArg()
 					.defaultsTo(ProjectGenerationRequest.DEFAULT_SERVICE_URL);
-			this.listCapabilities = option(Arrays.asList("list"),
+			this.listCapabilities = option(Collections.singletonList("list"),
 					"List the capabilities of the service. Use it to discover the "
 							+ "dependencies and the types that are available");
 			projectGenerationOptions();

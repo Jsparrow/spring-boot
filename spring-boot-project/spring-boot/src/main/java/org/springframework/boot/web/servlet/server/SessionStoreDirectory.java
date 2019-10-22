@@ -56,8 +56,8 @@ class SessionStoreDirectory {
 	}
 
 	private void assertDirectory(boolean mkdirs, File dir) {
-		Assert.state(!mkdirs || dir.exists(), () -> "Session dir " + dir + " does not exist");
-		Assert.state(!dir.isFile(), () -> "Session dir " + dir + " points to a file");
+		Assert.state(!mkdirs || dir.exists(), () -> new StringBuilder().append("Session dir ").append(dir).append(" does not exist").toString());
+		Assert.state(!dir.isFile(), () -> new StringBuilder().append("Session dir ").append(dir).append(" points to a file").toString());
 	}
 
 }

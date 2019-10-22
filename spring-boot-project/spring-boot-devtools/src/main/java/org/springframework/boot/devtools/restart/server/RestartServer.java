@@ -36,6 +36,8 @@ import org.springframework.boot.devtools.restart.classloader.ClassLoaderFiles.So
 import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ResourceUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Server used to {@link Restarter restart} the current application with updated
@@ -45,6 +47,8 @@ import org.springframework.util.ResourceUtils;
  * @since 1.3.0
  */
 public class RestartServer {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(RestartServer.class);
 
 	private static final Log logger = LogFactory.getLog(RestartServer.class);
 
@@ -82,16 +86,11 @@ public class RestartServer {
 	public void updateAndRestart(ClassLoaderFiles files) {
 		Set<URL> urls = new LinkedHashSet<>();
 		Set<URL> classLoaderUrls = getClassLoaderUrls();
-		for (SourceFolder folder : files.getSourceFolders()) {
-			for (Entry<String, ClassLoaderFile> entry : folder.getFilesEntrySet()) {
-				for (URL url : classLoaderUrls) {
-					if (updateFileSystem(url, entry.getKey(), entry.getValue())) {
-						urls.add(url);
-					}
-				}
-			}
+		files.getSourceFolders().forEach(folder -> {
+			folder.getFilesEntrySet().forEach(entry -> classLoaderUrls.stream().filter(url -> updateFileSystem(url, entry.getKey(), entry.getValue()))
+					.forEach(urls::add));
 			urls.addAll(getMatchingUrls(classLoaderUrls, folder.getName()));
-		}
+		});
 		updateTimeStamp(urls);
 		restart(urls, files);
 	}
@@ -112,6 +111,7 @@ public class RestartServer {
 			}
 		}
 		catch (IOException ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Ignore
 		}
 		return false;
@@ -123,14 +123,12 @@ public class RestartServer {
 
 	private Set<URL> getMatchingUrls(Set<URL> urls, String sourceFolder) {
 		Set<URL> matchingUrls = new LinkedHashSet<>();
-		for (URL url : urls) {
-			if (this.sourceFolderUrlFilter.isMatch(sourceFolder, url)) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("URL " + url + " matched against source folder " + sourceFolder);
-				}
-				matchingUrls.add(url);
+		urls.stream().filter(url -> this.sourceFolderUrlFilter.isMatch(sourceFolder, url)).forEach(url -> {
+			if (logger.isDebugEnabled()) {
+				logger.debug(new StringBuilder().append("URL ").append(url).append(" matched against source folder ").append(sourceFolder).toString());
 			}
-		}
+			matchingUrls.add(url);
+		});
 		return matchingUrls;
 	}
 
@@ -159,6 +157,7 @@ public class RestartServer {
 			file.setLastModified(System.currentTimeMillis());
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}

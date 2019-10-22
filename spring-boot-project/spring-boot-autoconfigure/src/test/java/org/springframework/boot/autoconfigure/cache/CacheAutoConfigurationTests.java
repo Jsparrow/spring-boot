@@ -952,11 +952,11 @@ class CacheAutoConfigurationTests extends AbstractCacheAutoConfigurationTests {
 
 		@Override
 		public Object postProcessAfterInitialization(Object bean, String beanName) {
-			if (bean instanceof CacheManager) {
-				this.cacheManagers.add((CacheManager) bean);
-				return new SimpleCacheManager();
+			if (!(bean instanceof CacheManager)) {
+				return bean;
 			}
-			return bean;
+			this.cacheManagers.add((CacheManager) bean);
+			return new SimpleCacheManager();
 		}
 
 	}

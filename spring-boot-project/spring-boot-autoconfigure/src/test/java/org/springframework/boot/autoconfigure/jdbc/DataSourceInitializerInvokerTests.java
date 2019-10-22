@@ -102,8 +102,7 @@ class DataSourceInitializerInvokerTests {
 	@Test
 	void dataSourceInitializedWithMultipleScripts() {
 		this.contextRunner.withPropertyValues("spring.datasource.initialization-mode:always",
-				"spring.datasource.schema:" + getRelativeLocationFor("schema.sql") + ","
-						+ getRelativeLocationFor("another.sql"),
+				new StringBuilder().append("spring.datasource.schema:").append(getRelativeLocationFor("schema.sql")).append(",").append(getRelativeLocationFor("another.sql")).toString(),
 				"spring.datasource.data:" + getRelativeLocationFor("data.sql")).run((context) -> {
 					DataSource dataSource = context.getBean(DataSource.class);
 					assertThat(dataSource).isInstanceOf(HikariDataSource.class);

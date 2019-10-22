@@ -16,7 +16,6 @@
 
 package smoketest.security.method;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +37,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 
 /**
  * Basic integration tests for demo application.
@@ -56,7 +56,7 @@ class SampleMethodSecurityApplicationTests {
 	@Test
 	void testHome() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		ResponseEntity<String> entity = this.restTemplate.exchange("/", HttpMethod.GET, new HttpEntity<Void>(headers),
 				String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -66,7 +66,7 @@ class SampleMethodSecurityApplicationTests {
 	@Test
 	void testLogin() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
 		form.set("username", "admin");
 		form.set("password", "admin");
@@ -74,13 +74,13 @@ class SampleMethodSecurityApplicationTests {
 		ResponseEntity<String> entity = this.restTemplate.exchange("/login", HttpMethod.POST,
 				new HttpEntity<>(form, headers), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-		assertThat(entity.getHeaders().getLocation().toString()).isEqualTo("http://localhost:" + this.port + "/");
+		assertThat(entity.getHeaders().getLocation().toString()).isEqualTo(new StringBuilder().append("http://localhost:").append(this.port).append("/").toString());
 	}
 
 	@Test
 	void testDenied() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
 		form.set("username", "user");
 		form.set("password", "user");
@@ -99,7 +99,7 @@ class SampleMethodSecurityApplicationTests {
 	@Test
 	void testManagementProtected() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 		ResponseEntity<String> entity = this.restTemplate.exchange("/actuator/beans", HttpMethod.GET,
 				new HttpEntity<Void>(headers), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

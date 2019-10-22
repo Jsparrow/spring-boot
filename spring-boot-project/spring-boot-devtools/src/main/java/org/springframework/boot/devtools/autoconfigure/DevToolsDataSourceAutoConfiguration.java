@@ -52,6 +52,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import java.util.Collections;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for DevTools-specific
@@ -110,7 +111,7 @@ public class DevToolsDataSourceAutoConfiguration {
 
 		private enum InMemoryDatabase {
 
-			DERBY(null, new HashSet<>(Arrays.asList("org.apache.derby.jdbc.EmbeddedDriver")), (dataSource) -> {
+			DERBY(null, new HashSet<>(Collections.singletonList("org.apache.derby.jdbc.EmbeddedDriver")), (dataSource) -> {
 				String url = dataSource.getConnection().getMetaData().getURL();
 				try {
 					new EmbeddedDriver().connect(url + ";drop=true", new Properties());

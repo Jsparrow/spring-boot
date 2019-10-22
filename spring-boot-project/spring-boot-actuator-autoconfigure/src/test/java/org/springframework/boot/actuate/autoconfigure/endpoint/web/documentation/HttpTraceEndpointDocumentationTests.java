@@ -18,7 +18,6 @@ package org.springframework.boot.actuate.autoconfigure.endpoint.web.documentatio
 
 import java.net.URI;
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.UUID;
@@ -63,17 +62,17 @@ class HttpTraceEndpointDocumentationTests extends MockMvcEndpointDocumentationTe
 		given(request.getUri()).willReturn(URI.create("https://api.example.com"));
 		given(request.getMethod()).willReturn("GET");
 		given(request.getHeaders())
-				.willReturn(Collections.singletonMap(HttpHeaders.ACCEPT, Arrays.asList("application/json")));
+				.willReturn(Collections.singletonMap(HttpHeaders.ACCEPT, Collections.singletonList("application/json")));
 		TraceableResponse response = mock(TraceableResponse.class);
 		given(response.getStatus()).willReturn(200);
 		given(response.getHeaders())
-				.willReturn(Collections.singletonMap(HttpHeaders.CONTENT_TYPE, Arrays.asList("application/json")));
+				.willReturn(Collections.singletonMap(HttpHeaders.CONTENT_TYPE, Collections.singletonList("application/json")));
 		Principal principal = mock(Principal.class);
 		given(principal.getName()).willReturn("alice");
 		HttpExchangeTracer tracer = new HttpExchangeTracer(EnumSet.allOf(Include.class));
 		HttpTrace trace = tracer.receivedRequest(request);
 		tracer.sendingResponse(trace, response, () -> principal, () -> UUID.randomUUID().toString());
-		given(this.repository.findAll()).willReturn(Arrays.asList(trace));
+		given(this.repository.findAll()).willReturn(Collections.singletonList(trace));
 		this.mockMvc.perform(get("/actuator/httptrace")).andExpect(status().isOk())
 				.andDo(document("httptrace", responseFields(
 						fieldWithPath("traces").description("An array of traced HTTP request-response exchanges."),

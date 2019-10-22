@@ -67,7 +67,7 @@ class LiquibaseEndpointDocumentationTests extends MockMvcEndpointDocumentationTe
 				fieldWithPath("deploymentId").description("ID of the deployment that ran the change set."),
 				fieldWithPath("description").description("Description of the change set."),
 				fieldWithPath("execType")
-						.description("Execution type of the change set (" + describeEnumValues(ExecType.class) + ")."),
+						.description(new StringBuilder().append("Execution type of the change set (").append(describeEnumValues(ExecType.class)).append(").").toString()),
 				fieldWithPath("id").description("ID of the change set."),
 				fieldWithPath("labels").description("Labels associated with the change set."),
 				fieldWithPath("checksum").description("Checksum of the change set."),

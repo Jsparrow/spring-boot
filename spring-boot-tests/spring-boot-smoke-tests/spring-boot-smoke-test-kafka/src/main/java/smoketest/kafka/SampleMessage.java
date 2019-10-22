@@ -40,7 +40,7 @@ public class SampleMessage {
 
 	@Override
 	public String toString() {
-		return "SampleMessage{id=" + this.id + ", message='" + this.message + "'}";
+		return new StringBuilder().append("SampleMessage{id=").append(this.id).append(", message='").append(this.message).append("'}").toString();
 	}
 
 }

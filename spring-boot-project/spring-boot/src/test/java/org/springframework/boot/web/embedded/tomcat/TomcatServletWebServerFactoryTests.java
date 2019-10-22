@@ -370,7 +370,7 @@ class TomcatServletWebServerFactoryTests extends AbstractServletWebServerFactory
 		this.webServer = factory.getWebServer(sessionServletRegistration());
 		this.webServer.start();
 		String s3 = getResponse(getLocalUrl("/session"));
-		String message = "Session error s1=" + s1 + " s2=" + s2 + " s3=" + s3;
+		String message = new StringBuilder().append("Session error s1=").append(s1).append(" s2=").append(s2).append(" s3=").append(s3).toString();
 		assertThat(s2.split(":")[0]).as(message).isEqualTo(s1.split(":")[1]);
 		assertThat(s3.split(":")[0]).as(message).isNotEqualTo(s2.split(":")[1]);
 	}

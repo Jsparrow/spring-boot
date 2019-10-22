@@ -72,10 +72,10 @@ public class ResourceHandlingApplication {
 			Set<String> allResourcePaths = new LinkedHashSet<>();
 			Set<String> pathsForPath = getServletContext().getResourcePaths(path);
 			if (pathsForPath != null) {
-				for (String resourcePath : pathsForPath) {
+				pathsForPath.forEach(resourcePath -> {
 					allResourcePaths.add(resourcePath);
 					allResourcePaths.addAll(collectResourcePaths(resourcePath));
-				}
+				});
 			}
 			return allResourcePaths;
 		}

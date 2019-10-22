@@ -106,9 +106,7 @@ public class ConditionEvaluationReportMessage {
 			message.append(String.format("%n    None%n"));
 		}
 		else {
-			for (String exclusion : report.getExclusions()) {
-				message.append(String.format("%n    %s%n", exclusion));
-			}
+			report.getExclusions().forEach(exclusion -> message.append(String.format("%n    %s%n", exclusion)));
 		}
 		message.append(String.format("%n%n"));
 	}
@@ -120,9 +118,7 @@ public class ConditionEvaluationReportMessage {
 			message.append(String.format("%n    None%n"));
 		}
 		else {
-			for (String unconditionalClass : report.getUnconditionalClasses()) {
-				message.append(String.format("%n    %s%n", unconditionalClass));
-			}
+			report.getUnconditionalClasses().forEach(unconditionalClass -> message.append(String.format("%n    %s%n", unconditionalClass)));
 		}
 	}
 
@@ -131,7 +127,7 @@ public class ConditionEvaluationReportMessage {
 		List<String> shortNames = new ArrayList<>(map.keySet());
 		Collections.sort(shortNames);
 		Map<String, ConditionAndOutcomes> result = new LinkedHashMap<>();
-		for (String shortName : shortNames) {
+		shortNames.forEach(shortName -> {
 			List<String> fullyQualifiedNames = map.get(shortName);
 			if (fullyQualifiedNames.size() > 1) {
 				fullyQualifiedNames.forEach(
@@ -140,7 +136,7 @@ public class ConditionEvaluationReportMessage {
 			else {
 				result.put(shortName, outcomes.get(fullyQualifiedNames.get(0)));
 			}
-		}
+		});
 		return result;
 	}
 
@@ -172,15 +168,12 @@ public class ConditionEvaluationReportMessage {
 			}
 		}
 		message.append(String.format("      Did not match:%n"));
-		for (ConditionAndOutcome nonMatch : nonMatches) {
-			logConditionAndOutcome(message, "         ", nonMatch);
+		nonMatches.forEach(nonMatch -> logConditionAndOutcome(message, "         ", nonMatch));
+		if (matches.isEmpty()) {
+			return;
 		}
-		if (!matches.isEmpty()) {
-			message.append(String.format("      Matched:%n"));
-			for (ConditionAndOutcome match : matches) {
-				logConditionAndOutcome(message, "         ", match);
-			}
-		}
+		message.append(String.format("      Matched:%n"));
+		matches.forEach(match -> logConditionAndOutcome(message, "         ", match));
 	}
 
 	private void logConditionAndOutcome(StringBuilder message, String indent, ConditionAndOutcome conditionAndOutcome) {

@@ -207,9 +207,7 @@ class DefaultErrorAttributesTests {
 		Map<String, Object> attributes = this.errorAttributes.getErrorAttributes(buildServerRequest(request, ex),
 				false);
 		assertThat(attributes.get("message")).asString()
-				.startsWith("Validation failed for argument at index 0 in method: "
-						+ "int org.springframework.boot.web.reactive.error.DefaultErrorAttributesTests"
-						+ ".method(java.lang.String), with 1 error(s)");
+				.startsWith(new StringBuilder().append("Validation failed for argument at index 0 in method: ").append("int org.springframework.boot.web.reactive.error.DefaultErrorAttributesTests").append(".method(java.lang.String), with 1 error(s)").toString());
 		assertThat(attributes.get("errors")).isEqualTo(bindingResult.getAllErrors());
 	}
 

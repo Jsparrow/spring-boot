@@ -36,6 +36,8 @@ import org.springframework.boot.actuate.endpoint.InvocationContext;
 import org.springframework.boot.actuate.endpoint.SecurityContext;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adapter to expose a {@link ExposableJmxEndpoint JMX endpoint} as a
@@ -47,6 +49,8 @@ import org.springframework.util.ClassUtils;
  * @since 2.0.0
  */
 public class EndpointMBean implements DynamicMBean {
+
+	private static final Logger logger = LoggerFactory.getLogger(EndpointMBean.class);
 
 	private static final boolean REACTOR_PRESENT = ClassUtils.isPresent("reactor.core.publisher.Mono",
 			EndpointMBean.class.getClassLoader());
@@ -87,8 +91,7 @@ public class EndpointMBean implements DynamicMBean {
 			throws MBeanException, ReflectionException {
 		JmxOperation operation = this.operations.get(actionName);
 		if (operation == null) {
-			String message = "Endpoint with id '" + this.endpoint.getEndpointId() + "' has no operation named "
-					+ actionName;
+			String message = new StringBuilder().append("Endpoint with id '").append(this.endpoint.getEndpointId()).append("' has no operation named ").append(actionName).toString();
 			throw new ReflectionException(new IllegalArgumentException(message), message);
 		}
 		ClassLoader previousClassLoader = overrideThreadContextClassLoader(this.classLoader);
@@ -106,6 +109,7 @@ public class EndpointMBean implements DynamicMBean {
 				return ClassUtils.overrideThreadContextClassLoader(classLoader);
 			}
 			catch (SecurityException ex) {
+				logger.error(ex.getMessage(), ex);
 				// can't set class loader, ignore it and proceed
 			}
 		}

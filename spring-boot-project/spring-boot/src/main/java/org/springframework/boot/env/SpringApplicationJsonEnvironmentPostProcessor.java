@@ -40,6 +40,7 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.support.StandardServletEnvironment;
+import java.util.Collections;
 
 /**
  * An {@link EnvironmentPostProcessor} that parses JSON from
@@ -68,10 +69,10 @@ public class SpringApplicationJsonEnvironmentPostProcessor implements Environmen
 	private static final String SERVLET_ENVIRONMENT_CLASS = "org.springframework.web."
 			+ "context.support.StandardServletEnvironment";
 
-	private static final Set<String> SERVLET_ENVIRONMENT_PROPERTY_SOURCES = new LinkedHashSet<>(
+	private static final Set<String> SERVLET_ENVIRONMENT_PROPERTY_SOURCES = Collections.unmodifiableSet(new LinkedHashSet<>(
 			Arrays.asList(StandardServletEnvironment.JNDI_PROPERTY_SOURCE_NAME,
 					StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
-					StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME));
+					StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME)));
 
 	/**
 	 * The default order for the processor.
@@ -128,7 +129,7 @@ public class SpringApplicationJsonEnvironmentPostProcessor implements Environmen
 		else if (value instanceof Collection) {
 			int index = 0;
 			for (Object object : (Collection<Object>) value) {
-				extract(name + "[" + index + "]", result, object);
+				extract(new StringBuilder().append(name).append("[").append(index).append("]").toString(), result, object);
 				index++;
 			}
 		}

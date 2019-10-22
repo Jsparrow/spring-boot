@@ -51,23 +51,18 @@ public abstract class PathBasedTemplateAvailabilityProvider implements TemplateA
 	@Override
 	public boolean isTemplateAvailable(String view, Environment environment, ClassLoader classLoader,
 			ResourceLoader resourceLoader) {
-		if (ClassUtils.isPresent(this.className, classLoader)) {
-			Binder binder = Binder.get(environment);
-			TemplateAvailabilityProperties properties = binder.bindOrCreate(this.propertyPrefix, this.propertiesClass);
-			return isTemplateAvailable(view, resourceLoader, properties);
+		if (!ClassUtils.isPresent(this.className, classLoader)) {
+			return false;
 		}
-		return false;
+		Binder binder = Binder.get(environment);
+		TemplateAvailabilityProperties properties = binder.bindOrCreate(this.propertyPrefix, this.propertiesClass);
+		return isTemplateAvailable(view, resourceLoader, properties);
 	}
 
 	private boolean isTemplateAvailable(String view, ResourceLoader resourceLoader,
 			TemplateAvailabilityProperties properties) {
-		String location = properties.getPrefix() + view + properties.getSuffix();
-		for (String path : properties.getLoaderPath()) {
-			if (resourceLoader.getResource(path + location).exists()) {
-				return true;
-			}
-		}
-		return false;
+		String location = new StringBuilder().append(properties.getPrefix()).append(view).append(properties.getSuffix()).toString();
+		return properties.getLoaderPath().stream().anyMatch(path -> resourceLoader.getResource(path + location).exists());
 	}
 
 	protected abstract static class TemplateAvailabilityProperties {

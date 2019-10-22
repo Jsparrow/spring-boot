@@ -27,6 +27,8 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory methods for creating {@link Tag Tags} related to a request-response exchange
@@ -40,6 +42,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public final class RestTemplateExchangeTags {
 
+	private static final Logger logger = LoggerFactory.getLogger(RestTemplateExchangeTags.class);
 	private static final Pattern STRIP_URI_PATTERN = Pattern.compile("^https?://[^/]+/");
 
 	private RestTemplateExchangeTags() {
@@ -100,6 +103,7 @@ public final class RestTemplateExchangeTags {
 			return String.valueOf(response.getRawStatusCode());
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			return "IO_ERROR";
 		}
 	}
@@ -132,6 +136,7 @@ public final class RestTemplateExchangeTags {
 			}
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Continue
 		}
 		return Outcome.UNKNOWN.asTag();

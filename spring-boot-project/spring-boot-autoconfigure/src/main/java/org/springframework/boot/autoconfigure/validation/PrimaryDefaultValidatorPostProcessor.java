@@ -48,7 +48,7 @@ class PrimaryDefaultValidatorPostProcessor implements ImportBeanDefinitionRegist
 	private ConfigurableListableBeanFactory beanFactory;
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		if (beanFactory instanceof ConfigurableListableBeanFactory) {
 			this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 		}

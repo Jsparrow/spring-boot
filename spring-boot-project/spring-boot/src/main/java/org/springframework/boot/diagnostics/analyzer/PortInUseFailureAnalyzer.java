@@ -30,9 +30,8 @@ class PortInUseFailureAnalyzer extends AbstractFailureAnalyzer<PortInUseExceptio
 
 	@Override
 	protected FailureAnalysis analyze(Throwable rootFailure, PortInUseException cause) {
-		return new FailureAnalysis("Web server failed to start. Port " + cause.getPort() + " was already in use.",
-				"Identify and stop the process that's listening on port " + cause.getPort() + " or configure this "
-						+ "application to listen on another port.",
+		return new FailureAnalysis(new StringBuilder().append("Web server failed to start. Port ").append(cause.getPort()).append(" was already in use.").toString(),
+				new StringBuilder().append("Identify and stop the process that's listening on port ").append(cause.getPort()).append(" or configure this ").append("application to listen on another port.").toString(),
 				cause);
 	}
 

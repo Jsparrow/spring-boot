@@ -63,10 +63,11 @@ class OutputCapture implements CapturedOutput {
 	 */
 	final void pop() {
 		this.systemCaptures.removeLast().release();
-		if (this.systemCaptures.isEmpty() && this.ansiOutputState != null) {
-			this.ansiOutputState.restore();
-			this.ansiOutputState = null;
+		if (!(this.systemCaptures.isEmpty() && this.ansiOutputState != null)) {
+			return;
 		}
+		this.ansiOutputState.restore();
+		this.ansiOutputState = null;
 	}
 
 	@Override
@@ -129,10 +130,17 @@ class OutputCapture implements CapturedOutput {
 		Assert.state(!this.systemCaptures.isEmpty(),
 				"No system captures found. Please check your output capture registration.");
 		StringBuilder builder = new StringBuilder();
-		for (SystemCapture systemCapture : this.systemCaptures) {
-			systemCapture.append(builder, filter);
-		}
+		this.systemCaptures.forEach(systemCapture -> systemCapture.append(builder, filter));
 		return builder.toString();
+	}
+
+	/**
+	 * Types of content that can be captured.
+	 */
+	private enum Type {
+
+		OUT, ERR
+
 	}
 
 	/**
@@ -175,11 +183,7 @@ class OutputCapture implements CapturedOutput {
 
 		void append(StringBuilder builder, Predicate<Type> filter) {
 			synchronized (this.monitor) {
-				for (CapturedString stringCapture : this.capturedStrings) {
-					if (filter.test(stringCapture.getType())) {
-						builder.append(stringCapture);
-					}
-				}
+				this.capturedStrings.stream().filter(stringCapture -> filter.test(stringCapture.getType())).forEach(builder::append);
 			}
 		}
 
@@ -270,15 +274,6 @@ class OutputCapture implements CapturedOutput {
 		public String toString() {
 			return this.string;
 		}
-
-	}
-
-	/**
-	 * Types of content that can be captured.
-	 */
-	private enum Type {
-
-		OUT, ERR
 
 	}
 

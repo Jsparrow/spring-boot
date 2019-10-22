@@ -30,6 +30,8 @@ import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWeb
 import org.springframework.boot.web.reactive.server.ReactiveWebServerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ManagementContextFactory} for reactive web applications.
@@ -37,6 +39,8 @@ import org.springframework.util.ObjectUtils;
  * @author Andy Wilkinson
  */
 class ReactiveManagementContextFactory implements ManagementContextFactory {
+
+	private static final Logger logger = LoggerFactory.getLogger(ReactiveManagementContextFactory.class);
 
 	@Override
 	public ConfigurableWebServerApplicationContext createManagementContext(ApplicationContext parent,
@@ -61,17 +65,15 @@ class ReactiveManagementContextFactory implements ManagementContextFactory {
 			}
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore and assume auto-configuration
 		}
 	}
 
-	private Class<?> determineReactiveWebServerFactoryClass(ApplicationContext parent)
-			throws NoSuchBeanDefinitionException {
+	private Class<?> determineReactiveWebServerFactoryClass(ApplicationContext parent) {
 		Class<?> factoryClass = parent.getBean(ReactiveWebServerFactory.class).getClass();
 		if (cannotBeInstantiated(factoryClass)) {
-			throw new FatalBeanException("ReactiveWebServerFactory implementation " + factoryClass.getName()
-					+ " cannot be instantiated. To allow a separate management port to be used, a top-level class "
-					+ "or static inner class should be used instead");
+			throw new FatalBeanException(new StringBuilder().append("ReactiveWebServerFactory implementation ").append(factoryClass.getName()).append(" cannot be instantiated. To allow a separate management port to be used, a top-level class ").append("or static inner class should be used instead").toString());
 		}
 		return factoryClass;
 	}

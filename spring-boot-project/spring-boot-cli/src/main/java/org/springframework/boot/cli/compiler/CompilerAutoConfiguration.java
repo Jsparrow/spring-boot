@@ -50,7 +50,7 @@ public abstract class CompilerAutoConfiguration {
 	 * @param dependencies dependency customizer
 	 * @throws CompilationFailedException if the dependencies cannot be applied
 	 */
-	public void applyDependencies(DependencyCustomizer dependencies) throws CompilationFailedException {
+	public void applyDependencies(DependencyCustomizer dependencies) {
 	}
 
 	/**
@@ -59,7 +59,7 @@ public abstract class CompilerAutoConfiguration {
 	 * @param imports import customizer
 	 * @throws CompilationFailedException if the imports cannot be applied
 	 */
-	public void applyImports(ImportCustomizer imports) throws CompilationFailedException {
+	public void applyImports(ImportCustomizer imports) {
 	}
 
 	/**
@@ -74,8 +74,7 @@ public abstract class CompilerAutoConfiguration {
 	 * @throws CompilationFailedException if the customizations cannot be applied
 	 */
 	public void applyToMainClass(GroovyClassLoader loader, GroovyCompilerConfiguration configuration,
-			GeneratorContext generatorContext, SourceUnit source, ClassNode classNode)
-			throws CompilationFailedException {
+			GeneratorContext generatorContext, SourceUnit source, ClassNode classNode) {
 	}
 
 	/**
@@ -88,8 +87,7 @@ public abstract class CompilerAutoConfiguration {
 	 * @throws CompilationFailedException if the configuration cannot be applied
 	 */
 	public void apply(GroovyClassLoader loader, GroovyCompilerConfiguration configuration,
-			GeneratorContext generatorContext, SourceUnit source, ClassNode classNode)
-			throws CompilationFailedException {
+			GeneratorContext generatorContext, SourceUnit source, ClassNode classNode) {
 	}
 
 }

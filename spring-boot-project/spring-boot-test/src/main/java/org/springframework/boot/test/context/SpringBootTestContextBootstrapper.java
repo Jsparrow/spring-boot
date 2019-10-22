@@ -124,9 +124,7 @@ public class SpringBootTestContextBootstrapper extends DefaultTestContextBootstr
 			List<ContextConfigurationAttributes> configAttributesList) {
 		Class<?>[] classes = getClasses(testClass);
 		if (!ObjectUtils.isEmpty(classes)) {
-			for (ContextConfigurationAttributes configAttributes : configAttributesList) {
-				addConfigAttributesClasses(configAttributes, classes);
-			}
+			configAttributesList.forEach(configAttributes -> addConfigAttributesClasses(configAttributes, classes));
 		}
 		return super.resolveContextLoader(testClass, configAttributesList);
 	}
@@ -232,7 +230,7 @@ public class SpringBootTestContextBootstrapper extends DefaultTestContextBootstr
 				.findFromClass(mergedConfig.getTestClass());
 		Assert.state(found != null, "Unable to find a @SpringBootConfiguration, you need to use "
 				+ "@ContextConfiguration or @SpringBootTest(classes=...) with your test");
-		logger.info("Found @SpringBootConfiguration " + found.getName() + " for test " + mergedConfig.getTestClass());
+		logger.info(new StringBuilder().append("Found @SpringBootConfiguration ").append(found.getName()).append(" for test ").append(mergedConfig.getTestClass()).toString());
 		return merge(found, classes);
 	}
 
@@ -324,9 +322,7 @@ public class SpringBootTestContextBootstrapper extends DefaultTestContextBootstr
 		SpringBootTest springBootTest = getAnnotation(testClass);
 		if (springBootTest != null && isListeningOnPort(springBootTest.webEnvironment()) && MergedAnnotations
 				.from(testClass, SearchStrategy.INHERITED_ANNOTATIONS).isPresent(WebAppConfiguration.class)) {
-			throw new IllegalStateException("@WebAppConfiguration should only be used "
-					+ "with @SpringBootTest when @SpringBootTest is configured with a "
-					+ "mock web environment. Please remove @WebAppConfiguration or reconfigure @SpringBootTest.");
+			throw new IllegalStateException(new StringBuilder().append("@WebAppConfiguration should only be used ").append("with @SpringBootTest when @SpringBootTest is configured with a ").append("mock web environment. Please remove @WebAppConfiguration or reconfigure @SpringBootTest.").toString());
 		}
 	}
 

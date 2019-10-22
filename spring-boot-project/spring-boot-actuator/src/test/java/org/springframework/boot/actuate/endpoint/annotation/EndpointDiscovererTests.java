@@ -333,6 +333,18 @@ class EndpointDiscovererTests {
 		}
 	}
 
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@Endpoint
+	@FilteredEndpoint(SpecializedEndpointFilter.class)
+	@interface SpecializedEndpoint {
+
+		@AliasFor(annotation = Endpoint.class)
+		String id();
+
+	}
+
 	@Configuration(proxyBeanMethods = false)
 	static class EmptyConfiguration {
 
@@ -451,18 +463,6 @@ class EndpointDiscovererTests {
 		void updateWithMoreArguments(String foo, String bar, String baz) {
 
 		}
-
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@Endpoint
-	@FilteredEndpoint(SpecializedEndpointFilter.class)
-	@interface SpecializedEndpoint {
-
-		@AliasFor(annotation = Endpoint.class)
-		String id();
 
 	}
 

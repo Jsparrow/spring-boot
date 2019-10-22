@@ -51,10 +51,7 @@ class OnPropertyCondition extends SpringBootCondition {
 				metadata.getAllAnnotationAttributes(ConditionalOnProperty.class.getName()));
 		List<ConditionMessage> noMatch = new ArrayList<>();
 		List<ConditionMessage> match = new ArrayList<>();
-		for (AnnotationAttributes annotationAttributes : allAnnotationAttributes) {
-			ConditionOutcome outcome = determineOutcome(annotationAttributes, context.getEnvironment());
-			(outcome.isMatch() ? match : noMatch).add(outcome.getConditionMessage());
-		}
+		allAnnotationAttributes.stream().map(annotationAttributes -> determineOutcome(annotationAttributes, context.getEnvironment())).forEach(outcome -> (outcome.isMatch() ? match : noMatch).add(outcome.getConditionMessage()));
 		if (!noMatch.isEmpty()) {
 			return ConditionOutcome.noMatch(ConditionMessage.of(noMatch));
 		}
@@ -78,9 +75,7 @@ class OnPropertyCondition extends SpringBootCondition {
 			}
 		});
 		List<AnnotationAttributes> annotationAttributes = new ArrayList<>(maps.size());
-		for (Map<String, Object> map : maps) {
-			annotationAttributes.add(AnnotationAttributes.fromMap(map));
-		}
+		maps.forEach(map -> annotationAttributes.add(AnnotationAttributes.fromMap(map)));
 		return annotationAttributes;
 	}
 

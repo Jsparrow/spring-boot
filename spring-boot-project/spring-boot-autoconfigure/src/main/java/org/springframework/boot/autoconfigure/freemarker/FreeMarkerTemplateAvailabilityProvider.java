@@ -17,11 +17,11 @@
 package org.springframework.boot.autoconfigure.freemarker;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.boot.autoconfigure.template.PathBasedTemplateAvailabilityProvider;
 import org.springframework.boot.autoconfigure.template.TemplateAvailabilityProvider;
+import java.util.Collections;
 
 /**
  * {@link TemplateAvailabilityProvider} that provides availability information for
@@ -39,7 +39,7 @@ public class FreeMarkerTemplateAvailabilityProvider extends PathBasedTemplateAva
 	protected static final class FreeMarkerTemplateAvailabilityProperties extends TemplateAvailabilityProperties {
 
 		private List<String> templateLoaderPath = new ArrayList<>(
-				Arrays.asList(FreeMarkerProperties.DEFAULT_TEMPLATE_LOADER_PATH));
+				Collections.singletonList(FreeMarkerProperties.DEFAULT_TEMPLATE_LOADER_PATH));
 
 		FreeMarkerTemplateAvailabilityProperties() {
 			super(FreeMarkerProperties.DEFAULT_PREFIX, FreeMarkerProperties.DEFAULT_SUFFIX);

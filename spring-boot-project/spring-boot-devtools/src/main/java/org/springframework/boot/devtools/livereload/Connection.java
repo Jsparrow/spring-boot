@@ -30,6 +30,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.util.Base64Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link LiveReloadServer} connection.
@@ -37,6 +39,8 @@ import org.springframework.util.Base64Utils;
  * @author Phillip Webb
  */
 class Connection {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(Connection.class);
 
 	private static final Log logger = LogFactory.getLog(Connection.class);
 
@@ -69,7 +73,7 @@ class Connection {
 		this.outputStream = new ConnectionOutputStream(outputStream);
 		this.header = this.inputStream.readHeader();
 		if (logger.isDebugEnabled()) {
-			logger.debug("Established livereload connection [" + this.header + "]");
+			logger.debug(new StringBuilder().append("Established livereload connection [").append(this.header).append("]").toString());
 		}
 	}
 
@@ -118,6 +122,7 @@ class Connection {
 			}
 		}
 		catch (SocketTimeoutException ex) {
+			logger1.error(ex.getMessage(), ex);
 			writeWebSocketFrame(new Frame(Frame.Type.PING));
 			Frame frame = Frame.read(this.inputStream);
 			if (frame.getType() != Frame.Type.PONG) {
@@ -131,10 +136,11 @@ class Connection {
 	 * @throws IOException in case of I/O errors
 	 */
 	void triggerReload() throws IOException {
-		if (this.webSocket) {
-			logger.debug("Triggering LiveReload");
-			writeWebSocketFrame(new Frame("{\"command\":\"reload\",\"path\":\"/\"}"));
+		if (!(this.webSocket)) {
+			return;
 		}
+		logger.debug("Triggering LiveReload");
+		writeWebSocketFrame(new Frame("{\"command\":\"reload\",\"path\":\"/\"}"));
 	}
 
 	private void writeWebSocketFrame(Frame frame) throws IOException {

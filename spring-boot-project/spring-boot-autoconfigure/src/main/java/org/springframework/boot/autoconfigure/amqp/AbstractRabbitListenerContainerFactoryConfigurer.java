@@ -117,17 +117,18 @@ public abstract class AbstractRabbitListenerContainerFactoryConfigurer<T extends
 		}
 		factory.setMissingQueuesFatal(configuration.isMissingQueuesFatal());
 		ListenerRetry retryConfig = configuration.getRetry();
-		if (retryConfig.isEnabled()) {
-			RetryInterceptorBuilder<?, ?> builder = (retryConfig.isStateless()) ? RetryInterceptorBuilder.stateless()
-					: RetryInterceptorBuilder.stateful();
-			RetryTemplate retryTemplate = new RetryTemplateFactory(this.retryTemplateCustomizers)
-					.createRetryTemplate(retryConfig, RabbitRetryTemplateCustomizer.Target.LISTENER);
-			builder.retryOperations(retryTemplate);
-			MessageRecoverer recoverer = (this.messageRecoverer != null) ? this.messageRecoverer
-					: new RejectAndDontRequeueRecoverer();
-			builder.recoverer(recoverer);
-			factory.setAdviceChain(builder.build());
+		if (!retryConfig.isEnabled()) {
+			return;
 		}
+		RetryInterceptorBuilder<?, ?> builder = (retryConfig.isStateless()) ? RetryInterceptorBuilder.stateless()
+				: RetryInterceptorBuilder.stateful();
+		RetryTemplate retryTemplate = new RetryTemplateFactory(this.retryTemplateCustomizers)
+				.createRetryTemplate(retryConfig, RabbitRetryTemplateCustomizer.Target.LISTENER);
+		builder.retryOperations(retryTemplate);
+		MessageRecoverer recoverer = (this.messageRecoverer != null) ? this.messageRecoverer
+				: new RejectAndDontRequeueRecoverer();
+		builder.recoverer(recoverer);
+		factory.setAdviceChain(builder.build());
 	}
 
 }

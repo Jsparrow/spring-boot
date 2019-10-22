@@ -33,6 +33,8 @@ import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebSe
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ManagementContextFactory} for servlet-based web applications.
@@ -40,6 +42,8 @@ import org.springframework.util.ClassUtils;
  * @author Andy Wilkinson
  */
 class ServletManagementContextFactory implements ManagementContextFactory {
+
+	private static final Logger logger = LoggerFactory.getLogger(ServletManagementContextFactory.class);
 
 	@Override
 	public ConfigurableWebServerApplicationContext createManagementContext(ApplicationContext parent,
@@ -64,17 +68,15 @@ class ServletManagementContextFactory implements ManagementContextFactory {
 			}
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore and assume auto-configuration
 		}
 	}
 
-	private Class<?> determineServletWebServerFactoryClass(ApplicationContext parent)
-			throws NoSuchBeanDefinitionException {
+	private Class<?> determineServletWebServerFactoryClass(ApplicationContext parent) {
 		Class<?> factoryClass = parent.getBean(ServletWebServerFactory.class).getClass();
 		if (cannotBeInstantiated(factoryClass)) {
-			throw new FatalBeanException("ServletWebServerFactory implementation " + factoryClass.getName()
-					+ " cannot be instantiated. To allow a separate management port to be used, a top-level class "
-					+ "or static inner class should be used instead");
+			throw new FatalBeanException(new StringBuilder().append("ServletWebServerFactory implementation ").append(factoryClass.getName()).append(" cannot be instantiated. To allow a separate management port to be used, a top-level class ").append("or static inner class should be used instead").toString());
 		}
 		return factoryClass;
 	}

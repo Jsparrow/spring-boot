@@ -51,6 +51,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link HttpTunnelServer}.
@@ -58,6 +60,8 @@ import static org.mockito.Mockito.verify;
  * @author Phillip Webb
  */
 class HttpTunnelServerTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(HttpTunnelServerTests.class);
 
 	private static final int DEFAULT_LONG_POLL_TIMEOUT = 10000;
 
@@ -138,7 +142,7 @@ class HttpTunnelServerTests {
 		this.servletRequest.addHeader(SEQ_HEADER, "1");
 		this.servletRequest.setContent("hello".getBytes());
 		this.server.handle(this.request, this.response);
-		System.out.println("sending");
+		logger.info("sending");
 		this.serverChannel.send("hello");
 		this.serverChannel.disconnect();
 		this.server.getServerThread().join();

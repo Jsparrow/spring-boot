@@ -40,11 +40,11 @@ import org.springframework.util.Assert;
  */
 public class TemplateAvailabilityProviders {
 
-	private final List<TemplateAvailabilityProvider> providers;
-
 	private static final int CACHE_LIMIT = 1024;
 
 	private static final TemplateAvailabilityProvider NONE = new NoTemplateAvailabilityProvider();
+
+	private final List<TemplateAvailabilityProvider> providers;
 
 	/**
 	 * Resolved template views, returning already cached instances without a global lock.
@@ -60,11 +60,11 @@ public class TemplateAvailabilityProviders {
 
 		@Override
 		protected boolean removeEldestEntry(Map.Entry<String, TemplateAvailabilityProvider> eldest) {
-			if (size() > CACHE_LIMIT) {
-				TemplateAvailabilityProviders.this.resolved.remove(eldest.getKey());
-				return true;
+			if (size() <= CACHE_LIMIT) {
+				return false;
 			}
-			return false;
+			TemplateAvailabilityProviders.this.resolved.remove(eldest.getKey());
+			return true;
 		}
 
 	};
@@ -147,12 +147,7 @@ public class TemplateAvailabilityProviders {
 
 	private TemplateAvailabilityProvider findProvider(String view, Environment environment, ClassLoader classLoader,
 			ResourceLoader resourceLoader) {
-		for (TemplateAvailabilityProvider candidate : this.providers) {
-			if (candidate.isTemplateAvailable(view, environment, classLoader, resourceLoader)) {
-				return candidate;
-			}
-		}
-		return null;
+		return this.providers.stream().filter(candidate -> candidate.isTemplateAvailable(view, environment, classLoader, resourceLoader)).findFirst().orElse(null);
 	}
 
 	private static class NoTemplateAvailabilityProvider implements TemplateAvailabilityProvider {

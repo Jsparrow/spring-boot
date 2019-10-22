@@ -93,8 +93,9 @@ public class Product {
 
 	@Override
 	public String toString() {
-		return "Product [id=" + this.id + ", name=" + this.name + ", price=" + this.price + ", category="
-				+ this.category + ", location=" + this.location + "]";
+		return new StringBuilder().append("Product [id=").append(this.id).append(", name=").append(this.name).append(", price=")
+				.append(this.price).append(", category=").append(this.category).append(", location=").append(this.location)
+				.append("]").toString();
 	}
 
 }

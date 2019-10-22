@@ -43,6 +43,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Auto-configured {@link HealthEndpointGroups}.
@@ -51,7 +53,9 @@ import org.springframework.util.ObjectUtils;
  */
 class AutoConfiguredHealthEndpointGroups implements HealthEndpointGroups {
 
-	private static Predicate<String> ALL = (name) -> true;
+	private static final Logger logger = LoggerFactory.getLogger(AutoConfiguredHealthEndpointGroups.class);
+
+	private static Predicate<String> all = (name) -> true;
 
 	private final HealthEndpointGroup primaryGroup;
 
@@ -76,7 +80,7 @@ class AutoConfiguredHealthEndpointGroups implements HealthEndpointGroups {
 		if (httpCodeStatusMapper == null) {
 			httpCodeStatusMapper = new SimpleHttpCodeStatusMapper(properties.getStatus().getHttpMapping());
 		}
-		this.primaryGroup = new AutoConfiguredHealthEndpointGroup(ALL, statusAggregator, httpCodeStatusMapper,
+		this.primaryGroup = new AutoConfiguredHealthEndpointGroup(all, statusAggregator, httpCodeStatusMapper,
 				showComponents, showDetails, roles);
 		this.groups = createGroups(properties.getGroup(), beanFactory, statusAggregator, httpCodeStatusMapper,
 				showComponents, showDetails, roles);
@@ -85,7 +89,7 @@ class AutoConfiguredHealthEndpointGroups implements HealthEndpointGroups {
 	private Map<String, HealthEndpointGroup> createGroups(Map<String, Group> groupProperties, BeanFactory beanFactory,
 			StatusAggregator defaultStatusAggregator, HttpCodeStatusMapper defaultHttpCodeStatusMapper,
 			Show defaultShowComponents, Show defaultShowDetails, Set<String> defaultRoles) {
-		Map<String, HealthEndpointGroup> groups = new LinkedHashMap<String, HealthEndpointGroup>();
+		Map<String, HealthEndpointGroup> groups = new LinkedHashMap<>();
 		groupProperties.forEach((groupName, group) -> {
 			Status status = group.getStatus();
 			Show showComponents = (group.getShowComponents() != null) ? group.getShowComponents()
@@ -136,6 +140,7 @@ class AutoConfiguredHealthEndpointGroups implements HealthEndpointGroups {
 			return BeanFactoryAnnotationUtils.qualifiedBeanOfType(beanFactory, type, qualifier);
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			return fallback.get();
 		}
 	}

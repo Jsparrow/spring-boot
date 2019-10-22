@@ -91,20 +91,20 @@ class DefaultSourceFolderUrlFilterTests {
 	private void doTest(String sourcePostfix, String moduleRoot, boolean expected) throws MalformedURLException {
 		String sourceFolder = SOURCE_ROOT + sourcePostfix;
 		for (String postfix : COMMON_POSTFIXES) {
-			for (URL url : getUrls(moduleRoot + postfix)) {
+			getUrls(moduleRoot + postfix).forEach(url -> {
 				boolean match = this.filter.isMatch(sourceFolder, url);
-				assertThat(match).as(url + " against " + sourceFolder).isEqualTo(expected);
-			}
+				assertThat(match).as(new StringBuilder().append(url).append(" against ").append(sourceFolder).toString()).isEqualTo(expected);
+			});
 		}
 	}
 
 	private List<URL> getUrls(String name) throws MalformedURLException {
 		List<URL> urls = new ArrayList<>();
 		urls.add(new URL("file:/some/path/" + name));
-		urls.add(new URL("file:/some/path/" + name + "!/"));
+		urls.add(new URL(new StringBuilder().append("file:/some/path/").append(name).append("!/").toString()));
 		for (String postfix : COMMON_POSTFIXES) {
-			urls.add(new URL("jar:file:/some/path/lib-module" + postfix + "!/lib/" + name));
-			urls.add(new URL("jar:file:/some/path/lib-module" + postfix + "!/lib/" + name + "!/"));
+			urls.add(new URL(new StringBuilder().append("jar:file:/some/path/lib-module").append(postfix).append("!/lib/").append(name).toString()));
+			urls.add(new URL(new StringBuilder().append("jar:file:/some/path/lib-module").append(postfix).append("!/lib/").append(name).append("!/").toString()));
 		}
 		return urls;
 	}

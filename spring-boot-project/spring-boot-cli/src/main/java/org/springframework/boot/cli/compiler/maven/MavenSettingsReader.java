@@ -96,7 +96,7 @@ public class MavenSettingsReader {
 			field.set(target, value);
 		}
 		catch (Exception ex) {
-			throw new IllegalStateException("Failed to set field '" + fieldName + "' on '" + target + "'", ex);
+			throw new IllegalStateException(new StringBuilder().append("Failed to set field '").append(fieldName).append("' on '").append(target).append("'").toString(), ex);
 		}
 	}
 

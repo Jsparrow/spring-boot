@@ -60,7 +60,7 @@ class JerseyAutoConfigurationServletContainerTests {
 	@Test
 	void existingJerseyServletIsAmended(CapturedOutput output) {
 		assertThat(output).contains("Configuring existing registration for Jersey servlet");
-		assertThat(output).contains("Servlet " + Application.class.getName() + " was not registered");
+		assertThat(output).contains(new StringBuilder().append("Servlet ").append(Application.class.getName()).append(" was not registered").toString());
 	}
 
 	@ImportAutoConfiguration({ ServletWebServerFactoryAutoConfiguration.class, JerseyAutoConfiguration.class,

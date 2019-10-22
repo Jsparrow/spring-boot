@@ -30,6 +30,8 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link BeanFactoryPostProcessor} to automatically setup the recommended
@@ -42,12 +44,14 @@ import org.springframework.util.StringUtils;
  */
 public class AtomikosDependsOnBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
+	private static final Logger logger = LoggerFactory.getLogger(AtomikosDependsOnBeanFactoryPostProcessor.class);
+
 	private static final String[] NO_BEANS = {};
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		String[] transactionManagers = beanFactory.getBeanNamesForType(UserTransactionManager.class, true, false);
 		for (String transactionManager : transactionManagers) {
 			addTransactionManagerDependencies(beanFactory, transactionManager);
@@ -88,6 +92,7 @@ public class AtomikosDependsOnBeanFactoryPostProcessor implements BeanFactoryPos
 			return beanFactory.getBeanNamesForType(Class.forName(type), true, false);
 		}
 		catch (ClassNotFoundException | NoClassDefFoundError ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 		return NO_BEANS;

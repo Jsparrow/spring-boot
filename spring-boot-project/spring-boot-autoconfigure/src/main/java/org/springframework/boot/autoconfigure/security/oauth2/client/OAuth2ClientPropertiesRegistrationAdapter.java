@@ -31,6 +31,8 @@ import org.springframework.security.oauth2.core.AuthenticationMethod;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adapter class to convert {@link OAuth2ClientProperties} to a
@@ -43,6 +45,8 @@ import org.springframework.util.StringUtils;
  * @since 2.1.0
  */
 public final class OAuth2ClientPropertiesRegistrationAdapter {
+
+	private static final Logger logger = LoggerFactory.getLogger(OAuth2ClientPropertiesRegistrationAdapter.class);
 
 	private OAuth2ClientPropertiesRegistrationAdapter() {
 	}
@@ -103,8 +107,8 @@ public final class OAuth2ClientPropertiesRegistrationAdapter {
 	}
 
 	private static String getErrorMessage(String configuredProviderId, String registrationId) {
-		return ((configuredProviderId != null) ? "Unknown provider ID '" + configuredProviderId + "'"
-				: "Provider ID must be specified for client registration '" + registrationId + "'");
+		return ((configuredProviderId != null) ? new StringBuilder().append("Unknown provider ID '").append(configuredProviderId).append("'").toString()
+				: new StringBuilder().append("Provider ID must be specified for client registration '").append(registrationId).append("'").toString());
 	}
 
 	private static Builder getBuilder(Builder builder, Provider provider) {
@@ -124,6 +128,7 @@ public final class OAuth2ClientPropertiesRegistrationAdapter {
 			return ApplicationConversionService.getSharedInstance().convert(providerId, CommonOAuth2Provider.class);
 		}
 		catch (ConversionException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

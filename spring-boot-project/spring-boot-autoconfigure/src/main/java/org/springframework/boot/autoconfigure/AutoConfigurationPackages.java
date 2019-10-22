@@ -37,6 +37,8 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for storing auto-configuration packages for reference later (e.g. by JPA entity
@@ -48,6 +50,8 @@ import org.springframework.util.StringUtils;
  * @since 1.0.0
  */
 public abstract class AutoConfigurationPackages {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(AutoConfigurationPackages.class);
 
 	private static final Log logger = LogFactory.getLog(AutoConfigurationPackages.class);
 
@@ -74,6 +78,7 @@ public abstract class AutoConfigurationPackages {
 			return beanFactory.getBean(BEAN, BasePackages.class).get();
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger1.error(ex.getMessage(), ex);
 			throw new IllegalStateException("Unable to retrieve @EnableAutoConfiguration base packages");
 		}
 	}
@@ -188,16 +193,13 @@ public abstract class AutoConfigurationPackages {
 			if (!this.loggedBasePackageInfo) {
 				if (this.packages.isEmpty()) {
 					if (logger.isWarnEnabled()) {
-						logger.warn("@EnableAutoConfiguration was declared on a class "
-								+ "in the default package. Automatic @Repository and "
-								+ "@Entity scanning is not enabled.");
+						logger.warn(new StringBuilder().append("@EnableAutoConfiguration was declared on a class ").append("in the default package. Automatic @Repository and ").append("@Entity scanning is not enabled.").toString());
 					}
 				}
 				else {
 					if (logger.isDebugEnabled()) {
 						String packageNames = StringUtils.collectionToCommaDelimitedString(this.packages);
-						logger.debug("@EnableAutoConfiguration was declared on a class in the package '" + packageNames
-								+ "'. Automatic @Repository and @Entity scanning is enabled.");
+						logger.debug(new StringBuilder().append("@EnableAutoConfiguration was declared on a class in the package '").append(packageNames).append("'. Automatic @Repository and @Entity scanning is enabled.").toString());
 					}
 				}
 				this.loggedBasePackageInfo = true;

@@ -55,8 +55,7 @@ class StartupInfoLoggerTests {
 		new StartupInfoLogger(getClass()).logStarted(this.log, stopWatch);
 		ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
 		verify(this.log).info(captor.capture());
-		assertThat(captor.getValue().toString()).matches("Started " + getClass().getSimpleName()
-				+ " in \\d+\\.\\d{1,3} seconds \\(JVM running for \\d+\\.\\d{1,3}\\)");
+		assertThat(captor.getValue().toString()).matches(new StringBuilder().append("Started ").append(getClass().getSimpleName()).append(" in \\d+\\.\\d{1,3} seconds \\(JVM running for \\d+\\.\\d{1,3}\\)").toString());
 	}
 
 }

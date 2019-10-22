@@ -21,14 +21,18 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Aspect
 @Component
 public class ServiceMonitor {
 
+	private static final Logger logger = LoggerFactory.getLogger(ServiceMonitor.class);
+
 	@AfterReturning("execution(* smoketest..*Service.*(..))")
 	public void logServiceAccess(JoinPoint joinPoint) {
-		System.out.println("Completed: " + joinPoint);
+		logger.info("Completed: " + joinPoint);
 	}
 
 }

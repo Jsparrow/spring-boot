@@ -72,15 +72,15 @@ import static org.assertj.core.api.Assertions.contentOf;
 @ExtendWith(OutputCaptureExtension.class)
 class LiquibaseAutoConfigurationTests {
 
+	private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+			.withConfiguration(AutoConfigurations.of(LiquibaseAutoConfiguration.class))
+			.withPropertyValues("spring.datasource.generate-unique-name=true");
+
 	@BeforeEach
 	void init() {
 		new LiquibaseServiceLocatorApplicationListener()
 				.onApplicationEvent(new ApplicationStartingEvent(new SpringApplication(Object.class), new String[0]));
 	}
-
-	private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations.of(LiquibaseAutoConfiguration.class))
-			.withPropertyValues("spring.datasource.generate-unique-name=true");
 
 	@Test
 	void backsOffWithNoDataSourceBeanAndNoLiquibaseUrl() {

@@ -66,19 +66,19 @@ public class ExtendedGroovyClassLoader extends GroovyClassLoader {
 		this(scope, createParentClassLoader(scope), new CompilerConfiguration());
 	}
 
+	private ExtendedGroovyClassLoader(GroovyCompilerScope scope, ClassLoader parent,
+			CompilerConfiguration configuration) {
+		super(parent, configuration);
+		this.configuration = configuration;
+		this.scope = scope;
+	}
+
 	private static ClassLoader createParentClassLoader(GroovyCompilerScope scope) {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		if (scope == GroovyCompilerScope.DEFAULT) {
 			classLoader = new DefaultScopeParentClassLoader(classLoader);
 		}
 		return classLoader;
-	}
-
-	private ExtendedGroovyClassLoader(GroovyCompilerScope scope, ClassLoader parent,
-			CompilerConfiguration configuration) {
-		super(parent, configuration);
-		this.configuration = configuration;
-		this.scope = scope;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class ExtendedGroovyClassLoader extends GroovyClassLoader {
 
 	private Class<?> findSharedClass(String name) {
 		try {
-			String path = name.replace('.', '/').concat(".class");
+			String path = name.replace('.', '/') + ".class";
 			try (InputStream inputStream = getParent().getResourceAsStream(path)) {
 				if (inputStream != null) {
 					return defineClass(name, FileCopyUtils.copyToByteArray(inputStream));
@@ -223,7 +223,7 @@ public class ExtendedGroovyClassLoader extends GroovyClassLoader {
 		private boolean isGroovyJar(String entry) {
 			entry = StringUtils.cleanPath(entry);
 			for (String jarPrefix : GROOVY_JARS_PREFIXES) {
-				if (entry.contains("/" + jarPrefix + "-")) {
+				if (entry.contains(new StringBuilder().append("/").append(jarPrefix).append("-").toString())) {
 					return true;
 				}
 			}

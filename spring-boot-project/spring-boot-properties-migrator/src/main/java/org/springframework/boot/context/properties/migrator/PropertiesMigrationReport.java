@@ -49,9 +49,7 @@ class PropertiesMigrationReport {
 				.format("%nThe use of configuration keys that have been renamed was found in the environment:%n%n"));
 		append(report, content);
 		report.append(String.format("%n"));
-		report.append("Each configuration key has been temporarily mapped to its "
-				+ "replacement for your convenience. To silence this warning, please "
-				+ "update your configuration to use the new keys.");
+		report.append(new StringBuilder().append("Each configuration key has been temporarily mapped to its ").append("replacement for your convenience. To silence this warning, please ").append("update your configuration to use the new keys.").toString());
 		report.append(String.format("%n"));
 		return report.toString();
 	}

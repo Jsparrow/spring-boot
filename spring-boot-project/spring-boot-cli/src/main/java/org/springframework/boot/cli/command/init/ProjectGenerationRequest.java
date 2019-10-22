@@ -357,7 +357,7 @@ class ProjectGenerationRequest {
 			return builder.build();
 		}
 		catch (URISyntaxException ex) {
-			throw new ReportableException("Invalid service URL (" + ex.getMessage() + ")");
+			throw new ReportableException(new StringBuilder().append("Invalid service URL (").append(ex.getMessage()).append(")").toString());
 		}
 	}
 
@@ -366,7 +366,7 @@ class ProjectGenerationRequest {
 			ProjectType result = metadata.getProjectTypes().get(this.type);
 			if (result == null) {
 				throw new ReportableException(
-						("No project type with id '" + this.type + "' - check the service capabilities (--list)"));
+						(new StringBuilder().append("No project type with id '").append(this.type).append("' - check the service capabilities (--list)").toString()));
 			}
 			return result;
 		}
@@ -382,12 +382,12 @@ class ProjectGenerationRequest {
 				return types.values().iterator().next();
 			}
 			else if (types.isEmpty()) {
-				throw new ReportableException("No type found with build '" + this.build + "' and format '" + this.format
-						+ "' check the service capabilities (--list)");
+				throw new ReportableException(new StringBuilder().append("No type found with build '").append(this.build).append("' and format '").append(this.format).append("' check the service capabilities (--list)")
+						.toString());
 			}
 			else {
-				throw new ReportableException("Multiple types found with build '" + this.build + "' and format '"
-						+ this.format + "' use --type with a more specific value " + types.keySet());
+				throw new ReportableException(new StringBuilder().append("Multiple types found with build '").append(this.build).append("' and format '").append(this.format).append("' use --type with a more specific value ")
+						.append(types.keySet()).toString());
 			}
 		}
 		else {
@@ -408,11 +408,11 @@ class ProjectGenerationRequest {
 		if (this.artifactId != null) {
 			return this.artifactId;
 		}
-		if (this.output != null) {
-			int i = this.output.lastIndexOf('.');
-			return (i != -1) ? this.output.substring(0, i) : this.output;
+		if (this.output == null) {
+			return null;
 		}
-		return null;
+		int i = this.output.lastIndexOf('.');
+		return (i != -1) ? this.output.substring(0, i) : this.output;
 	}
 
 	private static void filter(Map<String, ProjectType> projects, String tag, String tagValue) {

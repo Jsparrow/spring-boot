@@ -127,7 +127,7 @@ public abstract class JsonObjectDeserializer<T> extends com.fasterxml.jackson.da
 	protected final JsonNode getRequiredNode(JsonNode tree, String fieldName) {
 		Assert.notNull(tree, "Tree must not be null");
 		JsonNode node = tree.get(fieldName);
-		Assert.state(node != null && !(node instanceof NullNode), () -> "Missing JSON field '" + fieldName + "'");
+		Assert.state(node != null && !(node instanceof NullNode), () -> new StringBuilder().append("Missing JSON field '").append(fieldName).append("'").toString());
 		return node;
 	}
 

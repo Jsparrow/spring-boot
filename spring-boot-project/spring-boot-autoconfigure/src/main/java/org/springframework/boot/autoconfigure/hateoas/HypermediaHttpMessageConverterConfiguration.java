@@ -73,25 +73,26 @@ public class HypermediaHttpMessageConverterConfiguration {
 		}
 
 		private void configureHttpMessageConverters(Collection<RequestMappingHandlerAdapter> handlerAdapters) {
-			for (RequestMappingHandlerAdapter handlerAdapter : handlerAdapters) {
+			handlerAdapters.forEach(handlerAdapter -> {
 				for (HttpMessageConverter<?> messageConverter : handlerAdapter.getMessageConverters()) {
 					configureHttpMessageConverter(messageConverter);
 				}
-			}
+			});
 		}
 
 		private void configureHttpMessageConverter(HttpMessageConverter<?> converter) {
-			if (converter instanceof TypeConstrainedMappingJackson2HttpMessageConverter) {
-				List<MediaType> supportedMediaTypes = new ArrayList<>(converter.getSupportedMediaTypes());
-				if (!supportedMediaTypes.contains(MediaType.APPLICATION_JSON)) {
-					supportedMediaTypes.add(MediaType.APPLICATION_JSON);
-				}
-				((AbstractHttpMessageConverter<?>) converter).setSupportedMediaTypes(supportedMediaTypes);
+			if (!(converter instanceof TypeConstrainedMappingJackson2HttpMessageConverter)) {
+				return;
 			}
+			List<MediaType> supportedMediaTypes = new ArrayList<>(converter.getSupportedMediaTypes());
+			if (!supportedMediaTypes.contains(MediaType.APPLICATION_JSON)) {
+				supportedMediaTypes.add(MediaType.APPLICATION_JSON);
+			}
+			((AbstractHttpMessageConverter<?>) converter).setSupportedMediaTypes(supportedMediaTypes);
 		}
 
 		@Override
-		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		public void setBeanFactory(BeanFactory beanFactory) {
 			this.beanFactory = beanFactory;
 		}
 

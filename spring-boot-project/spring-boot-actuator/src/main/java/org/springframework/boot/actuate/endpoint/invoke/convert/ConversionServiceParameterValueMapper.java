@@ -52,7 +52,7 @@ public class ConversionServiceParameterValueMapper implements ParameterValueMapp
 	}
 
 	@Override
-	public Object mapParameterValue(OperationParameter parameter, Object value) throws ParameterMappingException {
+	public Object mapParameterValue(OperationParameter parameter, Object value) {
 		try {
 			return this.conversionService.convert(value, parameter.getType());
 		}

@@ -92,32 +92,30 @@ public class MavenSettings {
 
 	private MirrorSelector createMirrorSelector(Settings settings) {
 		DefaultMirrorSelector selector = new DefaultMirrorSelector();
-		for (Mirror mirror : settings.getMirrors()) {
-			selector.add(mirror.getId(), mirror.getUrl(), mirror.getLayout(), false, mirror.getMirrorOf(),
-					mirror.getMirrorOfLayouts());
-		}
+		settings.getMirrors().forEach(mirror -> selector.add(mirror.getId(), mirror.getUrl(), mirror.getLayout(), false, mirror.getMirrorOf(),
+				mirror.getMirrorOfLayouts()));
 		return selector;
 	}
 
 	private AuthenticationSelector createAuthenticationSelector(SettingsDecryptionResult decryptedSettings) {
 		DefaultAuthenticationSelector selector = new DefaultAuthenticationSelector();
-		for (Server server : decryptedSettings.getServers()) {
+		decryptedSettings.getServers().forEach(server -> {
 			AuthenticationBuilder auth = new AuthenticationBuilder();
 			auth.addUsername(server.getUsername()).addPassword(server.getPassword());
 			auth.addPrivateKey(server.getPrivateKey(), server.getPassphrase());
 			selector.add(server.getId(), auth.build());
-		}
+		});
 		return new ConservativeAuthenticationSelector(selector);
 	}
 
 	private ProxySelector createProxySelector(SettingsDecryptionResult decryptedSettings) {
 		DefaultProxySelector selector = new DefaultProxySelector();
-		for (Proxy proxy : decryptedSettings.getProxies()) {
+		decryptedSettings.getProxies().forEach(proxy -> {
 			Authentication authentication = new AuthenticationBuilder().addUsername(proxy.getUsername())
 					.addPassword(proxy.getPassword()).build();
 			selector.add(new org.eclipse.aether.repository.Proxy(proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
 					authentication), proxy.getNonProxyHosts());
-		}
+		});
 		return selector;
 	}
 
@@ -131,9 +129,7 @@ public class MavenSettings {
 		}
 		List<Profile> activeProfiles = new ArrayList<>();
 		Map<String, Profile> profiles = settings.getProfilesAsMap();
-		for (org.apache.maven.model.Profile modelProfile : activeModelProfiles) {
-			activeProfiles.add(profiles.get(modelProfile.getId()));
-		}
+		activeModelProfiles.forEach(modelProfile -> activeProfiles.add(profiles.get(modelProfile.getId())));
 		return activeProfiles;
 	}
 
@@ -141,13 +137,13 @@ public class MavenSettings {
 		StringWriter message = new StringWriter();
 		PrintWriter printer = new PrintWriter(message);
 		printer.println("Failed to determine active profiles:");
-		for (ModelProblemCollectorRequest problem : problemCollector.getProblems()) {
+		problemCollector.getProblems().forEach(problem -> {
 			String location = (problem.getLocation() != null) ? " at " + problem.getLocation() : "";
-			printer.println("    " + problem.getMessage() + location);
+			printer.println(new StringBuilder().append("    ").append(problem.getMessage()).append(location).toString());
 			if (problem.getException() != null) {
 				printer.println(indentStackTrace(problem.getException(), "        "));
 			}
-		}
+		});
 		return message.toString();
 	}
 
@@ -182,14 +178,14 @@ public class MavenSettings {
 
 	private List<org.apache.maven.model.Profile> createModelProfiles(List<Profile> profiles) {
 		List<org.apache.maven.model.Profile> modelProfiles = new ArrayList<>();
-		for (Profile profile : profiles) {
+		profiles.forEach(profile -> {
 			org.apache.maven.model.Profile modelProfile = new org.apache.maven.model.Profile();
 			modelProfile.setId(profile.getId());
 			if (profile.getActivation() != null) {
 				modelProfile.setActivation(createModelActivation(profile.getActivation()));
 			}
 			modelProfiles.add(modelProfile);
-		}
+		});
 		return modelProfiles;
 	}
 

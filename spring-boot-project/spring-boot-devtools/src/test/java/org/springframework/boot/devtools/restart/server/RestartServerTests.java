@@ -106,13 +106,13 @@ class RestartServerTests {
 
 	static class MockRestartServer extends RestartServer {
 
-		MockRestartServer(SourceFolderUrlFilter sourceFolderUrlFilter, ClassLoader classLoader) {
-			super(sourceFolderUrlFilter, classLoader);
-		}
-
 		private Set<URL> restartUrls;
 
 		private ClassLoaderFiles restartFiles;
+
+		MockRestartServer(SourceFolderUrlFilter sourceFolderUrlFilter, ClassLoader classLoader) {
+			super(sourceFolderUrlFilter, classLoader);
+		}
 
 		@Override
 		protected void restart(Set<URL> urls, ClassLoaderFiles files) {

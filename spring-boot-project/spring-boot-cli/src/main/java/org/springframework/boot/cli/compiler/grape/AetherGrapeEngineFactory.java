@@ -69,7 +69,7 @@ public abstract class AetherGrapeEngineFactory {
 
 	private static List<RemoteRepository> createRepositories(List<RepositoryConfiguration> repositoryConfigurations) {
 		List<RemoteRepository> repositories = new ArrayList<>(repositoryConfigurations.size());
-		for (RepositoryConfiguration repositoryConfiguration : repositoryConfigurations) {
+		repositoryConfigurations.forEach(repositoryConfiguration -> {
 			RemoteRepository.Builder builder = new RemoteRepository.Builder(repositoryConfiguration.getName(),
 					"default", repositoryConfiguration.getUri().toASCIIString());
 			if (!repositoryConfiguration.getSnapshotsEnabled()) {
@@ -77,7 +77,7 @@ public abstract class AetherGrapeEngineFactory {
 						RepositoryPolicy.CHECKSUM_POLICY_IGNORE));
 			}
 			repositories.add(builder.build());
-		}
+		});
 		return repositories;
 	}
 

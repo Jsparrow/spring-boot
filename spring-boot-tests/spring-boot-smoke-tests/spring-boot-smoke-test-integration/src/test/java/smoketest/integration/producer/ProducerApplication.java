@@ -40,15 +40,16 @@ public class ProducerApplication implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		this.serviceProperties.getInputDir().mkdirs();
-		if (args.getNonOptionArgs().size() > 0) {
-			FileOutputStream stream = new FileOutputStream(
-					new File(this.serviceProperties.getInputDir(), "data" + System.currentTimeMillis() + ".txt"));
-			for (String arg : args.getNonOptionArgs()) {
-				stream.write(arg.getBytes());
-			}
-			stream.flush();
-			stream.close();
+		if (args.getNonOptionArgs().size() <= 0) {
+			return;
 		}
+		FileOutputStream stream = new FileOutputStream(
+				new File(this.serviceProperties.getInputDir(), new StringBuilder().append("data").append(System.currentTimeMillis()).append(".txt").toString()));
+		for (String arg : args.getNonOptionArgs()) {
+			stream.write(arg.getBytes());
+		}
+		stream.flush();
+		stream.close();
 	}
 
 	public static void main(String[] args) {

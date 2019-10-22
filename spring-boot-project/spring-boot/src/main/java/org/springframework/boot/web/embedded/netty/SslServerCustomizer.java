@@ -156,7 +156,7 @@ public class SslServerCustomizer implements NettyServerCustomizer {
 			return store;
 		}
 		catch (Exception ex) {
-			throw new WebServerException("Could not load key store '" + resource + "'", ex);
+			throw new WebServerException(new StringBuilder().append("Could not load key store '").append(resource).append("'").toString(), ex);
 		}
 
 	}

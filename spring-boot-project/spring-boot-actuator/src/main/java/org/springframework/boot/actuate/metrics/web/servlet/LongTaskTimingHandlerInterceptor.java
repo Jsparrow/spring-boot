@@ -90,9 +90,10 @@ public class LongTaskTimingHandlerInterceptor implements HandlerInterceptor {
 	private Collection<LongTaskTimer.Sample> getLongTaskTimerSamples(HttpServletRequest request, Object handler,
 			Set<Timed> annotations) {
 		List<LongTaskTimer.Sample> samples = new ArrayList<>();
-		annotations.stream().filter(Timed::longTask).forEach((annotation) -> {
+		annotations.stream().filter(Timed::longTask).map((annotation) -> {
 			Iterable<Tag> tags = this.tagsProvider.getLongRequestTags(request, handler);
-			LongTaskTimer.Builder builder = LongTaskTimer.builder(annotation).tags(tags);
+			return LongTaskTimer.builder(annotation).tags(tags);
+		}).forEach((builder) -> {
 			LongTaskTimer timer = builder.register(this.registry);
 			samples.add(timer.start());
 		});
@@ -120,9 +121,7 @@ public class LongTaskTimingHandlerInterceptor implements HandlerInterceptor {
 	}
 
 	private void stopLongTaskTimers(LongTaskTimingContext timingContext) {
-		for (LongTaskTimer.Sample sample : timingContext.getLongTaskTimerSamples()) {
-			sample.stop();
-		}
+		timingContext.getLongTaskTimerSamples().forEach(LongTaskTimer.Sample::stop);
 	}
 
 	/**

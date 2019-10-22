@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link OutputCapture}.
@@ -33,6 +35,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * @author Phillip Webb
  */
 class OutputCaptureTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(OutputCaptureTests.class);
 
 	private PrintStream originalOut;
 
@@ -62,19 +66,19 @@ class OutputCaptureTests {
 
 	@Test
 	void pushWhenEmptyStartsCapture() {
-		System.out.print("A");
+		logger.info("A");
 		this.output.push();
-		System.out.print("B");
+		logger.info("B");
 		assertThat(this.output).isEqualTo("B");
 	}
 
 	@Test
 	void pushWhenHasExistingStartesNewCapture() {
-		System.out.print("A");
+		logger.info("A");
 		this.output.push();
-		System.out.print("B");
+		logger.info("B");
 		this.output.push();
-		System.out.print("C");
+		logger.info("C");
 		assertThat(this.output).isEqualTo("BC");
 	}
 
@@ -86,80 +90,80 @@ class OutputCaptureTests {
 	@Test
 	void popWhenHasExistingEndsCapture() {
 		this.output.push();
-		System.out.print("A");
+		logger.info("A");
 		this.output.pop();
-		System.out.print("B");
+		logger.info("B");
 		assertThat(this.systemOut.toString()).isEqualTo("AB");
 	}
 
 	@Test
 	void captureAlsoWritesToSystemOut() {
 		this.output.push();
-		System.out.print("A");
+		logger.info("A");
 		assertThat(this.systemOut.toString()).isEqualTo("A");
 	}
 
 	@Test
 	void captureAlsoWritesToSystemErr() {
 		this.output.push();
-		System.err.print("A");
+		logger.error("A");
 		assertThat(this.systemErr.toString()).isEqualTo("A");
 	}
 
 	@Test
 	void lengthReturnsCapturedLength() {
 		this.output.push();
-		System.out.print("ABC");
+		logger.info("ABC");
 		assertThat(this.output.length()).isEqualTo(3);
 	}
 
 	@Test
 	void charAtReturnsCapturedCharAt() {
 		this.output.push();
-		System.out.print("ABC");
+		logger.info("ABC");
 		assertThat(this.output.charAt(1)).isEqualTo('B');
 	}
 
 	@Test
 	void subSequenceReturnsCapturedSubSequence() {
 		this.output.push();
-		System.out.print("ABC");
+		logger.info("ABC");
 		assertThat(this.output.subSequence(1, 3)).isEqualTo("BC");
 	}
 
 	@Test
 	void getAllReturnsAllCapturedOutput() {
 		this.output.push();
-		System.out.print("A");
-		System.err.print("B");
-		System.out.print("C");
+		logger.info("A");
+		logger.error("B");
+		logger.info("C");
 		assertThat(this.output.getAll()).isEqualTo("ABC");
 	}
 
 	@Test
 	void toStringReturnsAllCapturedOutput() {
 		this.output.push();
-		System.out.print("A");
-		System.err.print("B");
-		System.out.print("C");
+		logger.info("A");
+		logger.error("B");
+		logger.info("C");
 		assertThat(this.output.toString()).isEqualTo("ABC");
 	}
 
 	@Test
 	void getErrReturnsOnlyCapturedErrOutput() {
 		this.output.push();
-		System.out.print("A");
-		System.err.print("B");
-		System.out.print("C");
+		logger.info("A");
+		logger.error("B");
+		logger.info("C");
 		assertThat(this.output.getErr()).isEqualTo("B");
 	}
 
 	@Test
 	void getOutReturnsOnlyCapturedOutOutput() {
 		this.output.push();
-		System.out.print("A");
-		System.err.print("B");
-		System.out.print("C");
+		logger.info("A");
+		logger.error("B");
+		logger.info("C");
 		assertThat(this.output.getOut()).isEqualTo("AC");
 	}
 

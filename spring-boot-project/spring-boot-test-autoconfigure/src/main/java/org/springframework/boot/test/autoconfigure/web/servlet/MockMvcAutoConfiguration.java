@@ -73,9 +73,7 @@ public class MockMvcAutoConfiguration {
 	public DefaultMockMvcBuilder mockMvcBuilder(List<MockMvcBuilderCustomizer> customizers) {
 		DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup(this.context);
 		builder.addDispatcherServletCustomizer(new MockMvcDispatcherServletCustomizer(this.webMvcProperties));
-		for (MockMvcBuilderCustomizer customizer : customizers) {
-			customizer.customize(builder);
-		}
+		customizers.forEach(customizer -> customizer.customize(builder));
 		return builder;
 	}
 

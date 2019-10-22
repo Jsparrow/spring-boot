@@ -23,6 +23,8 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link TestExecutionListener} for Spring REST Docs that removes the need for a
@@ -60,6 +62,8 @@ public class RestDocsTestExecutionListener extends AbstractTestExecutionListener
 
 	private static class DocumentationHandler {
 
+		private final Logger logger = LoggerFactory.getLogger(DocumentationHandler.class);
+
 		private void beforeTestMethod(TestContext testContext) throws Exception {
 			ManualRestDocumentation restDocumentation = findManualRestDocumentation(testContext);
 			if (restDocumentation != null) {
@@ -79,6 +83,7 @@ public class RestDocsTestExecutionListener extends AbstractTestExecutionListener
 				return testContext.getApplicationContext().getBean(ManualRestDocumentation.class);
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 				return null;
 			}
 		}

@@ -76,6 +76,74 @@ public class JmsProperties {
 		return this.template;
 	}
 
+	/**
+	 * Translate the acknowledge modes defined on the {@link javax.jms.Session}.
+	 *
+	 * <p>
+	 * {@link javax.jms.Session#SESSION_TRANSACTED} is not defined as we take care of this
+	 * already via a call to {@code setSessionTransacted}.
+	 */
+	public enum AcknowledgeMode {
+
+		/**
+		 * Messages sent or received from the session are automatically acknowledged. This
+		 * is the simplest mode and enables once-only message delivery guarantee.
+		 */
+		AUTO(1),
+
+		/**
+		 * Messages are acknowledged once the message listener implementation has called
+		 * {@link javax.jms.Message#acknowledge()}. This mode gives the application
+		 * (rather than the JMS provider) complete control over message acknowledgement.
+		 */
+		CLIENT(2),
+
+		/**
+		 * Similar to auto acknowledgment except that said acknowledgment is lazy. As a
+		 * consequence, the messages might be delivered more than once. This mode enables
+		 * at-least-once message delivery guarantee.
+		 */
+		DUPS_OK(3);
+
+		private final int mode;
+
+		AcknowledgeMode(int mode) {
+			this.mode = mode;
+		}
+
+		public int getMode() {
+			return this.mode;
+		}
+
+	}
+
+	public enum DeliveryMode {
+
+		/**
+		 * Does not require that the message be logged to stable storage. This is the
+		 * lowest-overhead delivery mode but can lead to lost of message if the broker
+		 * goes down.
+		 */
+		NON_PERSISTENT(1),
+
+		/*
+		 * Instructs the JMS provider to log the message to stable storage as part of the
+		 * client's send operation.
+		 */
+		PERSISTENT(2);
+
+		private final int value;
+
+		DeliveryMode(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return this.value;
+		}
+
+	}
+
 	public static class Cache {
 
 		/**
@@ -198,7 +266,7 @@ public class JmsProperties {
 			if (this.concurrency == null) {
 				return (this.maxConcurrency != null) ? "1-" + this.maxConcurrency : null;
 			}
-			return ((this.maxConcurrency != null) ? this.concurrency + "-" + this.maxConcurrency
+			return ((this.maxConcurrency != null) ? new StringBuilder().append(this.concurrency).append("-").append(this.maxConcurrency).toString()
 					: String.valueOf(this.concurrency));
 		}
 
@@ -315,74 +383,6 @@ public class JmsProperties {
 
 		public void setReceiveTimeout(Duration receiveTimeout) {
 			this.receiveTimeout = receiveTimeout;
-		}
-
-	}
-
-	/**
-	 * Translate the acknowledge modes defined on the {@link javax.jms.Session}.
-	 *
-	 * <p>
-	 * {@link javax.jms.Session#SESSION_TRANSACTED} is not defined as we take care of this
-	 * already via a call to {@code setSessionTransacted}.
-	 */
-	public enum AcknowledgeMode {
-
-		/**
-		 * Messages sent or received from the session are automatically acknowledged. This
-		 * is the simplest mode and enables once-only message delivery guarantee.
-		 */
-		AUTO(1),
-
-		/**
-		 * Messages are acknowledged once the message listener implementation has called
-		 * {@link javax.jms.Message#acknowledge()}. This mode gives the application
-		 * (rather than the JMS provider) complete control over message acknowledgement.
-		 */
-		CLIENT(2),
-
-		/**
-		 * Similar to auto acknowledgment except that said acknowledgment is lazy. As a
-		 * consequence, the messages might be delivered more than once. This mode enables
-		 * at-least-once message delivery guarantee.
-		 */
-		DUPS_OK(3);
-
-		private final int mode;
-
-		AcknowledgeMode(int mode) {
-			this.mode = mode;
-		}
-
-		public int getMode() {
-			return this.mode;
-		}
-
-	}
-
-	public enum DeliveryMode {
-
-		/**
-		 * Does not require that the message be logged to stable storage. This is the
-		 * lowest-overhead delivery mode but can lead to lost of message if the broker
-		 * goes down.
-		 */
-		NON_PERSISTENT(1),
-
-		/*
-		 * Instructs the JMS provider to log the message to stable storage as part of the
-		 * client's send operation.
-		 */
-		PERSISTENT(2);
-
-		private final int value;
-
-		DeliveryMode(int value) {
-			this.value = value;
-		}
-
-		public int getValue() {
-			return this.value;
 		}
 
 	}

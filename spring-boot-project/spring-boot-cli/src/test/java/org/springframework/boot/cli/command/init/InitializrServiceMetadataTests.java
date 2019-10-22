@@ -87,7 +87,7 @@ class InitializrServiceMetadataTests {
 	}
 
 	private static JSONObject readJson(String version) throws IOException, JSONException {
-		Resource resource = new ClassPathResource("metadata/service-metadata-" + version + ".json");
+		Resource resource = new ClassPathResource(new StringBuilder().append("metadata/service-metadata-").append(version).append(".json").toString());
 		try (InputStream stream = resource.getInputStream()) {
 			return new JSONObject(StreamUtils.copyToString(stream, StandardCharsets.UTF_8));
 		}

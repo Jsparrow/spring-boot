@@ -60,7 +60,7 @@ class OperationMethodParameter implements OperationParameter {
 
 	@Override
 	public String toString() {
-		return this.name + " of type " + this.parameter.getType().getName();
+		return new StringBuilder().append(this.name).append(" of type ").append(this.parameter.getType().getName()).toString();
 	}
 
 }

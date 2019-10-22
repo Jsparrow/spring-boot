@@ -62,10 +62,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ReactiveOAuth2ClientAutoConfigurationTests {
 
+	private static final String REGISTRATION_PREFIX = "spring.security.oauth2.client.registration";
+
 	private ApplicationContextRunner contextRunner = new ApplicationContextRunner().withConfiguration(AutoConfigurations
 			.of(ReactiveOAuth2ClientAutoConfiguration.class, ReactiveSecurityAutoConfiguration.class));
-
-	private static final String REGISTRATION_PREFIX = "spring.security.oauth2.client.registration";
 
 	@Test
 	void autoConfigurationShouldBackOffForServletEnvironments() {
@@ -251,7 +251,7 @@ class ReactiveOAuth2ClientAutoConfigurationTests {
 		static class TestServerHttpSecurity extends ServerHttpSecurity implements ApplicationContextAware {
 
 			@Override
-			public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+			public void setApplicationContext(ApplicationContext applicationContext) {
 				super.setApplicationContext(applicationContext);
 			}
 

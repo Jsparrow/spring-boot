@@ -76,9 +76,9 @@ class FlywayEndpointDocumentationTests extends MockMvcEndpointDocumentationTests
 				fieldWithPath("script").description("Name of the script used to execute the migration, if any.")
 						.optional(),
 				fieldWithPath("state")
-						.description("State of the migration. (" + describeEnumValues(MigrationState.class) + ")"),
+						.description(new StringBuilder().append("State of the migration. (").append(describeEnumValues(MigrationState.class)).append(")").toString()),
 				fieldWithPath("type")
-						.description("Type of the migration. (" + describeEnumValues(MigrationType.class) + ")"),
+						.description(new StringBuilder().append("Type of the migration. (").append(describeEnumValues(MigrationType.class)).append(")").toString()),
 				fieldWithPath("version").description("Version of the database after applying the migration, if any.")
 						.optional());
 	}

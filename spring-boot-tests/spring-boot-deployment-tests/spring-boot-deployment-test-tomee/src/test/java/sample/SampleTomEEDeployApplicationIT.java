@@ -23,17 +23,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Integration Tests for {@link SampleTomEEDeployApplication}.
  */
 public class SampleTomEEDeployApplicationIT {
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleTomEEDeployApplicationIT.class);
 	private int port = Integer.valueOf(System.getProperty("port"));
 
 	@Test
 	void testHome() throws Exception {
-		String url = "http://localhost:" + this.port + "/bootapp/";
+		String url = new StringBuilder().append("http://localhost:").append(this.port).append("/bootapp/").toString();
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(url, String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).isEqualTo("Hello World");
@@ -41,8 +44,8 @@ public class SampleTomEEDeployApplicationIT {
 
 	@Test
 	void testHealth() throws Exception {
-		String url = "http://localhost:" + this.port + "/bootapp/actuator/health";
-		System.out.println(url);
+		String url = new StringBuilder().append("http://localhost:").append(this.port).append("/bootapp/actuator/health").toString();
+		logger.info(url);
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(url, String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).isEqualTo("{\"status\":\"UP\"}");

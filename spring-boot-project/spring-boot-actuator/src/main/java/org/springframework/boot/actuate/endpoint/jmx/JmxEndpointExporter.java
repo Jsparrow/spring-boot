@@ -35,6 +35,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jmx.JmxException;
 import org.springframework.jmx.export.MBeanExportException;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Exports {@link ExposableJmxEndpoint JMX endpoints} to a {@link MBeanServer}.
@@ -44,6 +46,8 @@ import org.springframework.util.Assert;
  * @since 2.0.0
  */
 public class JmxEndpointExporter implements InitializingBean, DisposableBean, BeanClassLoaderAware {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(JmxEndpointExporter.class);
 
 	private static final Log logger = LogFactory.getLog(JmxEndpointExporter.class);
 
@@ -113,20 +117,21 @@ public class JmxEndpointExporter implements InitializingBean, DisposableBean, Be
 	private void unregister(ObjectName objectName) {
 		try {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Unregister endpoint with ObjectName '" + objectName + "' from the JMX domain");
+				logger.debug(new StringBuilder().append("Unregister endpoint with ObjectName '").append(objectName).append("' from the JMX domain").toString());
 			}
 			this.mBeanServer.unregisterMBean(objectName);
 		}
 		catch (InstanceNotFoundException ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Ignore and continue
 		}
 		catch (MBeanRegistrationException ex) {
-			throw new JmxException("Failed to unregister MBean with ObjectName '" + objectName + "'", ex);
+			throw new JmxException(new StringBuilder().append("Failed to unregister MBean with ObjectName '").append(objectName).append("'").toString(), ex);
 		}
 	}
 
 	private String getEndpointDescription(ExposableJmxEndpoint endpoint) {
-		return "endpoint '" + endpoint.getEndpointId() + "'";
+		return new StringBuilder().append("endpoint '").append(endpoint.getEndpointId()).append("'").toString();
 	}
 
 }

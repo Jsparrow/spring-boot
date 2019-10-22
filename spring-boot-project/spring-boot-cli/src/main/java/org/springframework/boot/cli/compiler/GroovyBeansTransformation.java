@@ -54,11 +54,7 @@ public class GroovyBeansTransformation implements ASTTransformation {
 		for (ASTNode node : nodes) {
 			if (node instanceof ModuleNode) {
 				ModuleNode module = (ModuleNode) node;
-				for (ClassNode classNode : new ArrayList<>(module.getClasses())) {
-					if (classNode.isScript()) {
-						classNode.visitContents(new ClassVisitor(source, classNode));
-					}
-				}
+				new ArrayList<>(module.getClasses()).stream().filter(ClassNode::isScript).forEach(classNode -> classNode.visitContents(new ClassVisitor(source, classNode)));
 			}
 		}
 	}
@@ -91,17 +87,18 @@ public class GroovyBeansTransformation implements ASTTransformation {
 				return;
 			}
 			ClosureExpression closure = beans(block);
-			if (closure != null) {
-				// Add a marker interface to the current script
-				this.classNode.addInterface(ClassHelper.make(SOURCE_INTERFACE));
-				// Implement the interface by adding a public read-only property with the
-				// same name as the method in the interface (getBeans). Make it return the
-				// closure.
-				this.classNode.addProperty(new PropertyNode(BEANS, Modifier.PUBLIC | Modifier.FINAL,
-						ClassHelper.CLOSURE_TYPE.getPlainNodeReference(), this.classNode, closure, null, null));
-				// Only do this once per class
-				this.xformed = true;
+			if (closure == null) {
+				return;
 			}
+			// Add a marker interface to the current script
+			this.classNode.addInterface(ClassHelper.make(SOURCE_INTERFACE));
+			// Implement the interface by adding a public read-only property with the
+			// same name as the method in the interface (getBeans). Make it return the
+			// closure.
+			this.classNode.addProperty(new PropertyNode(BEANS, Modifier.PUBLIC | Modifier.FINAL,
+					ClassHelper.CLOSURE_TYPE.getPlainNodeReference(), this.classNode, closure, null, null));
+			// Only do this once per class
+			this.xformed = true;
 		}
 
 		/**

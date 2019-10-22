@@ -24,10 +24,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SampleMongoApplication implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleMongoApplication.class);
 	@Autowired
 	private CustomerRepository repository;
 
@@ -40,23 +43,19 @@ public class SampleMongoApplication implements CommandLineRunner {
 		this.repository.save(new Customer("Bob", "Smith"));
 
 		// fetch all customers
-		System.out.println("Customers found with findAll():");
-		System.out.println("-------------------------------");
-		for (Customer customer : this.repository.findAll()) {
-			System.out.println(customer);
-		}
+		logger.info("Customers found with findAll():");
+		logger.info("-------------------------------");
+		this.repository.findAll().forEach(customer -> logger.info(String.valueOf(customer)));
 		System.out.println();
 
 		// fetch an individual customer
-		System.out.println("Customer found with findByFirstName('Alice'):");
-		System.out.println("--------------------------------");
-		System.out.println(this.repository.findByFirstName("Alice"));
+		logger.info("Customer found with findByFirstName('Alice'):");
+		logger.info("--------------------------------");
+		logger.info(String.valueOf(this.repository.findByFirstName("Alice")));
 
-		System.out.println("Customers found with findByLastName('Smith'):");
-		System.out.println("--------------------------------");
-		for (Customer customer : this.repository.findByLastName("Smith")) {
-			System.out.println(customer);
-		}
+		logger.info("Customers found with findByLastName('Smith'):");
+		logger.info("--------------------------------");
+		this.repository.findByLastName("Smith").forEach(customer -> logger.info(String.valueOf(customer)));
 	}
 
 	@Bean

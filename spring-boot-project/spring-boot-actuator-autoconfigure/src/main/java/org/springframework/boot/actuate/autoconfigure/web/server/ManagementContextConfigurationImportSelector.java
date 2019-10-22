@@ -58,21 +58,15 @@ class ManagementContextConfigurationImportSelector implements DeferredImportSele
 		List<ManagementConfiguration> configurations = getConfigurations();
 		OrderComparator.sort(configurations);
 		List<String> names = new ArrayList<>();
-		for (ManagementConfiguration configuration : configurations) {
-			if (configuration.getContextType() == ManagementContextType.ANY
-					|| configuration.getContextType() == contextType) {
-				names.add(configuration.getClassName());
-			}
-		}
+		configurations.stream().filter(configuration -> configuration.getContextType() == ManagementContextType.ANY
+				|| configuration.getContextType() == contextType).forEach(configuration -> names.add(configuration.getClassName()));
 		return StringUtils.toStringArray(names);
 	}
 
 	private List<ManagementConfiguration> getConfigurations() {
 		SimpleMetadataReaderFactory readerFactory = new SimpleMetadataReaderFactory(this.classLoader);
 		List<ManagementConfiguration> configurations = new ArrayList<>();
-		for (String className : loadFactoryNames()) {
-			addConfiguration(readerFactory, configurations, className);
-		}
+		loadFactoryNames().forEach(className -> addConfiguration(readerFactory, configurations, className));
 		return configurations;
 	}
 
@@ -83,7 +77,7 @@ class ManagementContextConfigurationImportSelector implements DeferredImportSele
 			configurations.add(new ManagementConfiguration(metadataReader));
 		}
 		catch (IOException ex) {
-			throw new RuntimeException("Failed to read annotation metadata for '" + className + "'", ex);
+			throw new RuntimeException(new StringBuilder().append("Failed to read annotation metadata for '").append(className).append("'").toString(), ex);
 		}
 	}
 

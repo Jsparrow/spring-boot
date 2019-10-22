@@ -34,6 +34,8 @@ import org.springframework.boot.testsupport.BuildOutput;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for launching a Spring Boot application as part of a JUnit test.
@@ -106,6 +108,8 @@ abstract class AbstractApplicationLauncher implements BeforeEachCallback, AfterE
 
 	private static class ConsoleCopy extends Thread {
 
+		private final Logger logger = LoggerFactory.getLogger(ConsoleCopy.class);
+
 		private final InputStream input;
 
 		private final PrintStream output;
@@ -121,6 +125,7 @@ abstract class AbstractApplicationLauncher implements BeforeEachCallback, AfterE
 				StreamUtils.copy(this.input, this.output);
 			}
 			catch (IOException ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 

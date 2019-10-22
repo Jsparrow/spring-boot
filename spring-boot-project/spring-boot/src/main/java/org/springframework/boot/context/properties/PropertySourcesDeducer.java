@@ -63,8 +63,7 @@ class PropertySourcesDeducer {
 			return beans.values().iterator().next();
 		}
 		if (beans.size() > 1 && logger.isWarnEnabled()) {
-			logger.warn("Multiple PropertySourcesPlaceholderConfigurer beans registered " + beans.keySet()
-					+ ", falling back to Environment");
+			logger.warn(new StringBuilder().append("Multiple PropertySourcesPlaceholderConfigurer beans registered ").append(beans.keySet()).append(", falling back to Environment").toString());
 		}
 		return null;
 	}

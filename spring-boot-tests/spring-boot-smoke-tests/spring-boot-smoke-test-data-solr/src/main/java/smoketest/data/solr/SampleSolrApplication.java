@@ -20,10 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SampleSolrApplication implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleSolrApplication.class);
 	@Autowired
 	private ProductRepository repository;
 
@@ -38,19 +41,17 @@ public class SampleSolrApplication implements CommandLineRunner {
 		this.repository.save(new Product("3", "Sony Playstation"));
 
 		// fetch all
-		System.out.println("Products found by findAll():");
-		System.out.println("----------------------------");
+		logger.info("Products found by findAll():");
+		logger.info("----------------------------");
 		for (Product product : this.repository.findAll()) {
-			System.out.println(product);
+			logger.info(String.valueOf(product));
 		}
 		System.out.println();
 
 		// fetch a single product
-		System.out.println("Products found with findByNameStartingWith('So'):");
-		System.out.println("--------------------------------");
-		for (Product product : this.repository.findByNameStartingWith("So")) {
-			System.out.println(product);
-		}
+		logger.info("Products found with findByNameStartingWith('So'):");
+		logger.info("--------------------------------");
+		this.repository.findByNameStartingWith("So").forEach(product -> logger.info(String.valueOf(product)));
 		System.out.println();
 	}
 

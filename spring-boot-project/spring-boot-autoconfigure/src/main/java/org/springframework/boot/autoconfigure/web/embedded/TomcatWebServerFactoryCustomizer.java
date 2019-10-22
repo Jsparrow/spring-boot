@@ -175,30 +175,31 @@ public class TomcatWebServerFactoryCustomizer
 		String protocolHeader = tomcatProperties.getProtocolHeader();
 		String remoteIpHeader = tomcatProperties.getRemoteIpHeader();
 		// For back compatibility the valve is also enabled if protocol-header is set
-		if (StringUtils.hasText(protocolHeader) || StringUtils.hasText(remoteIpHeader)
-				|| getOrDeduceUseForwardHeaders()) {
-			RemoteIpValve valve = new RemoteIpValve();
-			valve.setProtocolHeader(StringUtils.hasLength(protocolHeader) ? protocolHeader : "X-Forwarded-Proto");
-			if (StringUtils.hasLength(remoteIpHeader)) {
-				valve.setRemoteIpHeader(remoteIpHeader);
-			}
-			// The internal proxies default to a white list of "safe" internal IP
-			// addresses
-			valve.setInternalProxies(tomcatProperties.getInternalProxies());
-			valve.setHostHeader(tomcatProperties.getHostHeader());
-			valve.setPortHeader(tomcatProperties.getPortHeader());
-			valve.setProtocolHeaderHttpsValue(tomcatProperties.getProtocolHeaderHttpsValue());
-			// ... so it's safe to add this valve by default.
-			factory.addEngineValves(valve);
+		if (!(StringUtils.hasText(protocolHeader) || StringUtils.hasText(remoteIpHeader)
+				|| getOrDeduceUseForwardHeaders())) {
+			return;
 		}
+		RemoteIpValve valve = new RemoteIpValve();
+		valve.setProtocolHeader(StringUtils.hasLength(protocolHeader) ? protocolHeader : "X-Forwarded-Proto");
+		if (StringUtils.hasLength(remoteIpHeader)) {
+			valve.setRemoteIpHeader(remoteIpHeader);
+		}
+		// The internal proxies default to a white list of "safe" internal IP
+		// addresses
+		valve.setInternalProxies(tomcatProperties.getInternalProxies());
+		valve.setHostHeader(tomcatProperties.getHostHeader());
+		valve.setPortHeader(tomcatProperties.getPortHeader());
+		valve.setProtocolHeaderHttpsValue(tomcatProperties.getProtocolHeaderHttpsValue());
+		// ... so it's safe to add this valve by default.
+		factory.addEngineValves(valve);
 	}
 
 	private boolean getOrDeduceUseForwardHeaders() {
-		if (this.serverProperties.getForwardHeadersStrategy().equals(ServerProperties.ForwardHeadersStrategy.NONE)) {
-			CloudPlatform platform = CloudPlatform.getActive(this.environment);
-			return platform != null && platform.isUsingForwardHeaders();
+		if (this.serverProperties.getForwardHeadersStrategy() != ServerProperties.ForwardHeadersStrategy.NONE) {
+			return this.serverProperties.getForwardHeadersStrategy() == ServerProperties.ForwardHeadersStrategy.NATIVE;
 		}
-		return this.serverProperties.getForwardHeadersStrategy().equals(ServerProperties.ForwardHeadersStrategy.NATIVE);
+		CloudPlatform platform = CloudPlatform.getActive(this.environment);
+		return platform != null && platform.isUsingForwardHeaders();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -274,17 +275,15 @@ public class TomcatWebServerFactoryCustomizer
 
 	private void customizeStaticResources(ConfigurableTomcatWebServerFactory factory) {
 		ServerProperties.Tomcat.Resource resource = this.serverProperties.getTomcat().getResource();
-		factory.addContextCustomizers((context) -> {
-			context.addLifecycleListener((event) -> {
-				if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
-					context.getResources().setCachingAllowed(resource.isAllowCaching());
-					if (resource.getCacheTtl() != null) {
-						long ttl = resource.getCacheTtl().toMillis();
-						context.getResources().setCacheTtl(ttl);
-					}
+		factory.addContextCustomizers((context) -> context.addLifecycleListener((event) -> {
+			if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
+				context.getResources().setCachingAllowed(resource.isAllowCaching());
+				if (resource.getCacheTtl() != null) {
+					long ttl = resource.getCacheTtl().toMillis();
+					context.getResources().setCacheTtl(ttl);
 				}
-			});
-		});
+			}
+		}));
 	}
 
 	private void customizeErrorReportValve(ErrorProperties error, ConfigurableTomcatWebServerFactory factory) {

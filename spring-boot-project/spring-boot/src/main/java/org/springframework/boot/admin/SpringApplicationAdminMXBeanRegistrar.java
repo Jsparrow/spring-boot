@@ -70,7 +70,7 @@ public class SpringApplicationAdminMXBeanRegistrar implements ApplicationContext
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		Assert.state(applicationContext instanceof ConfigurableApplicationContext,
 				"ApplicationContext does not implement ConfigurableApplicationContext");
 		this.applicationContext = (ConfigurableApplicationContext) applicationContext;
@@ -128,7 +128,7 @@ public class SpringApplicationAdminMXBeanRegistrar implements ApplicationContext
 		MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 		server.registerMBean(new SpringApplicationAdmin(), this.objectName);
 		if (logger.isDebugEnabled()) {
-			logger.debug("Application Admin MBean registered with name '" + this.objectName + "'");
+			logger.debug(new StringBuilder().append("Application Admin MBean registered with name '").append(this.objectName).append("'").toString());
 		}
 	}
 

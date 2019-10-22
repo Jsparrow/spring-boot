@@ -49,6 +49,8 @@ import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link JpaBaseConfiguration} implementation for Hibernate.
@@ -63,6 +65,8 @@ import org.springframework.util.ClassUtils;
 @EnableConfigurationProperties(HibernateProperties.class)
 @ConditionalOnSingleCandidate(DataSource.class)
 class HibernateJpaConfiguration extends JpaBaseConfiguration {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(HibernateJpaConfiguration.class);
 
 	private static final Log logger = LogFactory.getLog(HibernateJpaConfiguration.class);
 
@@ -198,6 +202,7 @@ class HibernateJpaConfiguration extends JpaBaseConfiguration {
 			return JndiLocatorDelegate.isDefaultJndiEnvironmentAvailable();
 		}
 		catch (Error ex) {
+			logger1.error(ex.getMessage(), ex);
 			return false;
 		}
 	}
@@ -208,6 +213,7 @@ class HibernateJpaConfiguration extends JpaBaseConfiguration {
 				return Class.forName(candidate).newInstance();
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				// Continue searching
 			}
 		}

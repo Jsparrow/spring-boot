@@ -134,7 +134,7 @@ class MeterRegistryConfigurerIntegrationTests {
 			return new BeanPostProcessor() {
 
 				@Override
-				public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+				public Object postProcessAfterInitialization(Object bean, String beanName) {
 					if (bean instanceof Bravo) {
 						MeterRegistry meterRegistry = context.getBean(MeterRegistry.class);
 						meterRegistry.gauge("test", 1);

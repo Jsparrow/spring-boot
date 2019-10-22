@@ -44,7 +44,7 @@ class SampleSessionApplicationTests {
 	void sessionExpiry() throws Exception {
 		ConfigurableApplicationContext context = createContext();
 		String port = context.getEnvironment().getProperty("local.server.port");
-		URI uri = URI.create("http://localhost:" + port + "/");
+		URI uri = URI.create(new StringBuilder().append("http://localhost:").append(port).append("/").toString());
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> firstResponse = firstRequest(restTemplate, uri);
 		String sessionId1 = firstResponse.getBody();

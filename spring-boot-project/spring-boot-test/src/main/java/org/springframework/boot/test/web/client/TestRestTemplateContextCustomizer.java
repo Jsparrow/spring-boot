@@ -43,6 +43,8 @@ import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.MergedContextConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ContextCustomizer} for {@link TestRestTemplate}.
@@ -97,7 +99,7 @@ class TestRestTemplateContextCustomizer implements ContextCustomizer {
 		private BeanFactory beanFactory;
 
 		@Override
-		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		public void setBeanFactory(BeanFactory beanFactory) {
 			this.beanFactory = beanFactory;
 		}
 
@@ -107,7 +109,7 @@ class TestRestTemplateContextCustomizer implements ContextCustomizer {
 		}
 
 		@Override
-		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 			if (BeanFactoryUtils.beanNamesForTypeIncludingAncestors((ListableBeanFactory) this.beanFactory,
 					TestRestTemplate.class, false, false).length == 0) {
 				registry.registerBeanDefinition(TestRestTemplate.class.getName(),
@@ -117,7 +119,7 @@ class TestRestTemplateContextCustomizer implements ContextCustomizer {
 		}
 
 		@Override
-		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		}
 
 	}
@@ -131,10 +133,12 @@ class TestRestTemplateContextCustomizer implements ContextCustomizer {
 
 		private static final HttpClientOption[] SSL_OPTIONS = { HttpClientOption.SSL };
 
+		private final Logger logger = LoggerFactory.getLogger(TestRestTemplateFactory.class);
+
 		private TestRestTemplate template;
 
 		@Override
-		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		public void setApplicationContext(ApplicationContext applicationContext) {
 			RestTemplateBuilder builder = getRestTemplateBuilder(applicationContext);
 			boolean sslEnabled = isSslEnabled(applicationContext);
 			TestRestTemplate template = new TestRestTemplate(builder, null, null,
@@ -152,6 +156,7 @@ class TestRestTemplateContextCustomizer implements ContextCustomizer {
 				return webServerFactory.getSsl() != null && webServerFactory.getSsl().isEnabled();
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 				return false;
 			}
 		}
@@ -161,6 +166,7 @@ class TestRestTemplateContextCustomizer implements ContextCustomizer {
 				return applicationContext.getBean(RestTemplateBuilder.class);
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 				return new RestTemplateBuilder();
 			}
 		}

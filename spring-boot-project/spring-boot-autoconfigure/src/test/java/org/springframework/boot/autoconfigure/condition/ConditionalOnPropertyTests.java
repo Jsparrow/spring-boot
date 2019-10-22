@@ -252,6 +252,13 @@ class ConditionalOnPropertyTests {
 				.run();
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ ElementType.TYPE, ElementType.METHOD })
+	@ConditionalOnProperty(prefix = "my.feature", name = "enabled", havingValue = "true", matchIfMissing = false)
+	@interface ConditionalOnMyFeature {
+
+	}
+
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnProperty(name = { "property1", "property2" })
 	static class MultiplePropertiesRequiredConfiguration {
@@ -406,13 +413,6 @@ class ConditionalOnPropertyTests {
 		String foo() {
 			return "foo";
 		}
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.TYPE, ElementType.METHOD })
-	@ConditionalOnProperty(prefix = "my.feature", name = "enabled", havingValue = "true", matchIfMissing = false)
-	@interface ConditionalOnMyFeature {
 
 	}
 

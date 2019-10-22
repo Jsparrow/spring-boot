@@ -204,7 +204,7 @@ public class JSONTokener {
 			if (c == quote) {
 				if (builder == null) {
 					// a new string avoids leaking memory
-					return new String(this.in.substring(start, this.pos - 1));
+					return this.in.substring(start, this.pos - 1);
 				}
 				else {
 					builder.append(this.in, start, this.pos - 1);
@@ -330,7 +330,7 @@ public class JSONTokener {
 		}
 
 		/* ... finally give up. We have an unquoted string */
-		return new String(literal); // a new string avoids leaking memory
+		return literal; // a new string avoids leaking memory
 	}
 
 	/**
@@ -375,8 +375,7 @@ public class JSONTokener {
 					throw syntaxError("Names cannot be null");
 				}
 				else {
-					throw syntaxError("Names must be strings, but " + name
-							+ " is of type " + name.getClass().getName());
+					throw syntaxError(new StringBuilder().append("Names must be strings, but ").append(name).append(" is of type ").append(name.getClass().getName()).toString());
 				}
 			}
 
@@ -471,7 +470,7 @@ public class JSONTokener {
 	@Override
 	public String toString() {
 		// consistent with the original implementation
-		return " at character " + this.pos + " of " + this.in;
+		return new StringBuilder().append(" at character ").append(this.pos).append(" of ").append(this.in).toString();
 	}
 
 	/*
@@ -493,7 +492,7 @@ public class JSONTokener {
 	public char next(char c) throws JSONException {
 		char result = next();
 		if (result != c) {
-			throw syntaxError("Expected " + c + " but was " + result);
+			throw syntaxError(new StringBuilder().append("Expected ").append(c).append(" but was ").append(result).toString());
 		}
 		return result;
 	}

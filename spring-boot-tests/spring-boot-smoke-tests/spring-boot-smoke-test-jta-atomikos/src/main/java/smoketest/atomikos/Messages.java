@@ -18,13 +18,17 @@ package smoketest.atomikos;
 
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class Messages {
 
+	private static final Logger logger = LoggerFactory.getLogger(Messages.class);
+
 	@JmsListener(destination = "accounts")
 	public void onMessage(String content) {
-		System.out.println("----> " + content);
+		logger.info("----> " + content);
 	}
 
 }

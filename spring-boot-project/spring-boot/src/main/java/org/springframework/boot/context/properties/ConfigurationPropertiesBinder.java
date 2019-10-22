@@ -182,14 +182,15 @@ class ConfigurationPropertiesBinder {
 			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			registry.registerBeanDefinition(ConfigurationPropertiesBinder.FACTORY_BEAN_NAME, definition);
 		}
-		if (!registry.containsBeanDefinition(BEAN_NAME)) {
-			GenericBeanDefinition definition = new GenericBeanDefinition();
-			definition.setBeanClass(ConfigurationPropertiesBinder.class);
-			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			definition.setFactoryBeanName(FACTORY_BEAN_NAME);
-			definition.setFactoryMethodName("create");
-			registry.registerBeanDefinition(ConfigurationPropertiesBinder.BEAN_NAME, definition);
+		if (registry.containsBeanDefinition(BEAN_NAME)) {
+			return;
 		}
+		GenericBeanDefinition definition = new GenericBeanDefinition();
+		definition.setBeanClass(ConfigurationPropertiesBinder.class);
+		definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		definition.setFactoryBeanName(FACTORY_BEAN_NAME);
+		definition.setFactoryMethodName("create");
+		registry.registerBeanDefinition(ConfigurationPropertiesBinder.BEAN_NAME, definition);
 	}
 
 	static ConfigurationPropertiesBinder get(BeanFactory beanFactory) {
@@ -207,7 +208,7 @@ class ConfigurationPropertiesBinder {
 		private ApplicationContext applicationContext;
 
 		@Override
-		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		public void setApplicationContext(ApplicationContext applicationContext) {
 			this.applicationContext = applicationContext;
 		}
 

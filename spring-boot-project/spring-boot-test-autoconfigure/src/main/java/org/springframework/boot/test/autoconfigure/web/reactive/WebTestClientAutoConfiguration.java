@@ -59,13 +59,9 @@ public class WebTestClientAutoConfiguration {
 	public WebTestClient webTestClient(ApplicationContext applicationContext,
 			List<WebTestClientBuilderCustomizer> customizers, List<MockServerConfigurer> configurers) {
 		WebTestClient.MockServerSpec<?> mockServerSpec = WebTestClient.bindToApplicationContext(applicationContext);
-		for (MockServerConfigurer configurer : configurers) {
-			mockServerSpec.apply(configurer);
-		}
+		configurers.forEach(mockServerSpec::apply);
 		WebTestClient.Builder builder = mockServerSpec.configureClient();
-		for (WebTestClientBuilderCustomizer customizer : customizers) {
-			customizer.customize(builder);
-		}
+		customizers.forEach(customizer -> customizer.customize(builder));
 		return builder.build();
 	}
 

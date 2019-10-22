@@ -41,11 +41,11 @@ class ImportsContextCustomizerFactory implements ContextCustomizerFactory {
 	@Override
 	public ContextCustomizer createContextCustomizer(Class<?> testClass,
 			List<ContextConfigurationAttributes> configAttributes) {
-		if (MergedAnnotations.from(testClass, SearchStrategy.TYPE_HIERARCHY).isPresent(Import.class)) {
-			assertHasNoBeanMethods(testClass);
-			return new ImportsContextCustomizer(testClass);
+		if (!MergedAnnotations.from(testClass, SearchStrategy.TYPE_HIERARCHY).isPresent(Import.class)) {
+			return null;
 		}
-		return null;
+		assertHasNoBeanMethods(testClass);
+		return new ImportsContextCustomizer(testClass);
 	}
 
 	private void assertHasNoBeanMethods(Class<?> testClass) {

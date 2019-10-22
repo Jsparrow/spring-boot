@@ -79,8 +79,7 @@ class ElasticsearchAutoConfigurationTests {
 	void createTransportClient() {
 		this.context = new AnnotationConfigApplicationContext();
 		TestPropertyValues
-				.of("spring.data.elasticsearch.cluster-nodes:" + elasticsearch.getTcpHost().getHostString() + ":"
-						+ elasticsearch.getTcpHost().getPort(), "spring.data.elasticsearch.cluster-name:docker-cluster")
+				.of(new StringBuilder().append("spring.data.elasticsearch.cluster-nodes:").append(elasticsearch.getTcpHost().getHostString()).append(":").append(elasticsearch.getTcpHost().getPort()).toString(), "spring.data.elasticsearch.cluster-name:docker-cluster")
 				.applyTo(this.context);
 		this.context.register(PropertyPlaceholderAutoConfiguration.class, ElasticsearchAutoConfiguration.class);
 		this.context.refresh();

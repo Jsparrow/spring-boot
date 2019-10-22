@@ -82,12 +82,7 @@ public class DevToolsSettings {
 	}
 
 	private boolean isMatch(String url, List<Pattern> patterns) {
-		for (Pattern pattern : patterns) {
-			if (pattern.matcher(url).find()) {
-				return true;
-			}
-		}
-		return false;
+		return patterns.stream().anyMatch(pattern -> pattern.matcher(url).find());
 	}
 
 	public static DevToolsSettings get() {
@@ -115,7 +110,7 @@ public class DevToolsSettings {
 			return settings;
 		}
 		catch (Exception ex) {
-			throw new IllegalStateException("Unable to load devtools settings from location [" + location + "]", ex);
+			throw new IllegalStateException(new StringBuilder().append("Unable to load devtools settings from location [").append(location).append("]").toString(), ex);
 		}
 	}
 

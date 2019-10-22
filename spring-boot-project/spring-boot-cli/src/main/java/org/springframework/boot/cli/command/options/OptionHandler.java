@@ -135,11 +135,7 @@ public class OptionHandler {
 					.comparing((optionDescriptor) -> optionDescriptor.options().iterator().next());
 			Set<OptionDescriptor> sorted = new TreeSet<>(comparator);
 			sorted.addAll(options.values());
-			for (OptionDescriptor descriptor : sorted) {
-				if (!descriptor.representsNonOptions()) {
-					this.help.add(new OptionHelpAdapter(descriptor));
-				}
-			}
+			sorted.stream().filter(descriptor -> !descriptor.representsNonOptions()).forEach(descriptor -> this.help.add(new OptionHelpAdapter(descriptor)));
 			return "";
 		}
 
@@ -157,10 +153,10 @@ public class OptionHandler {
 
 		OptionHelpAdapter(OptionDescriptor descriptor) {
 			this.options = new LinkedHashSet<>();
-			for (String option : descriptor.options()) {
+			descriptor.options().forEach(option -> {
 				String prefix = (option.length() != 1) ? "--" : "-";
 				this.options.add(prefix + option);
-			}
+			});
 			if (this.options.contains("--cp")) {
 				this.options.remove("--cp");
 				this.options.add("-cp");

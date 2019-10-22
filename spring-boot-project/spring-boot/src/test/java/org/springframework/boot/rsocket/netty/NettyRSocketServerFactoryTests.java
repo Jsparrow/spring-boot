@@ -50,6 +50,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link NettyRSocketServerFactory}
@@ -59,11 +61,13 @@ import static org.mockito.Mockito.mock;
  */
 class NettyRSocketServerFactoryTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(NettyRSocketServerFactoryTests.class);
+
+	private static final Duration TIMEOUT = Duration.ofSeconds(3);
+
 	private NettyRSocketServer server;
 
 	private RSocketRequester requester;
-
-	private static final Duration TIMEOUT = Duration.ofSeconds(3);
 
 	@AfterEach
 	void tearDown() {
@@ -72,6 +76,7 @@ class NettyRSocketServerFactoryTests {
 				this.server.stop();
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}

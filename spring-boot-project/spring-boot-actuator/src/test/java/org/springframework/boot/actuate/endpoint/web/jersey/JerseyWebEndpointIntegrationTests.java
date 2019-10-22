@@ -17,7 +17,6 @@
 package org.springframework.boot.actuate.endpoint.web.jersey;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -54,6 +53,7 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import java.util.Collections;
 
 /**
  * Integration tests for web endpoints exposed using Jersey.
@@ -131,7 +131,7 @@ public class JerseyWebEndpointIntegrationTests
 						FilterChain filterChain) throws ServletException, IOException {
 					SecurityContext context = SecurityContextHolder.createEmptyContext();
 					context.setAuthentication(new UsernamePasswordAuthenticationToken("Alice", "secret",
-							Arrays.asList(new SimpleGrantedAuthority("ROLE_ACTUATOR"))));
+							Collections.singletonList(new SimpleGrantedAuthority("ROLE_ACTUATOR"))));
 					SecurityContextHolder.setContext(context);
 					try {
 						filterChain.doFilter(new SecurityContextHolderAwareRequestWrapper(request, "ROLE_"), response);

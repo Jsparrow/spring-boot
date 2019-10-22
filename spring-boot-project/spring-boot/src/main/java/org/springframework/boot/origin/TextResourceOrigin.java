@@ -62,14 +62,14 @@ public class TextResourceOrigin implements Origin {
 		if (obj == null) {
 			return false;
 		}
-		if (obj instanceof TextResourceOrigin) {
-			TextResourceOrigin other = (TextResourceOrigin) obj;
-			boolean result = true;
-			result = result && ObjectUtils.nullSafeEquals(this.resource, other.resource);
-			result = result && ObjectUtils.nullSafeEquals(this.location, other.location);
-			return result;
+		if (!(obj instanceof TextResourceOrigin)) {
+			return super.equals(obj);
 		}
-		return super.equals(obj);
+		TextResourceOrigin other = (TextResourceOrigin) obj;
+		boolean result = true;
+		result = result && ObjectUtils.nullSafeEquals(this.resource, other.resource);
+		result = result && ObjectUtils.nullSafeEquals(this.location, other.location);
+		return result;
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class TextResourceOrigin implements Origin {
 
 		@Override
 		public String toString() {
-			return (this.line + 1) + ":" + (this.column + 1);
+			return new StringBuilder().append(this.line + 1).append(":").append(this.column + 1).toString();
 		}
 
 	}

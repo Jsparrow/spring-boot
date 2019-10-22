@@ -32,14 +32,14 @@ public interface RSocketServer {
 	 * effect.
 	 * @throws RSocketServerException if the server cannot be started
 	 */
-	void start() throws RSocketServerException;
+	void start();
 
 	/**
 	 * Stops the RSocket server. Calling this method on an already stopped server has no
 	 * effect.
 	 * @throws RSocketServerException if the server cannot be stopped
 	 */
-	void stop() throws RSocketServerException;
+	void stop();
 
 	/**
 	 * Return the address this server is listening on.

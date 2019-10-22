@@ -36,12 +36,12 @@ public class ExampleEntity {
 
 	private String reference;
 
-	protected ExampleEntity() {
-	}
-
 	public ExampleEntity(String name, String reference) {
 		this.name = name;
 		this.reference = reference;
+	}
+
+	protected ExampleEntity() {
 	}
 
 	public String getName() {

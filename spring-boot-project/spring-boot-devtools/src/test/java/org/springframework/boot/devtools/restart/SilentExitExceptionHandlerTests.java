@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link SilentExitExceptionHandler}.
@@ -97,6 +99,8 @@ class SilentExitExceptionHandlerTests {
 
 	static class TestSilentExitExceptionHandler extends SilentExitExceptionHandler {
 
+		private final Logger logger = LoggerFactory.getLogger(TestSilentExitExceptionHandler.class);
+
 		private boolean nonZeroExitCodePrevented;
 
 		private final Object monitor = new Object();
@@ -120,6 +124,7 @@ class SilentExitExceptionHandlerTests {
 						TestSilentExitExceptionHandler.this.monitor.wait();
 					}
 					catch (InterruptedException ex) {
+						logger.error(ex.getMessage(), ex);
 						Thread.currentThread().interrupt();
 					}
 				}
@@ -130,6 +135,7 @@ class SilentExitExceptionHandlerTests {
 				threadRunning.await();
 			}
 			catch (InterruptedException ex) {
+				logger.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 			return new Thread[] { Thread.currentThread(), daemonThread };

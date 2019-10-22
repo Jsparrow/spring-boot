@@ -78,6 +78,8 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ServletWebServerFactory} that can be used to create
@@ -241,9 +243,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 		else {
 			builder.addHttpListener(port, getListenAddress());
 		}
-		for (UndertowBuilderCustomizer customizer : this.builderCustomizers) {
-			customizer.customize(builder);
-		}
+		this.builderCustomizers.forEach(customizer -> customizer.customize(builder));
 		return builder;
 	}
 
@@ -277,9 +277,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 		deployment.setTempDir(createTempDir("undertow"));
 		deployment.setEagerFilterInit(this.eagerInitFilters);
 		configureMimeMappings(deployment);
-		for (UndertowDeploymentInfoCustomizer customizer : this.deploymentInfoCustomizers) {
-			customizer.customize(deployment);
-		}
+		this.deploymentInfoCustomizers.forEach(customizer -> customizer.customize(deployment));
 		if (isAccessLogEnabled()) {
 			configureAccessLog(deployment);
 		}
@@ -331,7 +329,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 	private void createAccessLogDirectoryIfNecessary() {
 		Assert.state(this.accessLogDirectory != null, "Access log directory is not set");
 		if (!this.accessLogDirectory.isDirectory() && !this.accessLogDirectory.mkdirs()) {
-			throw new IllegalStateException("Failed to create access log directory '" + this.accessLogDirectory + "'");
+			throw new IllegalStateException(new StringBuilder().append("Failed to create access log directory '").append(this.accessLogDirectory).append("'").toString());
 		}
 	}
 
@@ -377,7 +375,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 				try {
 					File file = new File(url.toURI());
 					if (file.isFile()) {
-						resourceJarUrls.add(new URL("jar:" + url + "!/"));
+						resourceJarUrls.add(new URL(new StringBuilder().append("jar:").append(url).append("!/").toString()));
 					}
 					else {
 						managers.add(new FileResourceManager(new File(file, "META-INF/resources"), 0));
@@ -406,9 +404,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 	}
 
 	private void configureErrorPages(DeploymentInfo servletBuilder) {
-		for (ErrorPage errorPage : getErrorPages()) {
-			servletBuilder.addErrorPage(getUndertowErrorPage(errorPage));
-		}
+		getErrorPages().forEach(errorPage -> servletBuilder.addErrorPage(getUndertowErrorPage(errorPage)));
 	}
 
 	private io.undertow.servlet.api.ErrorPage getUndertowErrorPage(ErrorPage errorPage) {
@@ -431,9 +427,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 		// DeploymentManagerImpl will always add MimeMappings.DEFAULT_MIME_MAPPINGS
 		// but we only want ours
 		Map<String, String> mappings = new HashMap<>();
-		for (MimeMapping mapping : deploymentInfo.getMimeMappings()) {
-			mappings.put(mapping.getExtension().toLowerCase(Locale.ENGLISH), mapping.getMimeType());
-		}
+		deploymentInfo.getMimeMappings().forEach(mapping -> mappings.put(mapping.getExtension().toLowerCase(Locale.ENGLISH), mapping.getMimeType()));
 		deployment.setMimeExtensionMappings(mappings);
 	}
 
@@ -549,6 +543,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 	 */
 	private static final class MetaInfResourcesResourceManager implements ResourceManager {
 
+		private final Logger logger = LoggerFactory.getLogger(MetaInfResourcesResourceManager.class);
 		private final List<URL> metaInfResourceJarUrls;
 
 		private MetaInfResourcesResourceManager(List<URL> metaInfResourceJarUrls) {
@@ -587,7 +582,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 		private URLResource getMetaInfResource(URL resourceJar, String path) {
 			try {
 				String urlPath = URLEncoder.encode(ENCODED_SLASH.matcher(path).replaceAll("/"), "UTF-8");
-				URL resourceUrl = new URL(resourceJar + "META-INF/resources" + urlPath);
+				URL resourceUrl = new URL(new StringBuilder().append(resourceJar).append("META-INF/resources").append(urlPath).toString());
 				URLResource resource = new URLResource(resourceUrl, path);
 				if (resource.getContentLength() < 0) {
 					return null;
@@ -595,6 +590,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 				return resource;
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				return null;
 			}
 		}
@@ -662,6 +658,8 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 
 	private static class AccessLogShutdownListener implements ServletContextListener {
 
+		private final Logger logger = LoggerFactory.getLogger(AccessLogShutdownListener.class);
+
 		private final XnioWorker worker;
 
 		private final DefaultAccessLogReceiver accessLogReceiver;
@@ -686,6 +684,7 @@ public class UndertowServletWebServerFactory extends AbstractServletWebServerFac
 				throw new IllegalStateException(ex);
 			}
 			catch (InterruptedException ex) {
+				logger.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 		}

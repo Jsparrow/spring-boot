@@ -80,7 +80,7 @@ class JndiDataSourceAutoConfigurationTests {
 	}
 
 	@Test
-	void dataSourceIsAvailableFromJndi() throws IllegalStateException, NamingException {
+	void dataSourceIsAvailableFromJndi() throws NamingException {
 		DataSource dataSource = new BasicDataSource();
 		configureJndi("foo", dataSource);
 
@@ -94,7 +94,7 @@ class JndiDataSourceAutoConfigurationTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	void mbeanDataSourceIsExcludedFromExport() throws IllegalStateException, NamingException {
+	void mbeanDataSourceIsExcludedFromExport() throws NamingException {
 		DataSource dataSource = new BasicDataSource();
 		configureJndi("foo", dataSource);
 
@@ -111,7 +111,7 @@ class JndiDataSourceAutoConfigurationTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	void mbeanDataSourceIsExcludedFromExportByAllExporters() throws IllegalStateException, NamingException {
+	void mbeanDataSourceIsExcludedFromExportByAllExporters() throws NamingException {
 		DataSource dataSource = new BasicDataSource();
 		configureJndi("foo", dataSource);
 		this.context = new AnnotationConfigApplicationContext();
@@ -120,15 +120,12 @@ class JndiDataSourceAutoConfigurationTests {
 				AnotherMBeanExporterConfiguration.class);
 		this.context.refresh();
 		assertThat(this.context.getBean(DataSource.class)).isEqualTo(dataSource);
-		for (MBeanExporter exporter : this.context.getBeansOfType(MBeanExporter.class).values()) {
-			Set<String> excludedBeans = (Set<String>) ReflectionTestUtils.getField(exporter, "excludedBeans");
-			assertThat(excludedBeans).containsExactly("dataSource");
-		}
+		this.context.getBeansOfType(MBeanExporter.class).values().stream().map(exporter -> (Set<String>) ReflectionTestUtils.getField(exporter, "excludedBeans")).forEach(excludedBeans -> assertThat(excludedBeans).containsExactly("dataSource"));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	void standardDataSourceIsNotExcludedFromExport() throws IllegalStateException, NamingException {
+	void standardDataSourceIsNotExcludedFromExport() throws NamingException {
 		DataSource dataSource = mock(DataSource.class);
 		configureJndi("foo", dataSource);
 
@@ -143,7 +140,7 @@ class JndiDataSourceAutoConfigurationTests {
 		assertThat(excludedBeans).isEmpty();
 	}
 
-	private void configureJndi(String name, DataSource dataSource) throws IllegalStateException {
+	private void configureJndi(String name, DataSource dataSource) {
 		TestableInitialContextFactory.bind(name, dataSource);
 	}
 

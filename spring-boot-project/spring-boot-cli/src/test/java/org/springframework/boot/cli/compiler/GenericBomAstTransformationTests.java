@@ -93,9 +93,7 @@ final class GenericBomAstTransformationTests {
 		Expression expression = findAnnotation().getMember("value");
 		if (expression instanceof ListExpression) {
 			List<String> list = new ArrayList<>();
-			for (Expression ex : ((ListExpression) expression).getExpressions()) {
-				list.add((String) ((ConstantExpression) ex).getValue());
-			}
+			((ListExpression) expression).getExpressions().forEach(ex -> list.add((String) ((ConstantExpression) ex).getValue()));
 			return list;
 		}
 		else if (expression == null) {
@@ -109,10 +107,9 @@ final class GenericBomAstTransformationTests {
 	private AnnotationNode findAnnotation() {
 		PackageNode packageNode = this.moduleNode.getPackage();
 		ClassNode bom = ClassHelper.make(DependencyManagementBom.class);
-		if (packageNode != null) {
-			if (!packageNode.getAnnotations(bom).isEmpty()) {
-				return packageNode.getAnnotations(bom).get(0);
-			}
+		boolean condition = packageNode != null && !packageNode.getAnnotations(bom).isEmpty();
+		if (condition) {
+			return packageNode.getAnnotations(bom).get(0);
 		}
 		if (!this.moduleNode.getClasses().isEmpty()) {
 			return this.moduleNode.getClasses().get(0).getAnnotations(bom).get(0);

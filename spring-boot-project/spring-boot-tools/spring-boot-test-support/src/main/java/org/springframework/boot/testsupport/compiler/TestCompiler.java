@@ -28,6 +28,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
+import java.util.Collections;
 
 /**
  * Wrapper to make the {@link JavaCompiler} easier to use in tests.
@@ -59,7 +60,7 @@ public class TestCompiler {
 		this.fileManager = compiler.getStandardFileManager(null, null, null);
 		this.outputLocation = outputLocation;
 		this.outputLocation.mkdirs();
-		Iterable<? extends File> temp = Arrays.asList(this.outputLocation);
+		Iterable<? extends File> temp = Collections.singletonList(this.outputLocation);
 		this.fileManager.setLocation(StandardLocation.CLASS_OUTPUT, temp);
 		this.fileManager.setLocation(StandardLocation.SOURCE_OUTPUT, temp);
 	}

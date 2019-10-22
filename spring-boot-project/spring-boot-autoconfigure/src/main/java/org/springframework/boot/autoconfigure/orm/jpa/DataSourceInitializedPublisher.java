@@ -61,7 +61,7 @@ class DataSourceInitializedPublisher implements BeanPostProcessor {
 	private DataSourceSchemaCreatedPublisher schemaCreatedPublisher;
 
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		if (bean instanceof LocalContainerEntityManagerFactoryBean) {
 			LocalContainerEntityManagerFactoryBean factory = (LocalContainerEntityManagerFactoryBean) bean;
 			if (factory.getBootstrapExecutor() != null && factory.getJpaVendorAdapter() != null) {
@@ -73,7 +73,7 @@ class DataSourceInitializedPublisher implements BeanPostProcessor {
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		if (bean instanceof DataSource) {
 			// Normally this will be the right DataSource
 			this.dataSource = (DataSource) bean;
@@ -132,15 +132,16 @@ class DataSourceInitializedPublisher implements BeanPostProcessor {
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
 				BeanDefinitionRegistry registry) {
-			if (!registry.containsBeanDefinition(BEAN_NAME)) {
-				GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-				beanDefinition.setBeanClass(DataSourceInitializedPublisher.class);
-				beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-				// We don't need this one to be post processed otherwise it can cause a
-				// cascade of bean instantiation that we would rather avoid.
-				beanDefinition.setSynthetic(true);
-				registry.registerBeanDefinition(BEAN_NAME, beanDefinition);
+			if (registry.containsBeanDefinition(BEAN_NAME)) {
+				return;
 			}
+			GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+			beanDefinition.setBeanClass(DataSourceInitializedPublisher.class);
+			beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			// We don't need this one to be post processed otherwise it can cause a
+			// cascade of bean instantiation that we would rather avoid.
+			beanDefinition.setSynthetic(true);
+			registry.registerBeanDefinition(BEAN_NAME, beanDefinition);
 		}
 
 	}

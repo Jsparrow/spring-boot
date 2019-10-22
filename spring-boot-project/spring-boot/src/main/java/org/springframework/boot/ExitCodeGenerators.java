@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maintains a collection of {@link ExitCodeGenerator} instances and allows the final exit
@@ -34,6 +36,7 @@ import org.springframework.util.Assert;
  */
 class ExitCodeGenerators implements Iterable<ExitCodeGenerator> {
 
+	private static final Logger logger = LoggerFactory.getLogger(ExitCodeGenerators.class);
 	private List<ExitCodeGenerator> generators = new ArrayList<>();
 
 	void addAll(Throwable exception, ExitCodeExceptionMapper... mappers) {
@@ -93,7 +96,7 @@ class ExitCodeGenerators implements Iterable<ExitCodeGenerator> {
 			}
 			catch (Exception ex) {
 				exitCode = (exitCode != 0) ? exitCode : 1;
-				ex.printStackTrace();
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 		return exitCode;

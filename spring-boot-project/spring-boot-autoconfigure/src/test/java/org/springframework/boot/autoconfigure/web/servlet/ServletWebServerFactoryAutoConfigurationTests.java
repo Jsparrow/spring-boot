@@ -444,7 +444,7 @@ class ServletWebServerFactoryAutoConfigurationTests {
 	static class EnsureWebServerHasNoServletContext implements BeanPostProcessor {
 
 		@Override
-		public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		public Object postProcessBeforeInitialization(Object bean, String beanName) {
 			if (bean instanceof ConfigurableServletWebServerFactory) {
 				MockServletWebServerFactory webServerFactory = (MockServletWebServerFactory) bean;
 				assertThat(webServerFactory.getServletContext()).isNull();

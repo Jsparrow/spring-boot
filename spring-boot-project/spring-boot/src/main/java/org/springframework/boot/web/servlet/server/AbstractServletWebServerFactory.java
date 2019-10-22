@@ -125,13 +125,14 @@ public abstract class AbstractServletWebServerFactory extends AbstractConfigurab
 
 	private void checkContextPath(String contextPath) {
 		Assert.notNull(contextPath, "ContextPath must not be null");
-		if (!contextPath.isEmpty()) {
-			if ("/".equals(contextPath)) {
-				throw new IllegalArgumentException("Root ContextPath must be specified using an empty string");
-			}
-			if (!contextPath.startsWith("/") || contextPath.endsWith("/")) {
-				throw new IllegalArgumentException("ContextPath must start with '/' and not end with '/'");
-			}
+		if (contextPath.isEmpty()) {
+			return;
+		}
+		if ("/".equals(contextPath)) {
+			throw new IllegalArgumentException("Root ContextPath must be specified using an empty string");
+		}
+		if (!contextPath.startsWith("/") || contextPath.endsWith("/")) {
+			throw new IllegalArgumentException("ContextPath must start with '/' and not end with '/'");
 		}
 	}
 
@@ -333,9 +334,7 @@ public abstract class AbstractServletWebServerFactory extends AbstractConfigurab
 				return null;
 			}
 			Set<javax.servlet.SessionTrackingMode> result = new LinkedHashSet<>();
-			for (Session.SessionTrackingMode mode : modes) {
-				result.add(javax.servlet.SessionTrackingMode.valueOf(mode.name()));
-			}
+			modes.forEach(mode -> result.add(javax.servlet.SessionTrackingMode.valueOf(mode.name())));
 			return result;
 		}
 

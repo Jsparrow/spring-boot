@@ -82,6 +82,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.support.StandardServletEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that can be used to bootstrap and launch a Spring application from a Java main
@@ -159,6 +161,8 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * @see #SpringApplication(Class...)
  */
 public class SpringApplication {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(SpringApplication.class);
 
 	/**
 	 * The class name of application context that will be used by default for non-web
@@ -284,6 +288,7 @@ public class SpringApplication {
 			}
 		}
 		catch (ClassNotFoundException ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Swallow and continue
 		}
 		return null;
@@ -400,6 +405,7 @@ public class SpringApplication {
 				context.registerShutdownHook();
 			}
 			catch (AccessControlException ex) {
+				logger1.error(ex.getMessage(), ex);
 				// Not allowed in some environments.
 			}
 		}
@@ -442,7 +448,7 @@ public class SpringApplication {
 				instances.add(instance);
 			}
 			catch (Throwable ex) {
-				throw new IllegalArgumentException("Cannot instantiate " + type + " : " + name, ex);
+				throw new IllegalArgumentException(new StringBuilder().append("Cannot instantiate ").append(type).append(" : ").append(name).toString(), ex);
 			}
 		}
 		return instances;
@@ -494,19 +500,20 @@ public class SpringApplication {
 		if (this.defaultProperties != null && !this.defaultProperties.isEmpty()) {
 			sources.addLast(new MapPropertySource("defaultProperties", this.defaultProperties));
 		}
-		if (this.addCommandLineProperties && args.length > 0) {
-			String name = CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME;
-			if (sources.contains(name)) {
-				PropertySource<?> source = sources.get(name);
-				CompositePropertySource composite = new CompositePropertySource(name);
-				composite.addPropertySource(
-						new SimpleCommandLinePropertySource("springApplicationCommandLineArgs", args));
-				composite.addPropertySource(source);
-				sources.replace(name, composite);
-			}
-			else {
-				sources.addFirst(new SimpleCommandLinePropertySource(args));
-			}
+		if (!(this.addCommandLineProperties && args.length > 0)) {
+			return;
+		}
+		String name = CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME;
+		if (sources.contains(name)) {
+			PropertySource<?> source = sources.get(name);
+			CompositePropertySource composite = new CompositePropertySource(name);
+			composite.addPropertySource(
+					new SimpleCommandLinePropertySource("springApplicationCommandLineArgs", args));
+			composite.addPropertySource(source);
+			sources.replace(name, composite);
+		}
+		else {
+			sources.addFirst(new SimpleCommandLinePropertySource(args));
 		}
 	}
 
@@ -526,10 +533,11 @@ public class SpringApplication {
 	}
 
 	private void configureIgnoreBeanInfo(ConfigurableEnvironment environment) {
-		if (System.getProperty(CachedIntrospectionResults.IGNORE_BEANINFO_PROPERTY_NAME) == null) {
-			Boolean ignore = environment.getProperty("spring.beaninfo.ignore", Boolean.class, Boolean.TRUE);
-			System.setProperty(CachedIntrospectionResults.IGNORE_BEANINFO_PROPERTY_NAME, ignore.toString());
+		if (System.getProperty(CachedIntrospectionResults.IGNORE_BEANINFO_PROPERTY_NAME) != null) {
+			return;
 		}
+		Boolean ignore = environment.getProperty("spring.beaninfo.ignore", Boolean.class, Boolean.TRUE);
+		System.setProperty(CachedIntrospectionResults.IGNORE_BEANINFO_PROPERTY_NAME, ignore.toString());
 	}
 
 	/**
@@ -644,17 +652,18 @@ public class SpringApplication {
 	 */
 	protected void logStartupProfileInfo(ConfigurableApplicationContext context) {
 		Log log = getApplicationLog();
-		if (log.isInfoEnabled()) {
-			String[] activeProfiles = context.getEnvironment().getActiveProfiles();
-			if (ObjectUtils.isEmpty(activeProfiles)) {
-				String[] defaultProfiles = context.getEnvironment().getDefaultProfiles();
-				log.info("No active profile set, falling back to default profiles: "
-						+ StringUtils.arrayToCommaDelimitedString(defaultProfiles));
-			}
-			else {
-				log.info("The following profiles are active: "
-						+ StringUtils.arrayToCommaDelimitedString(activeProfiles));
-			}
+		if (!log.isInfoEnabled()) {
+			return;
+		}
+		String[] activeProfiles = context.getEnvironment().getActiveProfiles();
+		if (ObjectUtils.isEmpty(activeProfiles)) {
+			String[] defaultProfiles = context.getEnvironment().getDefaultProfiles();
+			log.info("No active profile set, falling back to default profiles: "
+					+ StringUtils.arrayToCommaDelimitedString(defaultProfiles));
+		}
+		else {
+			log.info("The following profiles are active: "
+					+ StringUtils.arrayToCommaDelimitedString(activeProfiles));
 		}
 	}
 
@@ -760,14 +769,14 @@ public class SpringApplication {
 		runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
 		runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
 		AnnotationAwareOrderComparator.sort(runners);
-		for (Object runner : new LinkedHashSet<>(runners)) {
+		new LinkedHashSet<>(runners).forEach(runner -> {
 			if (runner instanceof ApplicationRunner) {
 				callRunner((ApplicationRunner) runner, args);
 			}
 			if (runner instanceof CommandLineRunner) {
 				callRunner((CommandLineRunner) runner, args);
 			}
-		}
+		});
 	}
 
 	private void callRunner(ApplicationRunner runner, ApplicationArguments args) {
@@ -820,12 +829,14 @@ public class SpringApplication {
 			}
 		}
 		catch (Throwable ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Continue with normal handling of the original failure
 		}
-		if (logger.isErrorEnabled()) {
-			logger.error("Application run failed", failure);
-			registerLoggedException(failure);
+		if (!logger.isErrorEnabled()) {
+			return;
 		}
+		logger.error("Application run failed", failure);
+		registerLoggedException(failure);
 	}
 
 	/**
@@ -842,14 +853,15 @@ public class SpringApplication {
 
 	private void handleExitCode(ConfigurableApplicationContext context, Throwable exception) {
 		int exitCode = getExitCodeFromException(context, exception);
-		if (exitCode != 0) {
-			if (context != null) {
-				context.publishEvent(new ExitCodeEvent(context, exitCode));
-			}
-			SpringBootExceptionHandler handler = getSpringBootExceptionHandler();
-			if (handler != null) {
-				handler.registerExitCode(exitCode);
-			}
+		if (exitCode == 0) {
+			return;
+		}
+		if (context != null) {
+			context.publishEvent(new ExitCodeEvent(context, exitCode));
+		}
+		SpringBootExceptionHandler handler = getSpringBootExceptionHandler();
+		if (handler != null) {
+			handler.registerExitCode(exitCode);
 		}
 	}
 
@@ -1032,9 +1044,7 @@ public class SpringApplication {
 	 */
 	public void setDefaultProperties(Properties defaultProperties) {
 		this.defaultProperties = new HashMap<>();
-		for (Object key : Collections.list(defaultProperties.propertyNames())) {
-			this.defaultProperties.put((String) key, defaultProperties.get(key));
-		}
+		Collections.list(defaultProperties.propertyNames()).forEach(key -> this.defaultProperties.put((String) key, defaultProperties.get(key)));
 	}
 
 	/**
@@ -1272,17 +1282,18 @@ public class SpringApplication {
 			}
 		}
 		catch (Exception ex) {
-			ex.printStackTrace();
+			logger1.error(ex.getMessage(), ex);
 			exitCode = (exitCode != 0) ? exitCode : 1;
 		}
 		return exitCode;
 	}
 
 	private static void close(ApplicationContext context) {
-		if (context instanceof ConfigurableApplicationContext) {
-			ConfigurableApplicationContext closable = (ConfigurableApplicationContext) context;
-			closable.close();
+		if (!(context instanceof ConfigurableApplicationContext)) {
+			return;
 		}
+		ConfigurableApplicationContext closable = (ConfigurableApplicationContext) context;
+		closable.close();
 	}
 
 	private static <E> Set<E> asUnmodifiableOrderedSet(Collection<E> elements) {

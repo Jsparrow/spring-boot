@@ -30,10 +30,8 @@ class ConnectorStartFailureAnalyzer extends AbstractFailureAnalyzer<ConnectorSta
 	@Override
 	protected FailureAnalysis analyze(Throwable rootFailure, ConnectorStartFailedException cause) {
 		return new FailureAnalysis(
-				"The Tomcat connector configured to listen on port " + cause.getPort()
-						+ " failed to start. The port may already be in use or the connector may be misconfigured.",
-				"Verify the connector's configuration, identify and stop any process that's listening on port "
-						+ cause.getPort() + ", or configure this application to listen on another port.",
+				new StringBuilder().append("The Tomcat connector configured to listen on port ").append(cause.getPort()).append(" failed to start. The port may already be in use or the connector may be misconfigured.").toString(),
+				new StringBuilder().append("Verify the connector's configuration, identify and stop any process that's listening on port ").append(cause.getPort()).append(", or configure this application to listen on another port.").toString(),
 				cause);
 	}
 

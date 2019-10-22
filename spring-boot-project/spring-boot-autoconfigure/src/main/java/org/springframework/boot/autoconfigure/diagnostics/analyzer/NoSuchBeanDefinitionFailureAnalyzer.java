@@ -55,6 +55,8 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link AbstractInjectionFailureAnalyzer} that performs analysis of failures caused
@@ -73,7 +75,7 @@ class NoSuchBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyz
 	private ConditionEvaluationReport report;
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		Assert.isInstanceOf(ConfigurableListableBeanFactory.class, beanFactory);
 		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 		this.metadataReaderFactory = new CachingMetadataReaderFactory(this.beanFactory.getBeanClassLoader());
@@ -103,12 +105,8 @@ class NoSuchBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyz
 		}
 		if (!autoConfigurationResults.isEmpty() || !userConfigurationResults.isEmpty()) {
 			message.append(String.format("%nThe following candidates were found but could not be injected:%n"));
-			for (AutoConfigurationResult result : autoConfigurationResults) {
-				message.append(String.format("\t- %s%n", result));
-			}
-			for (UserConfigurationResult result : userConfigurationResults) {
-				message.append(String.format("\t- %s%n", result));
-			}
+			autoConfigurationResults.forEach(result -> message.append(String.format("\t- %s%n", result)));
+			userConfigurationResults.forEach(result -> message.append(String.format("\t- %s%n", result)));
 		}
 		String action = String.format("Consider %s %s in your configuration.",
 				(!autoConfigurationResults.isEmpty() || !userConfigurationResults.isEmpty())
@@ -130,11 +128,11 @@ class NoSuchBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyz
 	}
 
 	private String getBeanDescription(NoSuchBeanDefinitionException cause) {
-		if (cause.getResolvableType() != null) {
-			Class<?> type = extractBeanType(cause.getResolvableType());
-			return "a bean of type '" + type.getName() + "'";
+		if (cause.getResolvableType() == null) {
+			return new StringBuilder().append("a bean named '").append(cause.getBeanName()).append("'").toString();
 		}
-		return "a bean named '" + cause.getBeanName() + "'";
+		Class<?> type = extractBeanType(cause.getResolvableType());
+		return new StringBuilder().append("a bean of type '").append(type.getName()).append("'").toString();
 	}
 
 	private Class<?> extractBeanType(ResolvableType resolvableType) {
@@ -192,7 +190,7 @@ class NoSuchBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyz
 
 	private void collectExcludedAutoConfiguration(NoSuchBeanDefinitionException cause,
 			List<AutoConfigurationResult> results) {
-		for (String excludedClass : this.report.getExclusions()) {
+		this.report.getExclusions().forEach(excludedClass -> {
 			Source source = new Source(excludedClass);
 			BeanMethods methods = new BeanMethods(source, cause);
 			for (MethodMetadata method : methods) {
@@ -200,7 +198,7 @@ class NoSuchBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyz
 						ClassUtils.getShortName(excludedClass));
 				results.add(new AutoConfigurationResult(method, new ConditionOutcome(false, message)));
 			}
-		}
+		});
 	}
 
 	private InjectionPoint findInjectionPoint(Throwable failure) {
@@ -236,6 +234,7 @@ class NoSuchBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyz
 
 	private class BeanMethods implements Iterable<MethodMetadata> {
 
+		private final Logger logger = LoggerFactory.getLogger(BeanMethods.class);
 		private final List<MethodMetadata> methods;
 
 		BeanMethods(Source source, NoSuchBeanDefinitionException cause) {
@@ -249,14 +248,11 @@ class NoSuchBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyz
 				Set<MethodMetadata> candidates = classMetadata.getAnnotationMetadata()
 						.getAnnotatedMethods(Bean.class.getName());
 				List<MethodMetadata> result = new ArrayList<>();
-				for (MethodMetadata candidate : candidates) {
-					if (isMatch(candidate, source, cause)) {
-						result.add(candidate);
-					}
-				}
+				result.addAll(candidates.stream().filter(candidate -> isMatch(candidate, source, cause)).collect(Collectors.toList()));
 				return Collections.unmodifiableList(result);
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				return Collections.emptyList();
 			}
 		}
@@ -274,15 +270,15 @@ class NoSuchBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyz
 		private boolean hasName(MethodMetadata methodMetadata, String name) {
 			Map<String, Object> attributes = methodMetadata.getAnnotationAttributes(Bean.class.getName());
 			String[] candidates = (attributes != null) ? (String[]) attributes.get("name") : null;
-			if (candidates != null) {
-				for (String candidate : candidates) {
-					if (candidate.equals(name)) {
-						return true;
-					}
-				}
-				return false;
+			if (candidates == null) {
+				return methodMetadata.getMethodName().equals(name);
 			}
-			return methodMetadata.getMethodName().equals(name);
+			for (String candidate : candidates) {
+				if (candidate.equals(name)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private boolean hasType(MethodMetadata candidate, Class<?> type) {
@@ -296,6 +292,7 @@ class NoSuchBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyz
 				return type.isAssignableFrom(returnType);
 			}
 			catch (Throwable ex) {
+				logger.error(ex.getMessage(), ex);
 				return false;
 			}
 		}

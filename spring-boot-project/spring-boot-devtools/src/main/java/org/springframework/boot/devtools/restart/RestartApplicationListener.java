@@ -73,7 +73,7 @@ public class RestartApplicationListener implements ApplicationListener<Applicati
 			Restarter.initialize(args, false, initializer, restartOnInitialize);
 		}
 		else {
-			logger.info("Restart disabled due to System property '" + ENABLED_PROPERTY + "' being set to false");
+			logger.info(new StringBuilder().append("Restart disabled due to System property '").append(ENABLED_PROPERTY).append("' being set to false").toString());
 			Restarter.disable();
 		}
 	}

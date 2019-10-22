@@ -29,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link HealthIndicator} for a JMS {@link ConnectionFactory}.
@@ -57,6 +59,8 @@ public class JmsHealthIndicator extends AbstractHealthIndicator {
 
 	private final class MonitoredConnection {
 
+		private final Logger logger1 = LoggerFactory.getLogger(MonitoredConnection.class);
+
 		private final CountDownLatch latch = new CountDownLatch(1);
 
 		private final Connection connection;
@@ -75,6 +79,7 @@ public class JmsHealthIndicator extends AbstractHealthIndicator {
 					}
 				}
 				catch (InterruptedException ex) {
+					logger1.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 				}
 			}, "jms-health-indicator").start();
@@ -87,6 +92,7 @@ public class JmsHealthIndicator extends AbstractHealthIndicator {
 				this.connection.close();
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				// Continue
 			}
 		}

@@ -489,7 +489,7 @@ public class Binder {
 
 		private int depth;
 
-		private final List<ConfigurationPropertySource> source = Arrays.asList((ConfigurationPropertySource) null);
+		private final List<ConfigurationPropertySource> source = Collections.singletonList((ConfigurationPropertySource) null);
 
 		private int sourcePushCount;
 

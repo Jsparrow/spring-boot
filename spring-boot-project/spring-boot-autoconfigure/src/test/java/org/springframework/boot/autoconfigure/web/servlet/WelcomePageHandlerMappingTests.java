@@ -184,7 +184,7 @@ class WelcomePageHandlerMappingTests {
 		@Bean
 		TemplateAvailabilityProviders templateAvailabilityProviders() {
 			return new TestTemplateAvailabilityProviders(
-					(view, environment, classLoader, resourceLoader) -> view.equals("index"));
+					(view, environment, classLoader, resourceLoader) -> "index".equals(view));
 		}
 
 		@Bean

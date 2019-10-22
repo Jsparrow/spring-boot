@@ -152,9 +152,7 @@ class CloudFoundryMvcWebEndpointIntegrationTests {
 	}
 
 	private String mockAccessToken() {
-		return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0b3B0YWwu"
-				+ "Y29tIiwiZXhwIjoxNDI2NDIwODAwLCJhd2Vzb21lIjp0cnVlfQ."
-				+ Base64Utils.encodeToString("signature".getBytes());
+		return new StringBuilder().append("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0b3B0YWwu").append("Y29tIiwiZXhwIjoxNDI2NDIwODAwLCJhd2Vzb21lIjp0cnVlfQ.").append(Base64Utils.encodeToString("signature".getBytes())).toString();
 	}
 
 	@Configuration(proxyBeanMethods = false)
@@ -177,7 +175,7 @@ class CloudFoundryMvcWebEndpointIntegrationTests {
 				WebEndpointDiscoverer webEndpointDiscoverer, EndpointMediaTypes endpointMediaTypes,
 				CloudFoundrySecurityInterceptor interceptor) {
 			CorsConfiguration corsConfiguration = new CorsConfiguration();
-			corsConfiguration.setAllowedOrigins(Arrays.asList("https://example.com"));
+			corsConfiguration.setAllowedOrigins(Collections.singletonList("https://example.com"));
 			corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST"));
 			return new CloudFoundryWebEndpointServletHandlerMapping(new EndpointMapping("/cfApplication"),
 					webEndpointDiscoverer.getEndpoints(), endpointMediaTypes, corsConfiguration, interceptor,

@@ -45,7 +45,7 @@ abstract class HealthEndpointSupport<C, T> {
 	 */
 	@Deprecated
 	HealthEndpointSupport() {
-		throw new IllegalStateException("Unable to create " + getClass() + " using deprecated constructor");
+		throw new IllegalStateException(new StringBuilder().append("Unable to create ").append(getClass()).append(" using deprecated constructor").toString());
 	}
 
 	/**

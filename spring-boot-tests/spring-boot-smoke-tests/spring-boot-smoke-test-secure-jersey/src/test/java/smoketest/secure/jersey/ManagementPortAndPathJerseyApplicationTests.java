@@ -48,7 +48,7 @@ class ManagementPortAndPathJerseyApplicationTests extends AbstractJerseySecureTe
 	@Test
 	void testMissing() {
 		ResponseEntity<String> entity = new TestRestTemplate("admin", "admin")
-				.getForEntity("http://localhost:" + this.managementPort + "/management/actuator/missing", String.class);
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/management/actuator/missing").toString(), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
@@ -59,7 +59,7 @@ class ManagementPortAndPathJerseyApplicationTests extends AbstractJerseySecureTe
 
 	@Override
 	String getManagementPath() {
-		return "http://localhost:" + this.managementPort + "/management";
+		return new StringBuilder().append("http://localhost:").append(this.managementPort).append("/management").toString();
 	}
 
 }

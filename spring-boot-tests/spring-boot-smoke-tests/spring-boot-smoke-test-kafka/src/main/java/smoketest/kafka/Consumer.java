@@ -21,16 +21,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 class Consumer {
 
+	private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
 	private final List<SampleMessage> messages = new CopyOnWriteArrayList<>();
 
 	@KafkaListener(topics = "testTopic")
 	void processMessage(SampleMessage message) {
 		this.messages.add(message);
-		System.out.println("Received sample message [" + message + "]");
+		logger.info(new StringBuilder().append("Received sample message [").append(message).append("]").toString());
 	}
 
 	List<SampleMessage> getMessages() {

@@ -58,6 +58,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Condition} that checks for the presence or absence of specific beans.
@@ -73,6 +75,8 @@ import org.springframework.util.StringUtils;
  */
 @Order(Ordered.LOWEST_PRECEDENCE)
 class OnBeanCondition extends FilteringSpringBootCondition implements ConfigurationCondition {
+
+	private static final Logger logger = LoggerFactory.getLogger(OnBeanCondition.class);
 
 	@Override
 	public ConfigurationPhase getConfigurationPhase() {
@@ -100,12 +104,12 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 
 	private ConditionOutcome getOutcome(Set<String> requiredBeanTypes, Class<? extends Annotation> annotation) {
 		List<String> missing = filter(requiredBeanTypes, ClassNameFilter.MISSING, getBeanClassLoader());
-		if (!missing.isEmpty()) {
-			ConditionMessage message = ConditionMessage.forCondition(annotation)
-					.didNotFind("required type", "required types").items(Style.QUOTE, missing);
-			return ConditionOutcome.noMatch(message);
+		if (missing.isEmpty()) {
+			return null;
 		}
-		return null;
+		ConditionMessage message = ConditionMessage.forCondition(annotation)
+				.didNotFind("required type", "required types").items(Style.QUOTE, missing);
+		return ConditionOutcome.noMatch(message);
 	}
 
 	@Override
@@ -214,6 +218,7 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 					parameterizedContainers);
 		}
 		catch (ClassNotFoundException | NoClassDefFoundError ex) {
+			logger.error(ex.getMessage(), ex);
 			return Collections.emptySet();
 		}
 	}
@@ -250,6 +255,7 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 					considerHierarchy, result);
 		}
 		catch (ClassNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Continue
 		}
 		return (result != null) ? result : Collections.emptySet();
@@ -291,15 +297,16 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 	}
 
 	private void appendMessageForNoMatches(StringBuilder reason, Collection<String> unmatched, String description) {
-		if (!unmatched.isEmpty()) {
-			if (reason.length() > 0) {
-				reason.append(" and ");
-			}
-			reason.append("did not find any beans ");
-			reason.append(description);
-			reason.append(" ");
-			reason.append(StringUtils.collectionToDelimitedString(unmatched, ", "));
+		if (unmatched.isEmpty()) {
+			return;
 		}
+		if (reason.length() > 0) {
+			reason.append(" and ");
+		}
+		reason.append("did not find any beans ");
+		reason.append(description);
+		reason.append(" ");
+		reason.append(StringUtils.collectionToDelimitedString(unmatched, ", "));
 	}
 
 	private String createOnMissingBeanNoMatchReason(MatchResult matchResult) {
@@ -341,12 +348,12 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 	private List<String> getPrimaryBeans(ConfigurableListableBeanFactory beanFactory, Set<String> beanNames,
 			boolean considerHierarchy) {
 		List<String> primaryBeans = new ArrayList<>();
-		for (String beanName : beanNames) {
+		beanNames.forEach(beanName -> {
 			BeanDefinition beanDefinition = findBeanDefinition(beanFactory, beanName, considerHierarchy);
 			if (beanDefinition != null && beanDefinition.isPrimary()) {
 				primaryBeans.add(beanName);
 			}
-		}
+		});
 		return primaryBeans;
 	}
 
@@ -384,6 +391,8 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 	 * A search specification extracted from the underlying annotation.
 	 */
 	private static class Spec<A extends Annotation> {
+
+		private final Logger logger1 = LoggerFactory.getLogger(Spec.class);
 
 		private final ClassLoader classLoader;
 
@@ -439,14 +448,14 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			Set<String> result = new LinkedHashSet<>();
 			for (String attributeName : attributeNames) {
 				List<Object> values = attributes.getOrDefault(attributeName, Collections.emptyList());
-				for (Object value : values) {
+				values.forEach(value -> {
 					if (value instanceof String[]) {
 						merge(result, (String[]) value);
 					}
 					else if (value instanceof String) {
 						merge(result, (String) value);
 					}
-				}
+				});
 			}
 			return result.isEmpty() ? Collections.emptySet() : result;
 		}
@@ -465,19 +474,21 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 					resolved.add(resolve(className, this.classLoader));
 				}
 				catch (ClassNotFoundException | NoClassDefFoundError ex) {
+					logger1.error(ex.getMessage(), ex);
 				}
 			}
 			return resolved;
 		}
 
 		protected void validate(BeanTypeDeductionException ex) {
-			if (!hasAtLeastOneElement(this.types, this.names, this.annotations)) {
-				String message = getAnnotationName() + " did not specify a bean using type, name or annotation";
-				if (ex == null) {
-					throw new IllegalStateException(message);
-				}
-				throw new IllegalStateException(message + " and the attempt to deduce the bean's type failed", ex);
+			if (hasAtLeastOneElement(this.types, this.names, this.annotations)) {
+				return;
 			}
+			String message = getAnnotationName() + " did not specify a bean using type, name or annotation";
+			if (ex == null) {
+				throw new IllegalStateException(message);
+			}
+			throw new IllegalStateException(message + " and the attempt to deduce the bean's type failed", ex);
 		}
 
 		private boolean hasAtLeastOneElement(Set<?>... sets) {
@@ -638,8 +649,7 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 		@Override
 		protected void validate(BeanTypeDeductionException ex) {
 			Assert.isTrue(getTypes().size() == 1,
-					() -> getAnnotationName() + " annotations must specify only one type (got "
-							+ StringUtils.collectionToCommaDelimitedString(getTypes()) + ")");
+					() -> new StringBuilder().append(getAnnotationName()).append(" annotations must specify only one type (got ").append(StringUtils.collectionToCommaDelimitedString(getTypes())).append(")").toString());
 		}
 
 	}
@@ -736,7 +746,7 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 	static final class BeanTypeDeductionException extends RuntimeException {
 
 		private BeanTypeDeductionException(String className, String beanMethodName, Throwable cause) {
-			super("Failed to deduce bean type for " + className + "." + beanMethodName, cause);
+			super(new StringBuilder().append("Failed to deduce bean type for ").append(className).append(".").append(beanMethodName).toString(), cause);
 		}
 
 	}

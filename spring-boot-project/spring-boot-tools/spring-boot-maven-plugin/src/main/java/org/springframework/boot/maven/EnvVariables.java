@@ -40,11 +40,7 @@ class EnvVariables {
 			return Collections.emptyMap();
 		}
 		Map<String, String> result = new LinkedHashMap<>();
-		for (Map.Entry<String, String> e : args.entrySet()) {
-			if (e.getKey() != null) {
-				result.put(e.getKey(), getValue(e.getValue()));
-			}
-		}
+		args.entrySet().stream().filter(e -> e.getKey() != null).forEach(e -> result.put(e.getKey(), getValue(e.getValue())));
 		return result;
 	}
 
@@ -58,9 +54,7 @@ class EnvVariables {
 
 	String[] asArray() {
 		List<String> args = new ArrayList<>(this.variables.size());
-		for (Map.Entry<String, String> arg : this.variables.entrySet()) {
-			args.add(arg.getKey() + "=" + arg.getValue());
-		}
+		this.variables.entrySet().forEach(arg -> args.add(new StringBuilder().append(arg.getKey()).append("=").append(arg.getValue()).toString()));
 		return args.toArray(new String[0]);
 	}
 

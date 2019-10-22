@@ -121,7 +121,7 @@ public class TestProject {
 	 * @return the output file
 	 */
 	public File getOutputFile(String relativePath) {
-		Assert.isTrue(!new File(relativePath).isAbsolute(), "'" + relativePath + "' was absolute");
+		Assert.isTrue(!new File(relativePath).isAbsolute(), new StringBuilder().append("'").append(relativePath).append("' was absolute").toString());
 		return new File(this.compiler.getOutputLocation(), relativePath);
 	}
 
@@ -136,7 +136,7 @@ public class TestProject {
 		String contents = getContents(targetFile);
 		int insertAt = contents.lastIndexOf('}');
 		String additionalSource = FileCopyUtils.copyToString(new InputStreamReader(snippetStream));
-		contents = contents.substring(0, insertAt) + additionalSource + contents.substring(insertAt);
+		contents = new StringBuilder().append(contents.substring(0, insertAt)).append(additionalSource).append(contents.substring(insertAt)).toString();
 		putContents(targetFile, contents);
 	}
 
@@ -156,7 +156,7 @@ public class TestProject {
 	 * @throws IOException on IO error
 	 */
 	public void revert(Class<?> type) throws IOException {
-		Assert.isTrue(getSourceFile(type).exists(), "Source file for type '" + type + "' does not exist");
+		Assert.isTrue(getSourceFile(type).exists(), new StringBuilder().append("Source file for type '").append(type).append("' does not exist").toString());
 		copySources(type);
 	}
 
@@ -166,7 +166,7 @@ public class TestProject {
 	 * @throws IOException on IO error
 	 */
 	public void add(Class<?> type) throws IOException {
-		Assert.isTrue(!getSourceFile(type).exists(), "Source file for type '" + type + "' already exists");
+		Assert.isTrue(!getSourceFile(type).exists(), new StringBuilder().append("Source file for type '").append(type).append("' already exists").toString());
 		copySources(type);
 	}
 

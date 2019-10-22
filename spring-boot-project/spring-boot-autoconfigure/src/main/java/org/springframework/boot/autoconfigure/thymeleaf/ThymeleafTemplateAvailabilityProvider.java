@@ -34,12 +34,12 @@ public class ThymeleafTemplateAvailabilityProvider implements TemplateAvailabili
 	@Override
 	public boolean isTemplateAvailable(String view, Environment environment, ClassLoader classLoader,
 			ResourceLoader resourceLoader) {
-		if (ClassUtils.isPresent("org.thymeleaf.spring5.SpringTemplateEngine", classLoader)) {
-			String prefix = environment.getProperty("spring.thymeleaf.prefix", ThymeleafProperties.DEFAULT_PREFIX);
-			String suffix = environment.getProperty("spring.thymeleaf.suffix", ThymeleafProperties.DEFAULT_SUFFIX);
-			return resourceLoader.getResource(prefix + view + suffix).exists();
+		if (!ClassUtils.isPresent("org.thymeleaf.spring5.SpringTemplateEngine", classLoader)) {
+			return false;
 		}
-		return false;
+		String prefix = environment.getProperty("spring.thymeleaf.prefix", ThymeleafProperties.DEFAULT_PREFIX);
+		String suffix = environment.getProperty("spring.thymeleaf.suffix", ThymeleafProperties.DEFAULT_SUFFIX);
+		return resourceLoader.getResource(new StringBuilder().append(prefix).append(view).append(suffix).toString()).exists();
 	}
 
 }

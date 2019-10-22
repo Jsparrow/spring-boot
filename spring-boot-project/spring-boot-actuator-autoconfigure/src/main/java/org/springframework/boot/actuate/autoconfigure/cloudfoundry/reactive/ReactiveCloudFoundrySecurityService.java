@@ -83,7 +83,7 @@ class ReactiveCloudFoundrySecurityService {
 	 * @return a Mono of the access level that should be granted
 	 * @throws CloudFoundryAuthorizationException if the token is not authorized
 	 */
-	Mono<AccessLevel> getAccessLevel(String token, String applicationId) throws CloudFoundryAuthorizationException {
+	Mono<AccessLevel> getAccessLevel(String token, String applicationId) {
 		String uri = getPermissionsUri(applicationId);
 		return this.webClient.get().uri(uri).header("Authorization", "bearer " + token).retrieve().bodyToMono(Map.class)
 				.map(this::getAccessLevel).onErrorMap(this::mapError);
@@ -92,7 +92,7 @@ class ReactiveCloudFoundrySecurityService {
 	private Throwable mapError(Throwable throwable) {
 		if (throwable instanceof WebClientResponseException) {
 			HttpStatus statusCode = ((WebClientResponseException) throwable).getStatusCode();
-			if (statusCode.equals(HttpStatus.FORBIDDEN)) {
+			if (statusCode == HttpStatus.FORBIDDEN) {
 				return new CloudFoundryAuthorizationException(Reason.ACCESS_DENIED, "Access denied");
 			}
 			if (statusCode.is4xxClientError()) {
@@ -110,7 +110,7 @@ class ReactiveCloudFoundrySecurityService {
 	}
 
 	private String getPermissionsUri(String applicationId) {
-		return this.cloudControllerUrl + "/v2/apps/" + applicationId + "/permissions";
+		return new StringBuilder().append(this.cloudControllerUrl).append("/v2/apps/").append(applicationId).append("/permissions").toString();
 	}
 
 	/**
@@ -129,10 +129,10 @@ class ReactiveCloudFoundrySecurityService {
 
 	private Map<String, String> extractTokenKeys(Map<String, Object> response) {
 		Map<String, String> tokenKeys = new HashMap<>();
-		for (Object key : (List<?>) response.get("keys")) {
+		((List<?>) response.get("keys")).forEach(key -> {
 			Map<?, ?> tokenKey = (Map<?, ?>) key;
 			tokenKeys.put((String) tokenKey.get("kid"), (String) tokenKey.get("value"));
-		}
+		});
 		return tokenKeys;
 	}
 

@@ -17,6 +17,8 @@
 package org.springframework.boot;
 
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An enumeration of possible types of web application.
@@ -44,6 +46,8 @@ public enum WebApplicationType {
 	 * embedded reactive web server.
 	 */
 	REACTIVE;
+
+	private static final Logger logger = LoggerFactory.getLogger(WebApplicationType.class);
 
 	private static final String[] SERVLET_INDICATOR_CLASSES = { "javax.servlet.Servlet",
 			"org.springframework.web.context.ConfigurableWebApplicationContext" };
@@ -86,6 +90,7 @@ public enum WebApplicationType {
 			return ClassUtils.resolveClassName(target, null).isAssignableFrom(type);
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

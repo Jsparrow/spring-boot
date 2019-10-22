@@ -58,11 +58,12 @@ class DataSourceInitializerInvoker implements ApplicationListener<DataSourceSche
 	@Override
 	public void afterPropertiesSet() {
 		DataSourceInitializer initializer = getDataSourceInitializer();
-		if (initializer != null) {
-			boolean schemaCreated = this.dataSourceInitializer.createSchema();
-			if (schemaCreated) {
-				initialize(initializer);
-			}
+		if (initializer == null) {
+			return;
+		}
+		boolean schemaCreated = this.dataSourceInitializer.createSchema();
+		if (schemaCreated) {
+			initialize(initializer);
 		}
 	}
 
@@ -76,7 +77,7 @@ class DataSourceInitializerInvoker implements ApplicationListener<DataSourceSche
 			}
 		}
 		catch (IllegalStateException ex) {
-			logger.warn("Could not send event to complete DataSource initialization (" + ex.getMessage() + ")");
+			logger.warn(new StringBuilder().append("Could not send event to complete DataSource initialization (").append(ex.getMessage()).append(")").toString());
 		}
 	}
 
@@ -85,10 +86,11 @@ class DataSourceInitializerInvoker implements ApplicationListener<DataSourceSche
 		// NOTE the event can happen more than once and
 		// the event datasource is not used here
 		DataSourceInitializer initializer = getDataSourceInitializer();
-		if (!this.initialized && initializer != null) {
-			initializer.initSchema();
-			this.initialized = true;
+		if (!(!this.initialized && initializer != null)) {
+			return;
 		}
+		initializer.initSchema();
+		this.initialized = true;
 	}
 
 	private DataSourceInitializer getDataSourceInitializer() {

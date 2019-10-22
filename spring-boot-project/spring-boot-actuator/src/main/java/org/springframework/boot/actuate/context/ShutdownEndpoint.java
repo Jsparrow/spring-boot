@@ -25,6 +25,8 @@ import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Endpoint @Endpoint} to shutdown the {@link ApplicationContext}.
@@ -36,6 +38,8 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @Endpoint(id = "shutdown", enableByDefault = false)
 public class ShutdownEndpoint implements ApplicationContextAware {
+
+	private static final Logger logger = LoggerFactory.getLogger(ShutdownEndpoint.class);
 
 	private static final Map<String, String> NO_CONTEXT_MESSAGE = Collections
 			.unmodifiableMap(Collections.singletonMap("message", "No context to shutdown."));
@@ -65,13 +69,14 @@ public class ShutdownEndpoint implements ApplicationContextAware {
 			Thread.sleep(500L);
 		}
 		catch (InterruptedException ex) {
+			logger.error(ex.getMessage(), ex);
 			Thread.currentThread().interrupt();
 		}
 		this.context.close();
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext context) throws BeansException {
+	public void setApplicationContext(ApplicationContext context) {
 		if (context instanceof ConfigurableApplicationContext) {
 			this.context = (ConfigurableApplicationContext) context;
 		}

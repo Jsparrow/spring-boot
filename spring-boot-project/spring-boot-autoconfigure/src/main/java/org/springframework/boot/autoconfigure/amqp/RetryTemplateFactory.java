@@ -51,9 +51,7 @@ class RetryTemplateFactory {
 		map.from(properties::getMaxInterval).whenNonNull().as(Duration::toMillis).to(backOffPolicy::setMaxInterval);
 		template.setBackOffPolicy(backOffPolicy);
 		if (this.customizers != null) {
-			for (RabbitRetryTemplateCustomizer customizer : this.customizers) {
-				customizer.customize(target, template);
-			}
+			this.customizers.forEach(customizer -> customizer.customize(target, template));
 		}
 		return template;
 	}

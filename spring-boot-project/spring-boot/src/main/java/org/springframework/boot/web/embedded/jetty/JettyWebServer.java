@@ -39,6 +39,8 @@ import org.springframework.boot.web.server.WebServerException;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link WebServer} that can be used to control a Jetty web server.
@@ -53,6 +55,8 @@ import org.springframework.util.StringUtils;
  * @see JettyReactiveWebServerFactory
  */
 public class JettyWebServer implements WebServer {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(JettyWebServer.class);
 
 	private static final Log logger = LogFactory.getLog(JettyWebServer.class);
 
@@ -98,7 +102,7 @@ public class JettyWebServer implements WebServer {
 					protected void doStart() throws Exception {
 						for (Connector connector : JettyWebServer.this.connectors) {
 							Assert.state(connector.isStopped(),
-									() -> "Connector " + connector + " has been started prematurely");
+									() -> new StringBuilder().append("Connector ").append(connector).append(" has been started prematurely").toString());
 						}
 						JettyWebServer.this.server.setConnectors(null);
 					}
@@ -121,12 +125,13 @@ public class JettyWebServer implements WebServer {
 			this.server.stop();
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}
 
 	@Override
-	public void start() throws WebServerException {
+	public void start() {
 		synchronized (this.monitor) {
 			if (this.started) {
 				return;
@@ -153,8 +158,7 @@ public class JettyWebServer implements WebServer {
 					}
 				}
 				this.started = true;
-				logger.info("Jetty started on port(s) " + getActualPortsDescription() + " with context path '"
-						+ getContextPath() + "'");
+				logger.info(new StringBuilder().append("Jetty started on port(s) ").append(getActualPortsDescription()).append(" with context path '").append(getContextPath()).append("'").toString());
 			}
 			catch (WebServerException ex) {
 				stopSilently();
@@ -195,14 +199,14 @@ public class JettyWebServer implements WebServer {
 					.invokeMethod(ReflectionUtils.findMethod(connector.getClass(), "getLocalPort"), connector);
 		}
 		catch (Exception ex) {
-			logger.info("could not determine port ( " + ex.getMessage() + ")");
+			logger.info(new StringBuilder().append("could not determine port ( ").append(ex.getMessage()).append(")").toString());
 			return 0;
 		}
 	}
 
 	private String getProtocols(Connector connector) {
 		List<String> protocols = connector.getProtocols();
-		return " (" + StringUtils.collectionToDelimitedString(protocols, ", ") + ")";
+		return new StringBuilder().append(" (").append(StringUtils.collectionToDelimitedString(protocols, ", ")).append(")").toString();
 	}
 
 	private String getContextPath() {
@@ -232,6 +236,7 @@ public class JettyWebServer implements WebServer {
 				this.server.stop();
 			}
 			catch (InterruptedException ex) {
+				logger1.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 			catch (Exception ex) {

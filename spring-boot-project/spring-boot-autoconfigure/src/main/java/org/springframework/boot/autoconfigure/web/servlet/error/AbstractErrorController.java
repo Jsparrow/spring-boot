@@ -32,6 +32,8 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for error {@link Controller @Controller} implementations.
@@ -42,6 +44,8 @@ import org.springframework.web.servlet.ModelAndView;
  * @see ErrorAttributes
  */
 public abstract class AbstractErrorController implements ErrorController {
+
+	private static final Logger logger = LoggerFactory.getLogger(AbstractErrorController.class);
 
 	private final ErrorAttributes errorAttributes;
 
@@ -88,6 +92,7 @@ public abstract class AbstractErrorController implements ErrorController {
 			return HttpStatus.valueOf(statusCode);
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 	}

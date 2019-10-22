@@ -60,9 +60,7 @@ public class ValidationErrors implements Iterable<ObjectError> {
 	private List<ObjectError> convertErrors(ConfigurationPropertyName name, Set<ConfigurationProperty> boundProperties,
 			List<ObjectError> errors) {
 		List<ObjectError> converted = new ArrayList<>(errors.size());
-		for (ObjectError error : errors) {
-			converted.add(convertError(name, boundProperties, error));
-		}
+		errors.forEach(error -> converted.add(convertError(name, boundProperties, error)));
 		return Collections.unmodifiableList(converted);
 	}
 
@@ -84,12 +82,7 @@ public class ValidationErrors implements Iterable<ObjectError> {
 
 	private Origin findFieldErrorOrigin(ConfigurationPropertyName name, Set<ConfigurationProperty> boundProperties,
 			FieldError error) {
-		for (ConfigurationProperty boundProperty : boundProperties) {
-			if (isForError(name, boundProperty.getName(), error)) {
-				return Origin.from(boundProperty);
-			}
-		}
-		return null;
+		return boundProperties.stream().filter(boundProperty -> isForError(name, boundProperty.getName(), error)).findFirst().map(Origin::from).orElse(null);
 	}
 
 	private boolean isForError(ConfigurationPropertyName name, ConfigurationPropertyName boundPropertyName,

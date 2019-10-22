@@ -62,6 +62,12 @@ public class ImmutableInnerClassProperties {
 		return this.fourth;
 	}
 
+	public enum Fourth {
+
+		YES, NO
+
+	}
+
 	public static class Foo {
 
 		private String name;
@@ -93,12 +99,6 @@ public class ImmutableInnerClassProperties {
 			}
 
 		}
-
-	}
-
-	public enum Fourth {
-
-		YES, NO
 
 	}
 

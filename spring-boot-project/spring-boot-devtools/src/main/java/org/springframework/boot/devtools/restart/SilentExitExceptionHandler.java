@@ -80,10 +80,11 @@ class SilentExitExceptionHandler implements UncaughtExceptionHandler {
 
 	static void setup(Thread thread) {
 		UncaughtExceptionHandler handler = thread.getUncaughtExceptionHandler();
-		if (!(handler instanceof SilentExitExceptionHandler)) {
-			handler = new SilentExitExceptionHandler(handler);
-			thread.setUncaughtExceptionHandler(handler);
+		if (handler instanceof SilentExitExceptionHandler) {
+			return;
 		}
+		handler = new SilentExitExceptionHandler(handler);
+		thread.setUncaughtExceptionHandler(handler);
 	}
 
 	static void exitCurrentThread() {

@@ -107,12 +107,6 @@ public abstract class AnnotationCustomizableTypeExcludeFilter extends TypeExclud
 
 	protected abstract Set<Class<?>> getComponentIncludes();
 
-	protected enum FilterType {
-
-		INCLUDE, EXCLUDE
-
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -145,6 +139,12 @@ public abstract class AnnotationCustomizableTypeExcludeFilter extends TypeExclud
 		result = prime * result + ObjectUtils.nullSafeHashCode(getDefaultIncludes());
 		result = prime * result + ObjectUtils.nullSafeHashCode(getComponentIncludes());
 		return result;
+	}
+
+	protected enum FilterType {
+
+		INCLUDE, EXCLUDE
+
 	}
 
 }

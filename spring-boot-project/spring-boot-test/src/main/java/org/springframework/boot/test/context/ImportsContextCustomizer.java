@@ -49,6 +49,8 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ContextCustomizer} to allow {@code @Import} annotations to be used directly on
@@ -154,7 +156,7 @@ class ImportsContextCustomizer implements ContextCustomizer {
 		private ConfigurableListableBeanFactory beanFactory;
 
 		@Override
-		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		public void setBeanFactory(BeanFactory beanFactory) {
 			this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 		}
 
@@ -176,6 +178,8 @@ class ImportsContextCustomizer implements ContextCustomizer {
 
 		static final String BEAN_NAME = ImportsCleanupPostProcessor.class.getName();
 
+		private final Logger logger = LoggerFactory.getLogger(ImportsCleanupPostProcessor.class);
+
 		private final Class<?> testClass;
 
 		ImportsCleanupPostProcessor(Class<?> testClass) {
@@ -183,11 +187,11 @@ class ImportsContextCustomizer implements ContextCustomizer {
 		}
 
 		@Override
-		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		}
 
 		@Override
-		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 			try {
 				String[] names = registry.getBeanDefinitionNames();
 				for (String name : names) {
@@ -199,6 +203,7 @@ class ImportsContextCustomizer implements ContextCustomizer {
 				registry.removeBeanDefinition(ImportsConfiguration.BEAN_NAME);
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 
@@ -236,14 +241,15 @@ class ImportsContextCustomizer implements ContextCustomizer {
 		}
 
 		private void collectClassAnnotations(Class<?> classType, Set<Annotation> annotations, Set<Class<?>> seen) {
-			if (seen.add(classType)) {
-				collectElementAnnotations(classType, annotations, seen);
-				for (Class<?> interfaceType : classType.getInterfaces()) {
-					collectClassAnnotations(interfaceType, annotations, seen);
-				}
-				if (classType.getSuperclass() != null) {
-					collectClassAnnotations(classType.getSuperclass(), annotations, seen);
-				}
+			if (!seen.add(classType)) {
+				return;
+			}
+			collectElementAnnotations(classType, annotations, seen);
+			for (Class<?> interfaceType : classType.getInterfaces()) {
+				collectClassAnnotations(interfaceType, annotations, seen);
+			}
+			if (classType.getSuperclass() != null) {
+				collectClassAnnotations(classType.getSuperclass(), annotations, seen);
 			}
 		}
 
@@ -258,12 +264,7 @@ class ImportsContextCustomizer implements ContextCustomizer {
 		}
 
 		private boolean isIgnoredAnnotation(Annotation annotation) {
-			for (AnnotationFilter annotationFilter : ANNOTATION_FILTERS) {
-				if (annotationFilter.isIgnored(annotation)) {
-					return true;
-				}
-			}
-			return false;
+			return ANNOTATION_FILTERS.stream().anyMatch(annotationFilter -> annotationFilter.isIgnored(annotation));
 		}
 
 		private Set<Object> determineImports(Set<Annotation> annotations, Class<?> testClass) {

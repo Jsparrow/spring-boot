@@ -61,7 +61,7 @@ public final class Info {
 	public <T> T get(String id, Class<T> type) {
 		Object value = get(id);
 		if (value != null && type != null && !type.isInstance(value)) {
-			throw new IllegalStateException("Info entry is not of required type [" + type.getName() + "]: " + value);
+			throw new IllegalStateException(new StringBuilder().append("Info entry is not of required type [").append(type.getName()).append("]: ").append(value).toString());
 		}
 		return (T) value;
 	}
@@ -71,11 +71,11 @@ public final class Info {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof Info) {
-			Info other = (Info) obj;
-			return this.details.equals(other.details);
+		if (!(obj instanceof Info)) {
+			return false;
 		}
-		return false;
+		Info other = (Info) obj;
+		return this.details.equals(other.details);
 	}
 
 	@Override

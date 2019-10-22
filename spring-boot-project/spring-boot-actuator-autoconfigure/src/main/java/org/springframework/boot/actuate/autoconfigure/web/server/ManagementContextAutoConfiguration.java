@@ -127,20 +127,21 @@ public class ManagementContextAutoConfiguration {
 
 		@Override
 		public void onApplicationEvent(WebServerInitializedEvent event) {
-			if (event.getApplicationContext().equals(this.applicationContext)) {
-				ConfigurableWebServerApplicationContext managementContext = this.managementContextFactory
-						.createManagementContext(this.applicationContext,
-								EnableChildManagementContextConfiguration.class,
-								PropertyPlaceholderAutoConfiguration.class);
-				if (isLazyInitialization()) {
-					managementContext.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor());
-				}
-				managementContext.setServerNamespace("management");
-				managementContext.setId(this.applicationContext.getId() + ":management");
-				setClassLoaderIfPossible(managementContext);
-				CloseManagementContextListener.addIfPossible(this.applicationContext, managementContext);
-				managementContext.refresh();
+			if (!event.getApplicationContext().equals(this.applicationContext)) {
+				return;
 			}
+			ConfigurableWebServerApplicationContext managementContext = this.managementContextFactory
+					.createManagementContext(this.applicationContext,
+							EnableChildManagementContextConfiguration.class,
+							PropertyPlaceholderAutoConfiguration.class);
+			if (isLazyInitialization()) {
+				managementContext.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor());
+			}
+			managementContext.setServerNamespace("management");
+			managementContext.setId(this.applicationContext.getId() + ":management");
+			setClassLoaderIfPossible(managementContext);
+			CloseManagementContextListener.addIfPossible(this.applicationContext, managementContext);
+			managementContext.refresh();
 		}
 
 		protected boolean isLazyInitialization() {

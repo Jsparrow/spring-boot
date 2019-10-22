@@ -67,15 +67,13 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 			return null;
 		}
 		ConditionMessage.Builder message = ConditionMessage.forCondition(ConditionalOnWebApplication.class);
-		if (ConditionalOnWebApplication.Type.SERVLET.name().equals(type)) {
-			if (!ClassNameFilter.isPresent(SERVLET_WEB_APPLICATION_CLASS, getBeanClassLoader())) {
-				return ConditionOutcome.noMatch(message.didNotFind("servlet web application classes").atAll());
-			}
+		boolean condition = ConditionalOnWebApplication.Type.SERVLET.name().equals(type) && !ClassNameFilter.isPresent(SERVLET_WEB_APPLICATION_CLASS, getBeanClassLoader());
+		if (condition) {
+			return ConditionOutcome.noMatch(message.didNotFind("servlet web application classes").atAll());
 		}
-		if (ConditionalOnWebApplication.Type.REACTIVE.name().equals(type)) {
-			if (!ClassNameFilter.isPresent(REACTIVE_WEB_APPLICATION_CLASS, getBeanClassLoader())) {
-				return ConditionOutcome.noMatch(message.didNotFind("reactive web application classes").atAll());
-			}
+		boolean condition1 = ConditionalOnWebApplication.Type.REACTIVE.name().equals(type) && !ClassNameFilter.isPresent(REACTIVE_WEB_APPLICATION_CLASS, getBeanClassLoader());
+		if (condition1) {
+			return ConditionOutcome.noMatch(message.didNotFind("reactive web application classes").atAll());
 		}
 		if (!ClassNameFilter.isPresent(SERVLET_WEB_APPLICATION_CLASS, getBeanClassLoader())
 				&& !ClassUtils.isPresent(REACTIVE_WEB_APPLICATION_CLASS, getBeanClassLoader())) {

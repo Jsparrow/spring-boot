@@ -51,12 +51,12 @@ public class Hotel implements Serializable {
 	@Column(nullable = false)
 	private String zip;
 
-	protected Hotel() {
-	}
-
 	public Hotel(City city, String name) {
 		this.city = city;
 		this.name = name;
+	}
+
+	protected Hotel() {
 	}
 
 	public City getCity() {

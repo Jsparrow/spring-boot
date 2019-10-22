@@ -33,6 +33,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ApplicationListener} to trigger early initialization in a background thread of
@@ -49,6 +51,8 @@ import org.springframework.http.converter.support.AllEncompassingFormHttpMessage
  */
 @Order(LoggingApplicationListener.DEFAULT_ORDER + 1)
 public class BackgroundPreinitializer implements ApplicationListener<SpringApplicationEvent> {
+
+	private static final Logger logger = LoggerFactory.getLogger(BackgroundPreinitializer.class);
 
 	/**
 	 * System property that instructs Spring Boot how to run pre initialization. When the
@@ -76,6 +80,7 @@ public class BackgroundPreinitializer implements ApplicationListener<SpringAppli
 				preinitializationComplete.await();
 			}
 			catch (InterruptedException ex) {
+				logger.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 		}
@@ -104,6 +109,7 @@ public class BackgroundPreinitializer implements ApplicationListener<SpringAppli
 						runnable.run();
 					}
 					catch (Throwable ex) {
+						logger.error(ex.getMessage(), ex);
 						// Ignore
 					}
 				}
@@ -112,6 +118,7 @@ public class BackgroundPreinitializer implements ApplicationListener<SpringAppli
 			thread.start();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// This will fail on GAE where creating threads is prohibited. We can safely
 			// continue but startup will be slightly slower as the initialization will now
 			// happen on the main thread.

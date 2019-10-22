@@ -30,6 +30,8 @@ import java.util.jar.Manifest;
 
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides access to the application home directory. Attempts to pick a sensible home for
@@ -40,6 +42,8 @@ import org.springframework.util.StringUtils;
  * @since 2.0.0
  */
 public class ApplicationHome {
+
+	private static final Logger logger = LoggerFactory.getLogger(ApplicationHome.class);
 
 	private final File source;
 
@@ -67,6 +71,7 @@ public class ApplicationHome {
 			return getStartClass(classLoader.getResources("META-INF/MANIFEST.MF"));
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -81,6 +86,7 @@ public class ApplicationHome {
 				}
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 		return null;
@@ -98,6 +104,7 @@ public class ApplicationHome {
 			return null;
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -112,6 +119,7 @@ public class ApplicationHome {
 			}
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 		return false;
 	}

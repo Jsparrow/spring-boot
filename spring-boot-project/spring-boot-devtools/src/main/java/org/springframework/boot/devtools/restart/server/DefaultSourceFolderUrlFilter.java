@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.util.StringUtils;
+import java.util.Collections;
 
 /**
  * Default implementation of {@link SourceFolderUrlFilter} that attempts to match URLs
@@ -40,8 +41,8 @@ public class DefaultSourceFolderUrlFilter implements SourceFolderUrlFilter {
 
 	private static final Pattern VERSION_PATTERN = Pattern.compile("^-\\d+(?:\\.\\d+)*(?:[.-].+)?$");
 
-	private static final Set<String> SKIPPED_PROJECTS = new HashSet<>(Arrays.asList("spring-boot",
-			"spring-boot-devtools", "spring-boot-autoconfigure", "spring-boot-actuator", "spring-boot-starter"));
+	private static final Set<String> SKIPPED_PROJECTS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("spring-boot",
+			"spring-boot-devtools", "spring-boot-autoconfigure", "spring-boot-actuator", "spring-boot-starter")));
 
 	@Override
 	public boolean isMatch(String sourceFolder, URL url) {

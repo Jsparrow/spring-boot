@@ -245,13 +245,13 @@ class TomcatWebServerFactoryCustomizerTests {
 		assertThat(remoteIpValve.getRemoteIpHeader()).isEqualTo("X-Forwarded-For");
 		assertThat(remoteIpValve.getHostHeader()).isEqualTo("X-Forwarded-Host");
 		assertThat(remoteIpValve.getPortHeader()).isEqualTo("X-Forwarded-Port");
-		String expectedInternalProxies = "10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" // 10/8
-				+ "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" // 192.168/16
-				+ "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" // 169.254/16
-				+ "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" // 127/8
-				+ "172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" // 172.16/12
-				+ "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" //
-				+ "0:0:0:0:0:0:0:1|::1";
+		String expectedInternalProxies = new StringBuilder().append("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" // 10/8
+).append("192\\.168\\.\\d{1,3}\\.\\d{1,3}|" // 192.168/16
+).append("169\\.254\\.\\d{1,3}\\.\\d{1,3}|" // 169.254/16
+).append("127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" // 127/8
+).append("172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" // 172.16/12
+).append("172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" //
+).append("0:0:0:0:0:0:0:1|::1").toString();
 		assertThat(remoteIpValve.getInternalProxies()).isEqualTo(expectedInternalProxies);
 	}
 

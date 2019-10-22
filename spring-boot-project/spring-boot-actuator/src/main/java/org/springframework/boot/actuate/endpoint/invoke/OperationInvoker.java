@@ -34,6 +34,6 @@ public interface OperationInvoker {
 	 * @return the result of the operation, may be {@code null}
 	 * @throws MissingParametersException if parameters are missing
 	 */
-	Object invoke(InvocationContext context) throws MissingParametersException;
+	Object invoke(InvocationContext context);
 
 }

@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class CompoundConfigurationTableEntryTests {
 
-	private static String NEWLINE = System.lineSeparator();
+	private static String newline = System.lineSeparator();
 
 	@Test
 	void simpleProperty() {
@@ -48,8 +48,8 @@ class CompoundConfigurationTableEntryTests {
 		AsciidocBuilder builder = new AsciidocBuilder();
 		entry.write(builder);
 		assertThat(builder.toString()).isEqualTo(
-				"|`+spring.test.first+` +" + NEWLINE + "`+spring.test.second+` +" + NEWLINE + "`+spring.test.third+` +"
-						+ NEWLINE + NEWLINE + "|" + NEWLINE + "|+++This is a description.+++" + NEWLINE);
+				new StringBuilder().append("|`+spring.test.first+` +").append(newline).append("`+spring.test.second+` +").append(newline).append("`+spring.test.third+` +").append(newline)
+						.append(newline).append("|").append(newline).append("|+++This is a description.+++").append(newline).toString());
 	}
 
 }

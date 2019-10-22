@@ -34,6 +34,8 @@ import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet {@link Filter} that logs all requests to an {@link HttpTraceRepository}.
@@ -46,6 +48,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @since 2.0.0
  */
 public class HttpTraceFilter extends OncePerRequestFilter implements Ordered {
+
+	private static final Logger logger = LoggerFactory.getLogger(HttpTraceFilter.class);
 
 	// Not LOWEST_PRECEDENCE, but near the end, so it has a good chance of catching all
 	// enriched headers, but users can add stuff after this if they want to
@@ -103,6 +107,7 @@ public class HttpTraceFilter extends OncePerRequestFilter implements Ordered {
 			return true;
 		}
 		catch (URISyntaxException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

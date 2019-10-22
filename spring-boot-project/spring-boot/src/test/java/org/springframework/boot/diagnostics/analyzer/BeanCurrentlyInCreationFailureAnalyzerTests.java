@@ -82,7 +82,7 @@ class BeanCurrentlyInCreationFailureAnalyzerTests {
 		assertThat(lines.get(5)).startsWith("|  one defined in " + CycleWithAutowiredFields.class.getName());
 		assertThat(lines.get(6)).isEqualTo("↑     ↓");
 		assertThat(lines.get(7)).startsWith(
-				"|  " + BeanTwoConfiguration.class.getName() + " (field private " + BeanThree.class.getName());
+				new StringBuilder().append("|  ").append(BeanTwoConfiguration.class.getName()).append(" (field private ").append(BeanThree.class.getName()).toString());
 		assertThat(lines.get(8)).isEqualTo("└─────┘");
 	}
 

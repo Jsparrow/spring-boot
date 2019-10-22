@@ -27,6 +27,8 @@ import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for converting from a type to a {@link java.lang.Enum}.
@@ -54,13 +56,14 @@ abstract class LenientObjectToEnumConverterFactory<T> implements ConverterFactor
 		while (enumType != null && !enumType.isEnum()) {
 			enumType = enumType.getSuperclass();
 		}
-		Assert.notNull(enumType, () -> "The target type " + targetType.getName() + " does not refer to an enum");
+		Assert.notNull(enumType, () -> new StringBuilder().append("The target type ").append(targetType.getName()).append(" does not refer to an enum").toString());
 		return new LenientToEnumConverter<E>((Class<E>) enumType);
 	}
 
 	@SuppressWarnings("unchecked")
 	private class LenientToEnumConverter<E extends Enum> implements Converter<T, E> {
 
+		private final Logger logger = LoggerFactory.getLogger(LenientToEnumConverter.class);
 		private final Class<E> enumType;
 
 		LenientToEnumConverter(Class<E> enumType) {
@@ -77,6 +80,7 @@ abstract class LenientObjectToEnumConverterFactory<T> implements ConverterFactor
 				return (E) Enum.valueOf(this.enumType, value);
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				return findEnum(value);
 			}
 		}
@@ -90,7 +94,7 @@ abstract class LenientObjectToEnumConverterFactory<T> implements ConverterFactor
 					return candidate;
 				}
 			}
-			throw new IllegalArgumentException("No enum constant " + this.enumType.getCanonicalName() + "." + value);
+			throw new IllegalArgumentException(new StringBuilder().append("No enum constant ").append(this.enumType.getCanonicalName()).append(".").append(value).toString());
 		}
 
 		private String getCanonicalName(String name) {

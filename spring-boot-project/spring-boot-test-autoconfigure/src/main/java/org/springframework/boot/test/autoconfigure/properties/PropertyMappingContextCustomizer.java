@@ -73,7 +73,7 @@ class PropertyMappingContextCustomizer implements ContextCustomizer {
 	static class PropertyMappingCheckBeanPostProcessor implements BeanPostProcessor {
 
 		@Override
-		public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		public Object postProcessBeforeInitialization(Object bean, String beanName) {
 			Class<?> beanClass = bean.getClass();
 			MergedAnnotations annotations = MergedAnnotations.from(beanClass, SearchStrategy.SUPERCLASS);
 			Set<Class<?>> components = annotations.stream(Component.class).map(this::getRoot)
@@ -81,9 +81,7 @@ class PropertyMappingContextCustomizer implements ContextCustomizer {
 			Set<Class<?>> propertyMappings = annotations.stream(PropertyMapping.class).map(this::getRoot)
 					.collect(Collectors.toSet());
 			if (!components.isEmpty() && !propertyMappings.isEmpty()) {
-				throw new IllegalStateException("The @PropertyMapping " + getAnnotationsDescription(propertyMappings)
-						+ " cannot be used in combination with the @Component "
-						+ getAnnotationsDescription(components));
+				throw new IllegalStateException(new StringBuilder().append("The @PropertyMapping ").append(getAnnotationsDescription(propertyMappings)).append(" cannot be used in combination with the @Component ").append(getAnnotationsDescription(components)).toString());
 			}
 			return bean;
 		}
@@ -105,7 +103,7 @@ class PropertyMappingContextCustomizer implements ContextCustomizer {
 		}
 
 		@Override
-		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		public Object postProcessAfterInitialization(Object bean, String beanName) {
 			return bean;
 		}
 

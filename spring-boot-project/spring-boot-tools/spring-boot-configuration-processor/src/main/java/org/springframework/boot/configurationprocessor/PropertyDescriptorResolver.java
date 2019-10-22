@@ -62,14 +62,14 @@ class PropertyDescriptorResolver {
 
 	private Stream<PropertyDescriptor<?>> resolve(ConfigurationPropertiesTypeElement type,
 			ExecutableElement factoryMethod, TypeElementMembers members) {
-		if (type.isConstructorBindingEnabled()) {
-			ExecutableElement constructor = type.getBindConstructor();
-			if (constructor != null) {
-				return resolveConstructorProperties(type.getType(), factoryMethod, members, constructor);
-			}
-			return Stream.empty();
+		if (!type.isConstructorBindingEnabled()) {
+			return resolveJavaBeanProperties(type.getType(), factoryMethod, members);
 		}
-		return resolveJavaBeanProperties(type.getType(), factoryMethod, members);
+		ExecutableElement constructor = type.getBindConstructor();
+		if (constructor != null) {
+			return resolveConstructorProperties(type.getType(), factoryMethod, members, constructor);
+		}
+		return Stream.empty();
 	}
 
 	Stream<PropertyDescriptor<?>> resolveConstructorProperties(TypeElement type, ExecutableElement factoryMethod,

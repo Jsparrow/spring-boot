@@ -48,6 +48,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link Restarter}.
@@ -172,18 +174,20 @@ class RestarterTests {
 	@EnableScheduling
 	static class SampleApplication {
 
-		private int count = 0;
-
 		private static volatile boolean quit = false;
+
+		private final Logger logger = LoggerFactory.getLogger(SampleApplication.class);
+
+		private int count = 0;
 
 		@Scheduled(fixedDelay = 200)
 		void tickBean() {
-			System.out.println("Tick " + this.count++ + " " + Thread.currentThread());
+			logger.info(new StringBuilder().append("Tick ").append(this.count++).append(" ").append(Thread.currentThread()).toString());
 		}
 
 		@Scheduled(initialDelay = 500, fixedDelay = 500)
 		void restart() {
-			System.out.println("Restart " + Thread.currentThread());
+			logger.info("Restart " + Thread.currentThread());
 			if (!SampleApplication.quit) {
 				Restarter.getInstance().restart();
 			}
@@ -226,13 +230,13 @@ class RestarterTests {
 
 		private ClassLoader relaunchClassLoader;
 
-		TestableRestarter() {
-			this(Thread.currentThread(), new String[] {}, false, new MockRestartInitializer());
-		}
-
 		protected TestableRestarter(Thread thread, String[] args, boolean forceReferenceCleanup,
 				RestartInitializer initializer) {
 			super(thread, args, forceReferenceCleanup, initializer);
+		}
+
+		TestableRestarter() {
+			this(Thread.currentThread(), new String[] {}, false, new MockRestartInitializer());
 		}
 
 		@Override

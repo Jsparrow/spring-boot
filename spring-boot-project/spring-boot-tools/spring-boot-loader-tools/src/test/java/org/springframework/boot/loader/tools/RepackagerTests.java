@@ -53,6 +53,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link Repackager}.
@@ -61,6 +63,8 @@ import static org.mockito.Mockito.mock;
  * @author Andy Wilkinson
  */
 class RepackagerTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(RepackagerTests.class);
 
 	private static final Libraries NO_LIBRARIES = (callback) -> {
 	};
@@ -427,6 +431,7 @@ class RepackagerTests {
 			assertThat(Files.getPosixFilePermissions(dest.toPath())).contains(PosixFilePermission.OWNER_EXECUTE);
 		}
 		catch (UnsupportedOperationException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Probably running the test on Windows
 		}
 	}

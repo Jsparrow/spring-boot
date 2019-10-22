@@ -235,7 +235,7 @@ class ProjectGenerationRequestTests {
 
 	private static InitializrServiceMetadata readMetadata(String version) throws JSONException {
 		try {
-			Resource resource = new ClassPathResource("metadata/service-metadata-" + version + ".json");
+			Resource resource = new ClassPathResource(new StringBuilder().append("metadata/service-metadata-").append(version).append(".json").toString());
 			String content = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
 			JSONObject json = new JSONObject(content);
 			return new InitializrServiceMetadata(json);

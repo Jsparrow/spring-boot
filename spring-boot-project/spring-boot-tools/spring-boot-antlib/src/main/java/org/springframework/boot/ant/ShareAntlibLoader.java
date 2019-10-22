@@ -37,7 +37,7 @@ public class ShareAntlibLoader extends Task {
 	}
 
 	@Override
-	public void execute() throws BuildException {
+	public void execute() {
 		if (!StringUtils.hasText(this.refid)) {
 			throw new BuildException("@refid has no text");
 		}

@@ -64,7 +64,7 @@ public class ExampleObjectWithView {
 
 	@Override
 	public String toString() {
-		return this.name + " " + this.age;
+		return new StringBuilder().append(this.name).append(" ").append(this.age).toString();
 	}
 
 	static class TestView {

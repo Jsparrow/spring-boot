@@ -46,6 +46,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory that can be used to create a {@link RequestMatcher} for actuator endpoint
@@ -122,6 +124,7 @@ public final class EndpointRequest {
 	private abstract static class AbstractRequestMatcher
 			extends ApplicationContextRequestMatcher<WebApplicationContext> {
 
+		private final Logger logger = LoggerFactory.getLogger(AbstractRequestMatcher.class);
 		private volatile RequestMatcher delegate;
 
 		AbstractRequestMatcher() {
@@ -150,6 +153,7 @@ public final class EndpointRequest {
 				return createDelegate(context, new RequestMatcherFactory());
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 				return EMPTY_MATCHER;
 			}
 		}
@@ -170,6 +174,7 @@ public final class EndpointRequest {
 				return context.getBean(RequestMatcherProvider.class);
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 				return AntPathRequestMatcher::new;
 			}
 		}
@@ -259,7 +264,7 @@ public final class EndpointRequest {
 
 		private EndpointId getEndpointId(Class<?> source) {
 			MergedAnnotation<Endpoint> annotation = MergedAnnotations.from(source).get(Endpoint.class);
-			Assert.state(annotation.isPresent(), () -> "Class " + source + " is not annotated with @Endpoint");
+			Assert.state(annotation.isPresent(), () -> new StringBuilder().append("Class ").append(source).append(" is not annotated with @Endpoint").toString());
 			return EndpointId.of(annotation.getString("id"));
 		}
 

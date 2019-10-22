@@ -63,20 +63,20 @@ abstract class AbstractEndpointCondition extends SpringBootCondition {
 		Environment environment = context.getEnvironment();
 		AnnotationAttributes attributes = getEndpointAttributes(annotationClass, context, metadata);
 		EndpointId id = EndpointId.of(environment, attributes.getString("id"));
-		String key = "management.endpoint." + id.toLowerCaseString() + ".enabled";
+		String key = new StringBuilder().append("management.endpoint.").append(id.toLowerCaseString()).append(".enabled").toString();
 		Boolean userDefinedEnabled = environment.getProperty(key, Boolean.class);
 		if (userDefinedEnabled != null) {
 			return new ConditionOutcome(userDefinedEnabled, ConditionMessage.forCondition(annotationClass)
-					.because("found property " + key + " with value " + userDefinedEnabled));
+					.because(new StringBuilder().append("found property ").append(key).append(" with value ").append(userDefinedEnabled).toString()));
 		}
 		Boolean userDefinedDefault = isEnabledByDefault(environment);
 		if (userDefinedDefault != null) {
 			return new ConditionOutcome(userDefinedDefault, ConditionMessage.forCondition(annotationClass).because(
-					"no property " + key + " found so using user defined default from " + ENABLED_BY_DEFAULT_KEY));
+					new StringBuilder().append("no property ").append(key).append(" found so using user defined default from ").append(ENABLED_BY_DEFAULT_KEY).toString()));
 		}
 		boolean endpointDefault = attributes.getBoolean("enableByDefault");
 		return new ConditionOutcome(endpointDefault, ConditionMessage.forCondition(annotationClass)
-				.because("no property " + key + " found so using endpoint default"));
+				.because(new StringBuilder().append("no property ").append(key).append(" found so using endpoint default").toString()));
 	}
 
 	protected Class<?> getEndpointType(Class<?> annotationClass, ConditionContext context,
@@ -95,8 +95,7 @@ abstract class AbstractEndpointCondition extends SpringBootCondition {
 			return ClassUtils.forName(methodMetadata.getReturnTypeName(), context.getClassLoader());
 		}
 		catch (Throwable ex) {
-			throw new IllegalStateException("Failed to extract endpoint id for "
-					+ methodMetadata.getDeclaringClassName() + "." + methodMetadata.getMethodName(), ex);
+			throw new IllegalStateException(new StringBuilder().append("Failed to extract endpoint id for ").append(methodMetadata.getDeclaringClassName()).append(".").append(methodMetadata.getMethodName()).toString(), ex);
 		}
 	}
 

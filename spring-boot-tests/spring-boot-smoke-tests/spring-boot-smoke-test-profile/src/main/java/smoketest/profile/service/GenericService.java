@@ -32,7 +32,7 @@ public class GenericService implements MessageService {
 
 	@Override
 	public String getMessage() {
-		return this.hello + " " + this.name;
+		return new StringBuilder().append(this.hello).append(" ").append(this.name).toString();
 	}
 
 }

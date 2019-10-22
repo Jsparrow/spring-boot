@@ -71,7 +71,8 @@ public class ResourceBanner implements Banner {
 		}
 		catch (Exception ex) {
 			logger.warn(
-					"Banner not printable: " + this.resource + " (" + ex.getClass() + ": '" + ex.getMessage() + "')",
+					new StringBuilder().append("Banner not printable: ").append(this.resource).append(" (").append(ex.getClass()).append(": '")
+							.append(ex.getMessage()).append("')").toString(),
 					ex);
 		}
 	}
@@ -115,7 +116,7 @@ public class ResourceBanner implements Banner {
 		if (version == null) {
 			return "";
 		}
-		return format ? " (v" + version + ")" : version;
+		return format ? new StringBuilder().append(" (v").append(version).append(")").toString() : version;
 	}
 
 	private PropertyResolver getAnsiResolver() {

@@ -61,7 +61,7 @@ class RedisSessionConfiguration {
 			return ConfigureRedisAction.NO_OP;
 		}
 		throw new IllegalStateException(
-				"Unsupported redis configure action '" + redisSessionProperties.getConfigureAction() + "'.");
+				new StringBuilder().append("Unsupported redis configure action '").append(redisSessionProperties.getConfigureAction()).append("'.").toString());
 	}
 
 	@Configuration

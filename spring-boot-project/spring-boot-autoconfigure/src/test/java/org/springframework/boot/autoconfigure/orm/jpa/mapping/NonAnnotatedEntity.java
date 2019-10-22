@@ -27,11 +27,11 @@ public class NonAnnotatedEntity {
 
 	private String value;
 
-	protected NonAnnotatedEntity() {
-	}
-
 	public NonAnnotatedEntity(String value) {
 		this.value = value;
+	}
+
+	protected NonAnnotatedEntity() {
 	}
 
 	public Long getId() {

@@ -119,22 +119,20 @@ class Installer {
 		File extDirectory = getDefaultExtDirectory();
 		Log.info("Uninstalling from: " + extDirectory);
 		List<File> artifactFiles = this.dependencyResolver.resolve(artifactIdentifiers);
-		for (File artifactFile : artifactFiles) {
+		artifactFiles.forEach(artifactFile -> {
 			int installCount = getInstallCount(artifactFile);
 			if (installCount <= 1) {
 				new File(extDirectory, artifactFile.getName()).delete();
 			}
 			setInstallCount(artifactFile, installCount - 1);
-		}
+		});
 		saveInstallCounts();
 	}
 
 	void uninstallAll() throws Exception {
 		File extDirectory = getDefaultExtDirectory();
 		Log.info("Uninstalling from: " + extDirectory);
-		for (String name : this.installCounts.stringPropertyNames()) {
-			new File(extDirectory, name).delete();
-		}
+		this.installCounts.stringPropertyNames().forEach(name -> new File(extDirectory, name).delete());
 		this.installCounts.clear();
 		saveInstallCounts();
 	}

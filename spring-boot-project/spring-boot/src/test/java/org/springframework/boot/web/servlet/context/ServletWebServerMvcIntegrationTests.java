@@ -45,6 +45,8 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Integration tests for {@link ServletWebServerApplicationContext} and {@link WebServer}s
@@ -55,6 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ServletWebServerMvcIntegrationTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(ServletWebServerMvcIntegrationTests.class);
 	private AnnotationConfigServletWebServerApplicationContext context;
 
 	@AfterEach
@@ -63,6 +66,7 @@ class ServletWebServerMvcIntegrationTests {
 			this.context.close();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}
@@ -95,7 +99,7 @@ class ServletWebServerMvcIntegrationTests {
 			throws Exception {
 		SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
 		ClientHttpRequest request = clientHttpRequestFactory.createRequest(
-				new URI("http://localhost:" + context.getWebServer().getPort() + resourcePath), HttpMethod.GET);
+				new URI(new StringBuilder().append("http://localhost:").append(context.getWebServer().getPort()).append(resourcePath).toString()), HttpMethod.GET);
 		try (ClientHttpResponse response = request.execute()) {
 			String actual = StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8);
 			assertThat(actual).isEqualTo("Hello World");

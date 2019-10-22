@@ -34,6 +34,8 @@ import org.springframework.boot.web.servlet.context.ServletWebServerApplicationC
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code DispatcherServletHandlerMappings} provides access to a {@link DispatcherServlet
@@ -85,6 +87,7 @@ final class DispatcherServletHandlerMappings {
 
 	private static final class TomcatServletInitializer {
 
+		private final Logger logger = LoggerFactory.getLogger(TomcatServletInitializer.class);
 		private final TomcatWebServer webServer;
 
 		private TomcatServletInitializer(TomcatWebServer webServer) {
@@ -108,6 +111,7 @@ final class DispatcherServletHandlerMappings {
 					wrapper.deallocate(wrapper.allocate());
 				}
 				catch (ServletException ex) {
+					logger.error(ex.getMessage(), ex);
 					// Continue
 				}
 			}
@@ -117,6 +121,7 @@ final class DispatcherServletHandlerMappings {
 
 	private static final class UndertowServletInitializer {
 
+		private final Logger logger = LoggerFactory.getLogger(UndertowServletInitializer.class);
 		private final UndertowServletWebServer webServer;
 
 		private UndertowServletInitializer(UndertowServletWebServer webServer) {
@@ -128,6 +133,7 @@ final class DispatcherServletHandlerMappings {
 				this.webServer.getDeploymentManager().getDeployment().getServlets().getManagedServlet(name).forceInit();
 			}
 			catch (ServletException ex) {
+				logger.error(ex.getMessage(), ex);
 				// Continue
 			}
 		}

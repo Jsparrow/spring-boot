@@ -26,6 +26,8 @@ import org.springframework.boot.devtools.filewatch.FileSystemWatcher;
 import org.springframework.boot.devtools.filewatch.FileSystemWatcherFactory;
 import org.springframework.boot.devtools.restart.FailureHandler;
 import org.springframework.boot.devtools.restart.Restarter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link FailureHandler} that waits for filesystem changes before retrying.
@@ -34,6 +36,7 @@ import org.springframework.boot.devtools.restart.Restarter;
  */
 class FileWatchingFailureHandler implements FailureHandler {
 
+	private static final Logger logger = LoggerFactory.getLogger(FileWatchingFailureHandler.class);
 	private final FileSystemWatcherFactory fileSystemWatcherFactory;
 
 	FileWatchingFailureHandler(FileSystemWatcherFactory fileSystemWatcherFactory) {
@@ -51,6 +54,7 @@ class FileWatchingFailureHandler implements FailureHandler {
 			latch.await();
 		}
 		catch (InterruptedException ex) {
+			logger.error(ex.getMessage(), ex);
 			Thread.currentThread().interrupt();
 		}
 		return Outcome.RETRY;

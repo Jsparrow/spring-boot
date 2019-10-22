@@ -63,13 +63,10 @@ class EndpointAutoConfigurationTests {
 
 	@Test
 	void mapWhenConfigurationConverterIsNotQualifiedShouldNotConvert() {
-		assertThatExceptionOfType(ParameterMappingException.class).isThrownBy(() -> {
-			this.contextRunner.withUserConfiguration(NonQualifiedConverterConfiguration.class).run((context) -> {
-				ParameterValueMapper parameterValueMapper = context.getBean(ParameterValueMapper.class);
-				parameterValueMapper.mapParameterValue(new TestOperationParameter(Person.class), "John Smith");
-			});
-
-		}).withCauseInstanceOf(ConverterNotFoundException.class);
+		assertThatExceptionOfType(ParameterMappingException.class).isThrownBy(() -> this.contextRunner.withUserConfiguration(NonQualifiedConverterConfiguration.class).run((context) -> {
+			ParameterValueMapper parameterValueMapper = context.getBean(ParameterValueMapper.class);
+			parameterValueMapper.mapParameterValue(new TestOperationParameter(Person.class), "John Smith");
+		})).withCauseInstanceOf(ConverterNotFoundException.class);
 	}
 
 	@Test
@@ -87,13 +84,10 @@ class EndpointAutoConfigurationTests {
 
 	@Test
 	void mapWhenGenericConfigurationConverterIsNotQualifiedShouldNotConvert() {
-		assertThatExceptionOfType(ParameterMappingException.class).isThrownBy(() -> {
-			this.contextRunner.withUserConfiguration(NonQualifiedGenericConverterConfiguration.class).run((context) -> {
-				ParameterValueMapper parameterValueMapper = context.getBean(ParameterValueMapper.class);
-				parameterValueMapper.mapParameterValue(new TestOperationParameter(Person.class), "John Smith");
-			});
-
-		}).withCauseInstanceOf(ConverterNotFoundException.class);
+		assertThatExceptionOfType(ParameterMappingException.class).isThrownBy(() -> this.contextRunner.withUserConfiguration(NonQualifiedGenericConverterConfiguration.class).run((context) -> {
+			ParameterValueMapper parameterValueMapper = context.getBean(ParameterValueMapper.class);
+			parameterValueMapper.mapParameterValue(new TestOperationParameter(Person.class), "John Smith");
+		})).withCauseInstanceOf(ConverterNotFoundException.class);
 
 	}
 

@@ -46,11 +46,6 @@ public final class EndpointServlet {
 		this(instantiateClass(servlet));
 	}
 
-	private static Servlet instantiateClass(Class<? extends Servlet> servlet) {
-		Assert.notNull(servlet, "Servlet must not be null");
-		return BeanUtils.instantiateClass(servlet);
-	}
-
 	public EndpointServlet(Servlet servlet) {
 		this(servlet, Collections.emptyMap(), -1);
 	}
@@ -60,6 +55,11 @@ public final class EndpointServlet {
 		this.servlet = servlet;
 		this.initParameters = Collections.unmodifiableMap(initParameters);
 		this.loadOnStartup = loadOnStartup;
+	}
+
+	private static Servlet instantiateClass(Class<? extends Servlet> servlet) {
+		Assert.notNull(servlet, "Servlet must not be null");
+		return BeanUtils.instantiateClass(servlet);
 	}
 
 	public EndpointServlet withInitParameter(String name, String value) {

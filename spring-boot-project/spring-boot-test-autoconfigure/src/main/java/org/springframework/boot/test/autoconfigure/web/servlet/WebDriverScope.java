@@ -134,11 +134,11 @@ class WebDriverScope implements Scope {
 	 * @return the web driver scope or {@code null}
 	 */
 	static WebDriverScope getFrom(ApplicationContext context) {
-		if (context instanceof ConfigurableApplicationContext) {
-			Scope scope = ((ConfigurableApplicationContext) context).getBeanFactory().getRegisteredScope(NAME);
-			return (scope instanceof WebDriverScope) ? (WebDriverScope) scope : null;
+		if (!(context instanceof ConfigurableApplicationContext)) {
+			return null;
 		}
-		return null;
+		Scope scope = ((ConfigurableApplicationContext) context).getBeanFactory().getRegisteredScope(NAME);
+		return (scope instanceof WebDriverScope) ? (WebDriverScope) scope : null;
 	}
 
 }

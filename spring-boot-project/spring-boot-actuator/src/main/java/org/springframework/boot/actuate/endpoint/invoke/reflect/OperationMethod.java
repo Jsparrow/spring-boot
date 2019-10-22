@@ -81,7 +81,7 @@ public class OperationMethod {
 
 	@Override
 	public String toString() {
-		return "Operation " + this.operationType.name().toLowerCase(Locale.ENGLISH) + " method " + this.method;
+		return new StringBuilder().append("Operation ").append(this.operationType.name().toLowerCase(Locale.ENGLISH)).append(" method ").append(this.method).toString();
 	}
 
 }

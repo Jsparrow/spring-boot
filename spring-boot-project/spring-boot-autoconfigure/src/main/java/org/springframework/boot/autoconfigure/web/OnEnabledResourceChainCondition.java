@@ -59,7 +59,7 @@ class OnEnabledResourceChainCondition extends SpringBootCondition {
 	}
 
 	private Boolean getEnabledProperty(ConfigurableEnvironment environment, String key, Boolean defaultValue) {
-		String name = "spring.resources.chain." + key + "enabled";
+		String name = new StringBuilder().append("spring.resources.chain.").append(key).append("enabled").toString();
 		return environment.getProperty(name, Boolean.class, defaultValue);
 	}
 

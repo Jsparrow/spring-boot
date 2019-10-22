@@ -95,7 +95,7 @@ class KafkaAnnotationDrivenConfiguration {
 	ConcurrentKafkaListenerContainerFactoryConfigurer kafkaListenerContainerFactoryConfigurer() {
 		ConcurrentKafkaListenerContainerFactoryConfigurer configurer = new ConcurrentKafkaListenerContainerFactoryConfigurer();
 		configurer.setKafkaProperties(this.properties);
-		MessageConverter messageConverterToUse = (this.properties.getListener().getType().equals(Type.BATCH))
+		MessageConverter messageConverterToUse = (this.properties.getListener().getType() == Type.BATCH)
 				? this.batchMessageConverter : this.messageConverter;
 		configurer.setMessageConverter(messageConverterToUse);
 		configurer.setReplyTemplate(this.kafkaTemplate);

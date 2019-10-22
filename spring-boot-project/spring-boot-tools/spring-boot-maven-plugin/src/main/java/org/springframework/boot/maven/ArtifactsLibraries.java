@@ -75,7 +75,7 @@ public class ArtifactsLibraries implements Libraries {
 				String name = getFileName(artifact);
 				if (duplicates.contains(name)) {
 					this.log.debug("Duplicate found: " + name);
-					name = artifact.getGroupId() + "-" + name;
+					name = new StringBuilder().append(artifact.getGroupId()).append("-").append(name).toString();
 					this.log.debug("Renamed to: " + name);
 				}
 				callback.library(new Library(name, artifact.getFile(), scope, isUnpackRequired(artifact)));
@@ -86,12 +86,12 @@ public class ArtifactsLibraries implements Libraries {
 	private Set<String> getDuplicates(Set<Artifact> artifacts) {
 		Set<String> duplicates = new HashSet<>();
 		Set<String> seen = new HashSet<>();
-		for (Artifact artifact : artifacts) {
+		artifacts.forEach(artifact -> {
 			String fileName = getFileName(artifact);
 			if (artifact.getFile() != null && !seen.add(fileName)) {
 				duplicates.add(fileName);
 			}
-		}
+		});
 		return duplicates;
 	}
 

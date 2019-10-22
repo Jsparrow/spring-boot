@@ -55,7 +55,7 @@ class EnableConfigurationPropertiesRegistrarTests {
 	void typeWithDefaultConstructorShouldRegisterGenericBeanDefinition() throws Exception {
 		register(TestConfiguration.class);
 		BeanDefinition beanDefinition = this.beanFactory
-				.getBeanDefinition("foo-" + getClass().getName() + "$FooProperties");
+				.getBeanDefinition(new StringBuilder().append("foo-").append(getClass().getName()).append("$FooProperties").toString());
 		assertThat(beanDefinition).isExactlyInstanceOf(GenericBeanDefinition.class);
 	}
 
@@ -63,7 +63,7 @@ class EnableConfigurationPropertiesRegistrarTests {
 	void typeWithConstructorBindingShouldRegisterConfigurationPropertiesBeanDefinition() throws Exception {
 		register(TestConfiguration.class);
 		BeanDefinition beanDefinition = this.beanFactory
-				.getBeanDefinition("bar-" + getClass().getName() + "$BarProperties");
+				.getBeanDefinition(new StringBuilder().append("bar-").append(getClass().getName()).append("$BarProperties").toString());
 		assertThat(beanDefinition).isExactlyInstanceOf(ConfigurationPropertiesValueObjectBeanDefinition.class);
 	}
 
@@ -71,7 +71,7 @@ class EnableConfigurationPropertiesRegistrarTests {
 	void typeWithMultipleConstructorsShouldRegisterGenericBeanDefinition() throws Exception {
 		register(TestConfiguration.class);
 		BeanDefinition beanDefinition = this.beanFactory
-				.getBeanDefinition("bing-" + getClass().getName() + "$BingProperties");
+				.getBeanDefinition(new StringBuilder().append("bing-").append(getClass().getName()).append("$BingProperties").toString());
 		assertThat(beanDefinition).isExactlyInstanceOf(GenericBeanDefinition.class);
 	}
 
@@ -85,7 +85,7 @@ class EnableConfigurationPropertiesRegistrarTests {
 	@Test
 	void registrationWithDuplicatedTypeShouldRegisterSingleBeanDefinition() throws IOException {
 		register(DuplicateConfiguration.class);
-		String name = "foo-" + getClass().getName() + "$FooProperties";
+		String name = new StringBuilder().append("foo-").append(getClass().getName()).append("$FooProperties").toString();
 		verify(this.beanFactory, times(1)).registerBeanDefinition(eq(name), any());
 	}
 

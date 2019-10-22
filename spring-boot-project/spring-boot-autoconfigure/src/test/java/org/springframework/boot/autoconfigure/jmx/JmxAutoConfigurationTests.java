@@ -50,11 +50,12 @@ class JmxAutoConfigurationTests {
 
 	@AfterEach
 	void tearDown() {
-		if (this.context != null) {
-			this.context.close();
-			if (this.context.getParent() != null) {
-				((ConfigurableApplicationContext) this.context.getParent()).close();
-			}
+		if (this.context == null) {
+			return;
+		}
+		this.context.close();
+		if (this.context.getParent() != null) {
+			((ConfigurableApplicationContext) this.context.getParent()).close();
 		}
 	}
 

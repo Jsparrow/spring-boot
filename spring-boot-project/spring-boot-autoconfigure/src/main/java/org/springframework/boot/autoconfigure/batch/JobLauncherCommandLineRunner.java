@@ -54,6 +54,8 @@ import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link CommandLineRunner} to {@link JobLauncher launch} Spring Batch jobs. Runs all
@@ -66,6 +68,8 @@ import org.springframework.util.StringUtils;
  * @since 1.0.0
  */
 public class JobLauncherCommandLineRunner implements CommandLineRunner, Ordered, ApplicationEventPublisherAware {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(JobLauncherCommandLineRunner.class);
 
 	/**
 	 * The default order for the command line runner.
@@ -169,20 +173,22 @@ public class JobLauncherCommandLineRunner implements CommandLineRunner, Ordered,
 	}
 
 	private void executeRegisteredJobs(JobParameters jobParameters) throws JobExecutionException {
-		if (this.jobRegistry != null && StringUtils.hasText(this.jobNames)) {
-			String[] jobsToRun = this.jobNames.split(",");
-			for (String jobName : jobsToRun) {
-				try {
-					Job job = this.jobRegistry.getJob(jobName);
-					if (this.jobs.contains(job)) {
-						continue;
-					}
-					execute(job, jobParameters);
+		if (!(this.jobRegistry != null && StringUtils.hasText(this.jobNames))) {
+			return;
+		}
+		String[] jobsToRun = this.jobNames.split(",");
+		for (String jobName : jobsToRun) {
+			try {
+				Job job = this.jobRegistry.getJob(jobName);
+				if (this.jobs.contains(job)) {
+					continue;
 				}
-				catch (NoSuchJobException ex) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("No job found in registry for job name: " + jobName);
-					}
+				execute(job, jobParameters);
+			}
+			catch (NoSuchJobException ex) {
+				logger1.error(ex.getMessage(), ex);
+				if (logger.isDebugEnabled()) {
+					logger.debug("No job found in registry for job name: " + jobName);
 				}
 			}
 		}
@@ -212,11 +218,11 @@ public class JobLauncherCommandLineRunner implements CommandLineRunner, Ordered,
 
 	private JobParameters getNextJobParametersForExisting(Job job, JobParameters jobParameters) {
 		JobExecution lastExecution = this.jobRepository.getLastJobExecution(job.getName(), jobParameters);
-		if (isStoppedOrFailed(lastExecution) && job.isRestartable()) {
-			JobParameters previousIdentifyingParameters = getGetIdentifying(lastExecution.getJobParameters());
-			return merge(previousIdentifyingParameters, jobParameters);
+		if (!(isStoppedOrFailed(lastExecution) && job.isRestartable())) {
+			return jobParameters;
 		}
-		return jobParameters;
+		JobParameters previousIdentifyingParameters = getGetIdentifying(lastExecution.getJobParameters());
+		return merge(previousIdentifyingParameters, jobParameters);
 	}
 
 	private boolean isStoppedOrFailed(JobExecution execution) {

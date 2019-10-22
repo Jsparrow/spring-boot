@@ -41,6 +41,8 @@ import org.springframework.boot.web.reactive.server.ReactiveWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.http.server.reactive.UndertowHttpHandlerAdapter;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ReactiveWebServerFactory} that can be used to create {@link UndertowWebServer}s.
@@ -50,6 +52,8 @@ import org.springframework.util.Assert;
  */
 public class UndertowReactiveWebServerFactory extends AbstractReactiveWebServerFactory
 		implements ConfigurableUndertowWebServerFactory {
+
+	private static final Logger logger = LoggerFactory.getLogger(UndertowReactiveWebServerFactory.class);
 
 	private Set<UndertowBuilderCustomizer> builderCustomizers = new LinkedHashSet<>();
 
@@ -117,9 +121,7 @@ public class UndertowReactiveWebServerFactory extends AbstractReactiveWebServerF
 		else {
 			builder.addHttpListener(port, getListenAddress());
 		}
-		for (UndertowBuilderCustomizer customizer : this.builderCustomizers) {
-			customizer.customize(builder);
-		}
+		this.builderCustomizers.forEach(customizer -> customizer.customize(builder));
 		return builder;
 	}
 
@@ -160,6 +162,7 @@ public class UndertowReactiveWebServerFactory extends AbstractReactiveWebServerF
 					throw new IllegalStateException(ex);
 				}
 				catch (InterruptedException ex) {
+					logger.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 				}
 			};
@@ -172,7 +175,7 @@ public class UndertowReactiveWebServerFactory extends AbstractReactiveWebServerF
 	private void createAccessLogDirectoryIfNecessary() {
 		Assert.state(this.accessLogDirectory != null, "Access log directory is not set");
 		if (!this.accessLogDirectory.isDirectory() && !this.accessLogDirectory.mkdirs()) {
-			throw new IllegalStateException("Failed to create access log directory '" + this.accessLogDirectory + "'");
+			throw new IllegalStateException(new StringBuilder().append("Failed to create access log directory '").append(this.accessLogDirectory).append("'").toString());
 		}
 	}
 

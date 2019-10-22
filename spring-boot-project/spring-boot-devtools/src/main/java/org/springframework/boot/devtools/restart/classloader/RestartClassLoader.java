@@ -30,6 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.devtools.restart.classloader.ClassLoaderFile.Kind;
 import org.springframework.core.SmartClassLoader;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Disposable {@link ClassLoader} used to support application restarting. Provides parent
@@ -40,6 +42,8 @@ import org.springframework.util.Assert;
  * @since 1.3.0
  */
 public class RestartClassLoader extends URLClassLoader implements SmartClassLoader {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(RestartClassLoader.class);
 
 	private final Log logger;
 
@@ -129,7 +133,7 @@ public class RestartClassLoader extends URLClassLoader implements SmartClassLoad
 
 	@Override
 	public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-		String path = name.replace('.', '/').concat(".class");
+		String path = name.replace('.', '/') + ".class";
 		ClassLoaderFile file = this.updatedFiles.getFile(path);
 		if (file != null && file.getKind() == Kind.DELETED) {
 			throw new ClassNotFoundException(name);
@@ -141,6 +145,7 @@ public class RestartClassLoader extends URLClassLoader implements SmartClassLoad
 					loadedClass = findClass(name);
 				}
 				catch (ClassNotFoundException ex) {
+					logger1.error(ex.getMessage(), ex);
 					loadedClass = getParent().loadClass(name);
 				}
 			}
@@ -153,7 +158,7 @@ public class RestartClassLoader extends URLClassLoader implements SmartClassLoad
 
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		String path = name.replace('.', '/').concat(".class");
+		String path = name.replace('.', '/') + ".class";
 		final ClassLoaderFile file = this.updatedFiles.getFile(path);
 		if (file == null) {
 			return super.findClass(name);

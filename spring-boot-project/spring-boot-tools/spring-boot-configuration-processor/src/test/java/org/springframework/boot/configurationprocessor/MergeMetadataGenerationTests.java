@@ -86,7 +86,7 @@ class MergeMetadataGenerationTests extends AbstractMetadataGenerationTests {
 		writeAdditionalMetadata(property);
 		ConfigurationMetadata metadata = compile(SimpleProperties.class, SimpleConflictingProperties.class);
 		assertThat(metadata.getItems()).hasSize(6);
-		List<ItemMetadata> items = metadata.getItems().stream().filter((item) -> item.getName().equals("simple.flag"))
+		List<ItemMetadata> items = metadata.getItems().stream().filter((item) -> "simple.flag".equals(item.getName()))
 				.collect(Collectors.toList());
 		assertThat(items).hasSize(2);
 		ItemMetadata matchingProperty = items.stream().filter((item) -> item.getType().equals(Boolean.class.getName()))

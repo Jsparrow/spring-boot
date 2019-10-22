@@ -48,7 +48,7 @@ public enum DurationStyle {
 						.parse(matcher.group(1));
 			}
 			catch (Exception ex) {
-				throw new IllegalArgumentException("'" + value + "' is not a valid simple duration", ex);
+				throw new IllegalArgumentException(new StringBuilder().append("'").append(value).append("' is not a valid simple duration").toString(), ex);
 			}
 		}
 
@@ -70,7 +70,7 @@ public enum DurationStyle {
 				return Duration.parse(value);
 			}
 			catch (Exception ex) {
-				throw new IllegalArgumentException("'" + value + "' is not a valid ISO-8601 duration", ex);
+				throw new IllegalArgumentException(new StringBuilder().append("'").append(value).append("' is not a valid ISO-8601 duration").toString(), ex);
 			}
 		}
 
@@ -165,7 +165,7 @@ public enum DurationStyle {
 				return candidate;
 			}
 		}
-		throw new IllegalArgumentException("'" + value + "' is not a valid duration");
+		throw new IllegalArgumentException(new StringBuilder().append("'").append(value).append("' is not a valid duration").toString());
 	}
 
 	/**
@@ -250,7 +250,7 @@ public enum DurationStyle {
 					return candidate;
 				}
 			}
-			throw new IllegalArgumentException("Unknown unit '" + suffix + "'");
+			throw new IllegalArgumentException(new StringBuilder().append("Unknown unit '").append(suffix).append("'").toString());
 		}
 
 	}

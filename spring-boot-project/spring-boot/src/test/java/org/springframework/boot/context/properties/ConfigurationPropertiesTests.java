@@ -208,7 +208,7 @@ class ConfigurationPropertiesTests {
 		List<String> pairs = new ArrayList<>();
 		pairs.add("name:foo");
 		for (int i = 0; i < 1000; i++) {
-			pairs.add("list[" + i + "]:" + i);
+			pairs.add(new StringBuilder().append("list[").append(i).append("]:").append(i).toString());
 		}
 		load(BasicConfiguration.class, StringUtils.toStringArray(pairs));
 		BasicProperties bean = this.context.getBean(BasicProperties.class);
@@ -357,7 +357,7 @@ class ConfigurationPropertiesTests {
 		this.context = new AnnotationConfigApplicationContext() {
 
 			@Override
-			protected void onRefresh() throws BeansException {
+			protected void onRefresh() {
 				assertThat(WithFactoryBeanConfiguration.factoryBeanInitialized).as("Initialized too early").isFalse();
 				super.onRefresh();
 			}
@@ -678,9 +678,7 @@ class ConfigurationPropertiesTests {
 		removeSystemProperties();
 		assertThatExceptionOfType(ConfigurationPropertiesBindException.class)
 				.isThrownBy(() -> load(IgnoreUnknownFieldsFalseConfiguration.class, "name=foo", "bar=baz"))
-				.withMessageContaining("Could not bind properties to "
-						+ "'ConfigurationPropertiesTests.IgnoreUnknownFieldsFalseProperties' : "
-						+ "prefix=, ignoreInvalidFields=false, ignoreUnknownFields=false;");
+				.withMessageContaining(new StringBuilder().append("Could not bind properties to ").append("'ConfigurationPropertiesTests.IgnoreUnknownFieldsFalseProperties' : ").append("prefix=, ignoreInvalidFields=false, ignoreUnknownFields=false;").toString());
 	}
 
 	@Test
@@ -873,6 +871,12 @@ class ConfigurationPropertiesTests {
 	private void resetContext() {
 		this.context.close();
 		this.context = new AnnotationConfigApplicationContext();
+	}
+
+	enum FooEnum {
+
+		FOO, BAZ, BAR
+
 	}
 
 	@Configuration(proxyBeanMethods = false)
@@ -1115,11 +1119,11 @@ class ConfigurationPropertiesTests {
 
 		@Override
 		public Resource resolve(String location, ResourceLoader resourceLoader) {
-			if (location.startsWith(PREFIX)) {
-				String path = location.substring(PREFIX.length());
-				return new ClassPathResource(path);
+			if (!location.startsWith(PREFIX)) {
+				return null;
 			}
-			return null;
+			String path = location.substring(PREFIX.length());
+			return new ClassPathResource(path);
 		}
 
 	}
@@ -1536,12 +1540,6 @@ class ConfigurationPropertiesTests {
 
 	}
 
-	enum FooEnum {
-
-		FOO, BAZ, BAR
-
-	}
-
 	@EnableConfigurationProperties
 	@ConfigurationProperties(prefix = "test", ignoreUnknownFields = false)
 	static class WithCharArrayProperties {
@@ -1725,7 +1723,7 @@ class ConfigurationPropertiesTests {
 
 		void setFoo(String foo) {
 			this.foo = foo;
-			if (!foo.equals("bar")) {
+			if (!"bar".equals(foo)) {
 				throw new IllegalArgumentException("Wrong value for foo");
 			}
 		}
@@ -1926,7 +1924,7 @@ class ConfigurationPropertiesTests {
 	static class PersonPropertyEditor extends PropertyEditorSupport {
 
 		@Override
-		public void setAsText(String text) throws IllegalArgumentException {
+		public void setAsText(String text) {
 			String[] split = text.split(",");
 			setValue(new Person(split[1], split[0]));
 		}

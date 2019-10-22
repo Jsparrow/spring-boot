@@ -43,10 +43,9 @@ class OnRepositoryTypeCondition extends SpringBootCondition {
 		ConditionMessage.Builder message = ConditionMessage.forCondition(ConditionalOnRepositoryType.class);
 		if (configuredType == requiredType || configuredType == RepositoryType.AUTO) {
 			return ConditionOutcome
-					.match(message.because("configured type of '" + configuredType.name() + "' matched required type"));
+					.match(message.because(new StringBuilder().append("configured type of '").append(configuredType.name()).append("' matched required type").toString()));
 		}
-		return ConditionOutcome.noMatch(message.because("configured type (" + configuredType.name()
-				+ ") did not match required type (" + requiredType.name() + ")"));
+		return ConditionOutcome.noMatch(message.because(new StringBuilder().append("configured type (").append(configuredType.name()).append(") did not match required type (").append(requiredType.name()).append(")").toString()));
 	}
 
 	private RepositoryType getTypeProperty(Environment environment, String store) {

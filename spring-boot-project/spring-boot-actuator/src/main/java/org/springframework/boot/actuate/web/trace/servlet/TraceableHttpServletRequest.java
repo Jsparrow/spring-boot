@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.boot.actuate.trace.http.TraceableRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An adapter that exposes an {@link HttpServletRequest} as a {@link TraceableRequest}.
@@ -38,6 +40,7 @@ import org.springframework.web.util.UriUtils;
  */
 final class TraceableHttpServletRequest implements TraceableRequest {
 
+	private static final Logger logger = LoggerFactory.getLogger(TraceableHttpServletRequest.class);
 	private final HttpServletRequest request;
 
 	TraceableHttpServletRequest(HttpServletRequest request) {
@@ -60,6 +63,7 @@ final class TraceableHttpServletRequest implements TraceableRequest {
 			return new URI(urlBuffer.toString());
 		}
 		catch (URISyntaxException ex) {
+			logger.error(ex.getMessage(), ex);
 			String encoded = UriUtils.encodeQuery(queryString, StandardCharsets.UTF_8);
 			StringBuffer urlBuffer = appendQueryString(encoded);
 			return URI.create(urlBuffer.toString());

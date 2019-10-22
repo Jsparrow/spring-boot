@@ -89,8 +89,7 @@ public final class AnnotatedClassFinder {
 		while (!source.isEmpty()) {
 			Set<BeanDefinition> components = this.scanner.findCandidateComponents(source);
 			if (!components.isEmpty()) {
-				Assert.state(components.size() == 1, () -> "Found multiple @" + this.annotationType.getSimpleName()
-						+ " annotated classes " + components);
+				Assert.state(components.size() == 1, () -> new StringBuilder().append("Found multiple @").append(this.annotationType.getSimpleName()).append(" annotated classes ").append(components).toString());
 				return ClassUtils.resolveClassName(components.iterator().next().getBeanClassName(), null);
 			}
 			source = getParentPackage(source);

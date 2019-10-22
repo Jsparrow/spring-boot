@@ -57,14 +57,14 @@ class ManagementPortSampleActuatorApplicationTests {
 	void testMetrics() {
 		testHome(); // makes sure some requests have been made
 		ResponseEntity<Map<String, Object>> entity = asMapEntity(new TestRestTemplate()
-				.getForEntity("http://localhost:" + this.managementPort + "/actuator/metrics", Map.class));
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/actuator/metrics").toString(), Map.class));
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 	}
 
 	@Test
 	void testHealth() {
 		ResponseEntity<String> entity = new TestRestTemplate().withBasicAuth("user", "password")
-				.getForEntity("http://localhost:" + this.managementPort + "/actuator/health", String.class);
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/actuator/health").toString(), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).contains("\"status\":\"UP\"");
 		assertThat(entity.getBody()).contains("\"example\"");
@@ -74,7 +74,7 @@ class ManagementPortSampleActuatorApplicationTests {
 	@Test
 	void testErrorPage() {
 		ResponseEntity<Map<String, Object>> entity = asMapEntity(new TestRestTemplate("user", "password")
-				.getForEntity("http://localhost:" + this.managementPort + "/error", Map.class));
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/error").toString(), Map.class));
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody().get("status")).isEqualTo(999);
 	}

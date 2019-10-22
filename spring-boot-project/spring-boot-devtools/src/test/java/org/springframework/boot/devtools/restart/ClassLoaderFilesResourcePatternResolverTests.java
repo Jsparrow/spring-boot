@@ -93,7 +93,7 @@ class ClassLoaderFilesResourcePatternResolverTests {
 	@Test
 	void getResourcesShouldReturnResources(@TempDir File folder) throws Exception {
 		createFile(folder, "name.class");
-		Resource[] resources = this.resolver.getResources("file:" + folder.getAbsolutePath() + "/**");
+		Resource[] resources = this.resolver.getResources(new StringBuilder().append("file:").append(folder.getAbsolutePath()).append("/**").toString());
 		assertThat(resources).isNotEmpty();
 	}
 
@@ -101,7 +101,7 @@ class ClassLoaderFilesResourcePatternResolverTests {
 	void getResourcesWhenDeletedShouldFilterDeleted(@TempDir File folder) throws Exception {
 		createFile(folder, "name.class");
 		this.files.addFile(folder.getName(), "name.class", new ClassLoaderFile(Kind.DELETED, null));
-		Resource[] resources = this.resolver.getResources("file:" + folder.getAbsolutePath() + "/**");
+		Resource[] resources = this.resolver.getResources(new StringBuilder().append("file:").append(folder.getAbsolutePath()).append("/**").toString());
 		assertThat(resources).isEmpty();
 	}
 

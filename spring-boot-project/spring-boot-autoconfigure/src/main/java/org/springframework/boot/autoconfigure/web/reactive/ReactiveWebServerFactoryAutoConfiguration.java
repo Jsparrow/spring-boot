@@ -87,7 +87,7 @@ public class ReactiveWebServerFactoryAutoConfiguration {
 		private ConfigurableListableBeanFactory beanFactory;
 
 		@Override
-		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		public void setBeanFactory(BeanFactory beanFactory) {
 			if (beanFactory instanceof ConfigurableListableBeanFactory) {
 				this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 			}
@@ -104,11 +104,12 @@ public class ReactiveWebServerFactoryAutoConfiguration {
 		}
 
 		private void registerSyntheticBeanIfMissing(BeanDefinitionRegistry registry, String name, Class<?> beanClass) {
-			if (ObjectUtils.isEmpty(this.beanFactory.getBeanNamesForType(beanClass, true, false))) {
-				RootBeanDefinition beanDefinition = new RootBeanDefinition(beanClass);
-				beanDefinition.setSynthetic(true);
-				registry.registerBeanDefinition(name, beanDefinition);
+			if (!ObjectUtils.isEmpty(this.beanFactory.getBeanNamesForType(beanClass, true, false))) {
+				return;
 			}
+			RootBeanDefinition beanDefinition = new RootBeanDefinition(beanClass);
+			beanDefinition.setSynthetic(true);
+			registry.registerBeanDefinition(name, beanDefinition);
 		}
 
 	}

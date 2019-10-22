@@ -35,8 +35,7 @@ public class SpringImplicitNamingStrategy extends ImplicitNamingStrategyJpaCompl
 
 	@Override
 	public Identifier determineJoinTableName(ImplicitJoinTableNameSource source) {
-		String name = source.getOwningPhysicalTableName() + "_"
-				+ source.getAssociationOwningAttributePath().getProperty();
+		String name = new StringBuilder().append(source.getOwningPhysicalTableName()).append("_").append(source.getAssociationOwningAttributePath().getProperty()).toString();
 		return toIdentifier(name, source.getBuildingContext());
 	}
 

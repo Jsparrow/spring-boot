@@ -42,10 +42,10 @@ public class LocalHostWebClient extends WebClient {
 	}
 
 	@Override
-	public <P extends Page> P getPage(String url) throws IOException, FailingHttpStatusCodeException {
+	public <P extends Page> P getPage(String url) throws IOException {
 		if (url.startsWith("/")) {
 			String port = this.environment.getProperty("local.server.port", "8080");
-			url = "http://localhost:" + port + url;
+			url = new StringBuilder().append("http://localhost:").append(port).append(url).toString();
 		}
 		return super.getPage(url);
 	}

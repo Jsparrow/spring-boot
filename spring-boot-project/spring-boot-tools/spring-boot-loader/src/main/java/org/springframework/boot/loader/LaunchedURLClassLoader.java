@@ -27,6 +27,8 @@ import java.util.Enumeration;
 import java.util.jar.JarFile;
 
 import org.springframework.boot.loader.jar.Handler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ClassLoader} used by the {@link Launcher}.
@@ -37,6 +39,8 @@ import org.springframework.boot.loader.jar.Handler;
  * @since 1.0.0
  */
 public class LaunchedURLClassLoader extends URLClassLoader {
+
+	private static final Logger logger = LoggerFactory.getLogger(LaunchedURLClassLoader.class);
 
 	static {
 		ClassLoader.registerAsParallelCapable();
@@ -81,12 +85,13 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 				definePackageIfNecessary(name);
 			}
 			catch (IllegalArgumentException ex) {
+				logger.error(ex.getMessage(), ex);
 				// Tolerate race condition due to being parallel capable
 				if (getPackage(name) == null) {
 					// This should never happen as the IllegalArgumentException indicates
 					// that the package has already been defined and, therefore,
 					// getPackage(name) should not return null.
-					throw new AssertionError("Package " + name + " has already been defined but it could not be found");
+					throw new AssertionError(new StringBuilder().append("Package ").append(name).append(" has already been defined but it could not be found").toString());
 				}
 			}
 			return super.loadClass(name, resolve);
@@ -104,21 +109,23 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 	 */
 	private void definePackageIfNecessary(String className) {
 		int lastDot = className.lastIndexOf('.');
-		if (lastDot >= 0) {
-			String packageName = className.substring(0, lastDot);
-			if (getPackage(packageName) == null) {
-				try {
-					definePackage(className, packageName);
-				}
-				catch (IllegalArgumentException ex) {
-					// Tolerate race condition due to being parallel capable
-					if (getPackage(packageName) == null) {
-						// This should never happen as the IllegalArgumentException
-						// indicates that the package has already been defined and,
-						// therefore, getPackage(name) should not have returned null.
-						throw new AssertionError(
-								"Package " + packageName + " has already been defined but it could not be found");
-					}
+		if (lastDot < 0) {
+			return;
+		}
+		String packageName = className.substring(0, lastDot);
+		if (getPackage(packageName) == null) {
+			try {
+				definePackage(className, packageName);
+			}
+			catch (IllegalArgumentException ex) {
+				logger.error(ex.getMessage(), ex);
+				// Tolerate race condition due to being parallel capable
+				if (getPackage(packageName) == null) {
+					// This should never happen as the IllegalArgumentException
+					// indicates that the package has already been defined and,
+					// therefore, getPackage(name) should not have returned null.
+					throw new AssertionError(
+							new StringBuilder().append("Package ").append(packageName).append(" has already been defined but it could not be found").toString());
 				}
 			}
 		}
@@ -142,6 +149,7 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 						}
 					}
 					catch (IOException ex) {
+						logger.error(ex.getMessage(), ex);
 						// Ignore
 					}
 				}
@@ -149,6 +157,7 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 			}, AccessController.getContext());
 		}
 		catch (java.security.PrivilegedActionException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}
@@ -165,6 +174,7 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 				}
 			}
 			catch (IOException ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}

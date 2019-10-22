@@ -82,13 +82,11 @@ public final class RepositoryConfigurationFactory {
 
 	private static void addActiveProfileRepositories(List<Profile> activeProfiles,
 			List<RepositoryConfiguration> configurations) {
-		for (Profile activeProfile : activeProfiles) {
+		activeProfiles.forEach(activeProfile -> {
 			Interpolator interpolator = new RegexBasedInterpolator();
 			interpolator.addValueSource(new PropertiesBasedValueSource(activeProfile.getProperties()));
-			for (Repository repository : activeProfile.getRepositories()) {
-				configurations.add(getRepositoryConfiguration(interpolator, repository));
-			}
-		}
+			activeProfile.getRepositories().forEach(repository -> configurations.add(getRepositoryConfiguration(interpolator, repository)));
+		});
 	}
 
 	private static RepositoryConfiguration getRepositoryConfiguration(Interpolator interpolator,

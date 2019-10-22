@@ -116,10 +116,8 @@ public class HibernateProperties {
 	private void applyNewIdGeneratorMappings(Map<String, Object> result) {
 		if (this.useNewIdGeneratorMappings != null) {
 			result.put(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, this.useNewIdGeneratorMappings.toString());
-		}
-		else if (!result.containsKey(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS)) {
-			result.put(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, "true");
-		}
+		} else
+			result.putIfAbsent(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, "true");
 	}
 
 	private void applyScanner(Map<String, Object> result) {

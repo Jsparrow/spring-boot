@@ -28,7 +28,7 @@ public class HelloWorldService {
 	}
 
 	public String getHelloMessage(String name) {
-		return this.configuration.getGreeting() + " " + name;
+		return new StringBuilder().append(this.configuration.getGreeting()).append(" ").append(name).toString();
 	}
 
 }

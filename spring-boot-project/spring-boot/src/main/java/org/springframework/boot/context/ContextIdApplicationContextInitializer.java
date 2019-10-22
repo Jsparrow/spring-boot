@@ -83,7 +83,7 @@ public class ContextIdApplicationContextInitializer
 		}
 
 		ContextId createChildId() {
-			return new ContextId(this.id + "-" + this.children.incrementAndGet());
+			return new ContextId(new StringBuilder().append(this.id).append("-").append(this.children.incrementAndGet()).toString());
 		}
 
 		String getId() {

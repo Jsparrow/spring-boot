@@ -42,15 +42,11 @@ class TunnelClientListeners {
 	}
 
 	void fireOpenEvent(SocketChannel socket) {
-		for (TunnelClientListener listener : this.listeners) {
-			listener.onOpen(socket);
-		}
+		this.listeners.forEach(listener -> listener.onOpen(socket));
 	}
 
 	void fireCloseEvent(SocketChannel socket) {
-		for (TunnelClientListener listener : this.listeners) {
-			listener.onClose(socket);
-		}
+		this.listeners.forEach(listener -> listener.onClose(socket));
 	}
 
 }

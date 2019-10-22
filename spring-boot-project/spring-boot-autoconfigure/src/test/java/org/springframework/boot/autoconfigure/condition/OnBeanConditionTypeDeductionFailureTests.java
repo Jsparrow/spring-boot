@@ -45,8 +45,7 @@ class OnBeanConditionTypeDeductionFailureTests {
 				.isThrownBy(() -> new AnnotationConfigApplicationContext(ImportingConfiguration.class).close())
 				.satisfies((ex) -> {
 					Throwable beanTypeDeductionException = findNestedCause(ex, BeanTypeDeductionException.class);
-					assertThat(beanTypeDeductionException).hasMessage("Failed to deduce bean type for "
-							+ OnMissingBeanConfiguration.class.getName() + ".objectMapper");
+					assertThat(beanTypeDeductionException).hasMessage(new StringBuilder().append("Failed to deduce bean type for ").append(OnMissingBeanConfiguration.class.getName()).append(".objectMapper").toString());
 					assertThat(findNestedCause(beanTypeDeductionException, NoClassDefFoundError.class)).isNotNull();
 
 				});

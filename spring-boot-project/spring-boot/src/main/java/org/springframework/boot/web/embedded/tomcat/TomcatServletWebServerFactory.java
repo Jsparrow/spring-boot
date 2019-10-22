@@ -76,6 +76,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link AbstractServletWebServerFactory} that can be used to create
@@ -100,6 +102,8 @@ import org.springframework.util.StringUtils;
  */
 public class TomcatServletWebServerFactory extends AbstractServletWebServerFactory
 		implements ConfigurableTomcatWebServerFactory, ResourceLoaderAware {
+
+	private static final Logger logger = LoggerFactory.getLogger(TomcatServletWebServerFactory.class);
 
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
@@ -165,7 +169,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	private static List<LifecycleListener> getDefaultLifecycleListeners() {
 		AprLifecycleListener aprLifecycleListener = new AprLifecycleListener();
-		return AprLifecycleListener.isAprAvailable() ? new ArrayList<>(Arrays.asList(aprLifecycleListener))
+		return AprLifecycleListener.isAprAvailable() ? new ArrayList<>(Collections.singletonList(aprLifecycleListener))
 				: new ArrayList<>();
 	}
 
@@ -184,18 +188,14 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		tomcat.setConnector(connector);
 		tomcat.getHost().setAutoDeploy(false);
 		configureEngine(tomcat.getEngine());
-		for (Connector additionalConnector : this.additionalTomcatConnectors) {
-			tomcat.getService().addConnector(additionalConnector);
-		}
+		this.additionalTomcatConnectors.forEach(additionalConnector -> tomcat.getService().addConnector(additionalConnector));
 		prepareContext(tomcat.getHost(), initializers);
 		return getTomcatWebServer(tomcat);
 	}
 
 	private void configureEngine(Engine engine) {
 		engine.setBackgroundProcessorDelay(this.backgroundProcessorDelay);
-		for (Valve valve : this.engineValves) {
-			engine.getPipeline().addValve(valve);
-		}
+		this.engineValves.forEach(valve -> engine.getPipeline().addValve(valve));
 	}
 
 	protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
@@ -219,6 +219,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			context.setCreateUploadTargets(true);
 		}
 		catch (NoSuchMethodError ex) {
+			logger.error(ex.getMessage(), ex);
 			// Tomcat is < 8.5.39. Continue.
 		}
 		configureTldSkipPatterns(context);
@@ -293,6 +294,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			context.addServletContainerInitializer(initializer, null);
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// Probably not Tomcat 8
 		}
 	}
@@ -318,9 +320,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		}
 		TomcatConnectorCustomizer compression = new CompressionConnectorCustomizer(getCompression());
 		compression.customize(connector);
-		for (TomcatConnectorCustomizer customizer : this.tomcatConnectorCustomizers) {
-			customizer.customize(connector);
-		}
+		this.tomcatConnectorCustomizers.forEach(customizer -> customizer.customize(connector));
 	}
 
 	private void customizeProtocol(AbstractProtocol<?> protocol) {
@@ -355,27 +355,21 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			embeddedContext.setFailCtxIfServletStartFails(true);
 		}
 		context.addServletContainerInitializer(starter, NO_CLASSES);
-		for (LifecycleListener lifecycleListener : this.contextLifecycleListeners) {
-			context.addLifecycleListener(lifecycleListener);
-		}
-		for (Valve valve : this.contextValves) {
-			context.getPipeline().addValve(valve);
-		}
-		for (ErrorPage errorPage : getErrorPages()) {
+		this.contextLifecycleListeners.forEach(context::addLifecycleListener);
+		this.contextValves.forEach(valve -> context.getPipeline().addValve(valve));
+		getErrorPages().forEach(errorPage -> {
 			org.apache.tomcat.util.descriptor.web.ErrorPage tomcatErrorPage = new org.apache.tomcat.util.descriptor.web.ErrorPage();
 			tomcatErrorPage.setLocation(errorPage.getPath());
 			tomcatErrorPage.setErrorCode(errorPage.getStatusCode());
 			tomcatErrorPage.setExceptionType(errorPage.getExceptionName());
 			context.addErrorPage(tomcatErrorPage);
-		}
+		});
 		for (MimeMappings.Mapping mapping : getMimeMappings()) {
 			context.addMimeMapping(mapping.getExtension(), mapping.getMimeType());
 		}
 		configureSession(context);
 		new DisableReferenceClearingContextCustomizer().customize(context);
-		for (TomcatContextCustomizer customizer : this.tomcatContextCustomizers) {
-			customizer.customize(context);
-		}
+		this.tomcatContextCustomizers.forEach(customizer -> customizer.customize(context));
 	}
 
 	private void configureSession(Context context) {
@@ -708,12 +702,13 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 		@Override
 		public void lifecycleEvent(LifecycleEvent event) {
-			if (event.getType().equals(Lifecycle.START_EVENT)) {
-				Context context = (Context) event.getLifecycle();
-				Manager manager = context.getManager();
-				if (manager instanceof StandardManager) {
-					((StandardManager) manager).setPathname(null);
-				}
+			if (!event.getType().equals(Lifecycle.START_EVENT)) {
+				return;
+			}
+			Context context = (Context) event.getLifecycle();
+			Manager manager = context.getManager();
+			if (manager instanceof StandardManager) {
+				((StandardManager) manager).setPathname(null);
 			}
 		}
 
@@ -721,6 +716,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	private final class StaticResourceConfigurer implements LifecycleListener {
 
+		private final Logger logger1 = LoggerFactory.getLogger(StaticResourceConfigurer.class);
 		private final Context context;
 
 		private StaticResourceConfigurer(Context context) {
@@ -735,20 +731,20 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		}
 
 		private void addResourceJars(List<URL> resourceJarUrls) {
-			for (URL url : resourceJarUrls) {
+			resourceJarUrls.forEach(url -> {
 				String path = url.getPath();
 				if (path.endsWith(".jar") || path.endsWith(".jar!/")) {
 					String jar = url.toString();
 					if (!jar.startsWith("jar:")) {
 						// A jar file in the file system. Convert to Jar URL.
-						jar = "jar:" + jar + "!/";
+						jar = new StringBuilder().append("jar:").append(jar).append("!/").toString();
 					}
 					addResourceSet(jar);
 				}
 				else {
 					addResourceSet(url.toString());
 				}
-			}
+			});
 		}
 
 		private void addResourceSet(String resource) {
@@ -764,6 +760,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 				this.context.getResources().createWebResourceSet(ResourceSetType.RESOURCE_JAR, "/", url, path);
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				// Ignore (probably not a directory)
 			}
 		}

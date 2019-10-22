@@ -79,15 +79,15 @@ public final class LoggerConfiguration {
 		if (obj == null) {
 			return false;
 		}
-		if (obj instanceof LoggerConfiguration) {
-			LoggerConfiguration other = (LoggerConfiguration) obj;
-			boolean rtn = true;
-			rtn = rtn && ObjectUtils.nullSafeEquals(this.name, other.name);
-			rtn = rtn && ObjectUtils.nullSafeEquals(this.configuredLevel, other.configuredLevel);
-			rtn = rtn && ObjectUtils.nullSafeEquals(this.effectiveLevel, other.effectiveLevel);
-			return rtn;
+		if (!(obj instanceof LoggerConfiguration)) {
+			return super.equals(obj);
 		}
-		return super.equals(obj);
+		LoggerConfiguration other = (LoggerConfiguration) obj;
+		boolean rtn = true;
+		rtn = rtn && ObjectUtils.nullSafeEquals(this.name, other.name);
+		rtn = rtn && ObjectUtils.nullSafeEquals(this.configuredLevel, other.configuredLevel);
+		rtn = rtn && ObjectUtils.nullSafeEquals(this.effectiveLevel, other.effectiveLevel);
+		return rtn;
 	}
 
 	@Override
@@ -102,8 +102,8 @@ public final class LoggerConfiguration {
 
 	@Override
 	public String toString() {
-		return "LoggerConfiguration [name=" + this.name + ", configuredLevel=" + this.configuredLevel
-				+ ", effectiveLevel=" + this.effectiveLevel + "]";
+		return new StringBuilder().append("LoggerConfiguration [name=").append(this.name).append(", configuredLevel=").append(this.configuredLevel).append(", effectiveLevel=")
+				.append(this.effectiveLevel).append("]").toString();
 	}
 
 }

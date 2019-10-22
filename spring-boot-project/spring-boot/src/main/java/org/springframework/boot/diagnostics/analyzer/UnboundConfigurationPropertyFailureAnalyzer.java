@@ -41,19 +41,20 @@ class UnboundConfigurationPropertyFailureAnalyzer
 			UnboundConfigurationPropertiesException exception) {
 		StringBuilder description = new StringBuilder(
 				String.format("Binding to target %s failed:%n", cause.getTarget()));
-		for (ConfigurationProperty property : exception.getUnboundProperties()) {
+		exception.getUnboundProperties().forEach(property -> {
 			buildDescription(description, property);
 			description.append(String.format("%n    Reason: %s", exception.getMessage()));
-		}
+		});
 		return getFailureAnalysis(description, cause);
 	}
 
 	private void buildDescription(StringBuilder description, ConfigurationProperty property) {
-		if (property != null) {
-			description.append(String.format("%n    Property: %s", property.getName()));
-			description.append(String.format("%n    Value: %s", property.getValue()));
-			description.append(String.format("%n    Origin: %s", property.getOrigin()));
+		if (property == null) {
+			return;
 		}
+		description.append(String.format("%n    Property: %s", property.getName()));
+		description.append(String.format("%n    Value: %s", property.getValue()));
+		description.append(String.format("%n    Origin: %s", property.getOrigin()));
 	}
 
 	private FailureAnalysis getFailureAnalysis(Object description, BindException cause) {

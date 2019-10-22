@@ -74,12 +74,7 @@ final class WelcomePageHandlerMapping extends AbstractUrlHandlerMapping {
 
 	@Override
 	public Object getHandlerInternal(HttpServletRequest request) throws Exception {
-		for (MediaType mediaType : getAcceptedMediaTypes(request)) {
-			if (mediaType.includes(MediaType.TEXT_HTML)) {
-				return super.getHandlerInternal(request);
-			}
-		}
-		return null;
+		return getAcceptedMediaTypes(request).stream().filter(mediaType -> mediaType.includes(MediaType.TEXT_HTML)).findFirst().map(mediaType -> super.getHandlerInternal(request)).orElse(null);
 	}
 
 	private List<MediaType> getAcceptedMediaTypes(HttpServletRequest request) {

@@ -65,7 +65,7 @@ class DefaultContributorRegistry<C> implements ContributorRegistry<C> {
 		String adaptedName = this.nameFactory.apply(name);
 		synchronized (this.monitor) {
 			Assert.state(!this.contributors.containsKey(adaptedName),
-					() -> "A contributor named \"" + adaptedName + "\" has already been registered");
+					() -> new StringBuilder().append("A contributor named \"").append(adaptedName).append("\" has already been registered").toString());
 			Map<String, C> contributors = new LinkedHashMap<>(this.contributors);
 			contributors.put(adaptedName, contributor);
 			this.contributors = Collections.unmodifiableMap(contributors);

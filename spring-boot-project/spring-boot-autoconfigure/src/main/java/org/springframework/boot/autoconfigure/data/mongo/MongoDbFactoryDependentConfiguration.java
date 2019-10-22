@@ -98,7 +98,7 @@ class MongoDbFactoryDependentConfiguration {
 		}
 
 		@Override
-		public MongoDatabase getDb() throws DataAccessException {
+		public MongoDatabase getDb() {
 			String gridFsDatabase = this.properties.getGridFsDatabase();
 			if (StringUtils.hasText(gridFsDatabase)) {
 				return this.mongoDbFactory.getDb(gridFsDatabase);
@@ -107,7 +107,7 @@ class MongoDbFactoryDependentConfiguration {
 		}
 
 		@Override
-		public MongoDatabase getDb(String dbName) throws DataAccessException {
+		public MongoDatabase getDb(String dbName) {
 			return this.mongoDbFactory.getDb(dbName);
 		}
 

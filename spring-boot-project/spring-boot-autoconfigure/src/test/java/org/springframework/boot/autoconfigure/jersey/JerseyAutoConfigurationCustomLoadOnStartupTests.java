@@ -54,15 +54,6 @@ class JerseyAutoConfigurationCustomLoadOnStartupTests {
 		assertThat(this.context.getBean("jerseyServletRegistration")).hasFieldOrPropertyWithValue("loadOnStartup", 5);
 	}
 
-	@MinimalWebConfiguration
-	static class Application extends ResourceConfig {
-
-		Application() {
-			register(Application.class);
-		}
-
-	}
-
 	@Target(ElementType.TYPE)
 	@Retention(RetentionPolicy.RUNTIME)
 	@Documented
@@ -70,6 +61,15 @@ class JerseyAutoConfigurationCustomLoadOnStartupTests {
 	@Import({ ServletWebServerFactoryAutoConfiguration.class, JerseyAutoConfiguration.class,
 			PropertyPlaceholderAutoConfiguration.class })
 	protected @interface MinimalWebConfiguration {
+
+	}
+
+	@MinimalWebConfiguration
+	static class Application extends ResourceConfig {
+
+		Application() {
+			register(Application.class);
+		}
 
 	}
 

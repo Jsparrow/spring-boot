@@ -51,7 +51,7 @@ class ProjectGenerator {
 				return;
 			}
 			else {
-				Log.info("Could not extract '" + response.getContentType() + "'");
+				Log.info(new StringBuilder().append("Could not extract '").append(response.getContentType()).append("'").toString());
 				// Use value from the server since we can't extract it
 				fileName = response.getFileName();
 			}
@@ -101,7 +101,7 @@ class ProjectGenerator {
 			extractFromStream(zipStream, overwrite, outputFolder);
 			fixExecutableFlag(outputFolder, "mvnw");
 			fixExecutableFlag(outputFolder, "gradlew");
-			Log.info("Project extracted to '" + outputFolder.getAbsolutePath() + "'");
+			Log.info(new StringBuilder().append("Project extracted to '").append(outputFolder.getAbsolutePath()).append("'").toString());
 		}
 	}
 
@@ -112,14 +112,12 @@ class ProjectGenerator {
 			File file = new File(outputFolder, entry.getName());
 			String canonicalEntryPath = file.getCanonicalPath();
 			if (!canonicalEntryPath.startsWith(canonicalOutputPath)) {
-				throw new ReportableException("Entry '" + entry.getName() + "' would be written to '"
-						+ canonicalEntryPath + "'. This is outside the output location of '" + canonicalOutputPath
-						+ "'. Verify your target server configuration.");
+				throw new ReportableException(new StringBuilder().append("Entry '").append(entry.getName()).append("' would be written to '").append(canonicalEntryPath).append("'. This is outside the output location of '").append(canonicalOutputPath)
+						.append("'. Verify your target server configuration.").toString());
 			}
 			if (file.exists() && !overwrite) {
-				throw new ReportableException((file.isDirectory() ? "Directory" : "File") + " '" + file.getName()
-						+ "' already exists. Use --force if you want to overwrite or "
-						+ "specify an alternate location.");
+				throw new ReportableException(new StringBuilder().append(file.isDirectory() ? "Directory" : "File").append(" '").append(file.getName()).append("' already exists. Use --force if you want to overwrite or ")
+						.append("specify an alternate location.").toString());
 			}
 			if (!entry.isDirectory()) {
 				FileCopyUtils.copy(StreamUtils.nonClosing(zipStream), new FileOutputStream(file));
@@ -137,15 +135,14 @@ class ProjectGenerator {
 		if (outputFile.exists()) {
 			if (!overwrite) {
 				throw new ReportableException(
-						"File '" + outputFile.getName() + "' already exists. Use --force if you want to "
-								+ "overwrite or specify an alternate location.");
+						new StringBuilder().append("File '").append(outputFile.getName()).append("' already exists. Use --force if you want to ").append("overwrite or specify an alternate location.").toString());
 			}
 			if (!outputFile.delete()) {
 				throw new ReportableException("Failed to delete existing file " + outputFile.getPath());
 			}
 		}
 		FileCopyUtils.copy(entity.getContent(), outputFile);
-		Log.info("Content saved to '" + output + "'");
+		Log.info(new StringBuilder().append("Content saved to '").append(output).append("'").toString());
 	}
 
 	private void fixExecutableFlag(File dir, String fileName) {

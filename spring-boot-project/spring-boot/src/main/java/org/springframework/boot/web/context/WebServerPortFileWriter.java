@@ -28,6 +28,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link ApplicationListener} that saves embedded server port and management port into
@@ -41,6 +43,8 @@ import org.springframework.util.StringUtils;
  * @since 2.0.0
  */
 public class WebServerPortFileWriter implements ApplicationListener<WebServerInitializedEvent> {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(WebServerPortFileWriter.class);
 
 	private static final String DEFAULT_FILE_NAME = "application.port";
 
@@ -91,6 +95,7 @@ public class WebServerPortFileWriter implements ApplicationListener<WebServerIni
 			portFile.deleteOnExit();
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			logger.warn(String.format("Cannot create port file %s", this.file));
 		}
 	}
@@ -111,13 +116,13 @@ public class WebServerPortFileWriter implements ApplicationListener<WebServerIni
 		String extension = StringUtils.getFilenameExtension(this.file.getName());
 		name = name.substring(0, name.length() - extension.length() - 1);
 		if (isUpperCase(name)) {
-			name = name + "-" + namespace.toUpperCase(Locale.ENGLISH);
+			name = new StringBuilder().append(name).append("-").append(namespace.toUpperCase(Locale.ENGLISH)).toString();
 		}
 		else {
-			name = name + "-" + namespace.toLowerCase(Locale.ENGLISH);
+			name = new StringBuilder().append(name).append("-").append(namespace.toLowerCase(Locale.ENGLISH)).toString();
 		}
 		if (StringUtils.hasLength(extension)) {
-			name = name + "." + extension;
+			name = new StringBuilder().append(name).append(".").append(extension).toString();
 		}
 		return new File(this.file.getParentFile(), name);
 	}

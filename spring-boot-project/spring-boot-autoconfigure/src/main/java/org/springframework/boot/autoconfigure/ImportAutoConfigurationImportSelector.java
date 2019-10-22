@@ -80,9 +80,7 @@ class ImportAutoConfigurationImportSelector extends AutoConfigurationImportSelec
 
 	private void collectCandidateConfigurations(Class<?> source, List<Annotation> annotations,
 			List<String> candidates) {
-		for (Annotation annotation : annotations) {
-			candidates.addAll(getConfigurationsForAnnotation(source, annotation));
-		}
+		annotations.forEach(annotation -> candidates.addAll(getConfigurationsForAnnotation(source, annotation)));
 	}
 
 	private Collection<String> getConfigurationsForAnnotation(Class<?> source, Annotation annotation) {
@@ -101,23 +99,20 @@ class ImportAutoConfigurationImportSelector extends AutoConfigurationImportSelec
 	protected Set<String> getExclusions(AnnotationMetadata metadata, AnnotationAttributes attributes) {
 		Set<String> exclusions = new LinkedHashSet<>();
 		Class<?> source = ClassUtils.resolveClassName(metadata.getClassName(), null);
-		for (String annotationName : ANNOTATION_NAMES) {
-			AnnotationAttributes merged = AnnotatedElementUtils.getMergedAnnotationAttributes(source, annotationName);
+		ANNOTATION_NAMES.stream().map(annotationName -> AnnotatedElementUtils.getMergedAnnotationAttributes(source, annotationName)).forEach(merged -> {
 			Class<?>[] exclude = (merged != null) ? merged.getClassArray("exclude") : null;
 			if (exclude != null) {
 				for (Class<?> excludeClass : exclude) {
 					exclusions.add(excludeClass.getName());
 				}
 			}
-		}
-		for (List<Annotation> annotations : getAnnotations(metadata).values()) {
-			for (Annotation annotation : annotations) {
-				String[] exclude = (String[]) AnnotationUtils.getAnnotationAttributes(annotation, true).get("exclude");
-				if (!ObjectUtils.isEmpty(exclude)) {
-					exclusions.addAll(Arrays.asList(exclude));
-				}
+		});
+		getAnnotations(metadata).values().stream().flatMap(List::stream).forEach(annotation -> {
+			String[] exclude = (String[]) AnnotationUtils.getAnnotationAttributes(annotation, true).get("exclude");
+			if (!ObjectUtils.isEmpty(exclude)) {
+				exclusions.addAll(Arrays.asList(exclude));
 			}
-		}
+		});
 		return exclusions;
 	}
 
@@ -130,17 +125,18 @@ class ImportAutoConfigurationImportSelector extends AutoConfigurationImportSelec
 
 	private void collectAnnotations(Class<?> source, MultiValueMap<Class<?>, Annotation> annotations,
 			HashSet<Class<?>> seen) {
-		if (source != null && seen.add(source)) {
-			for (Annotation annotation : source.getDeclaredAnnotations()) {
-				if (!AnnotationUtils.isInJavaLangAnnotationPackage(annotation)) {
-					if (ANNOTATION_NAMES.contains(annotation.annotationType().getName())) {
-						annotations.add(source, annotation);
-					}
-					collectAnnotations(annotation.annotationType(), annotations, seen);
-				}
-			}
-			collectAnnotations(source.getSuperclass(), annotations, seen);
+		if (!(source != null && seen.add(source))) {
+			return;
 		}
+		for (Annotation annotation : source.getDeclaredAnnotations()) {
+			if (!AnnotationUtils.isInJavaLangAnnotationPackage(annotation)) {
+				if (ANNOTATION_NAMES.contains(annotation.annotationType().getName())) {
+					annotations.add(source, annotation);
+				}
+				collectAnnotations(annotation.annotationType(), annotations, seen);
+			}
+		}
+		collectAnnotations(source.getSuperclass(), annotations, seen);
 	}
 
 	@Override

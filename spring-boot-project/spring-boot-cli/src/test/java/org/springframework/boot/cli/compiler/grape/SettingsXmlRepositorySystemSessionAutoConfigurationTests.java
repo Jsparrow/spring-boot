@@ -79,7 +79,7 @@ class SettingsXmlRepositorySystemSessionAutoConfigurationTests {
 					return null;
 				});
 		assertThat(session.getLocalRepository().getBasedir().getAbsolutePath())
-				.endsWith(File.separatorChar + "bar" + File.separatorChar + "repository");
+				.endsWith(new StringBuilder().append(File.separatorChar).append("bar").append(File.separatorChar).append("repository").toString());
 	}
 
 	private void assertSessionCustomization(String userHome) {

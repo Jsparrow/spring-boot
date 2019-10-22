@@ -31,7 +31,7 @@ public class InvalidConfigurationPropertyNameException extends RuntimeException 
 	private final List<Character> invalidCharacters;
 
 	public InvalidConfigurationPropertyNameException(CharSequence name, List<Character> invalidCharacters) {
-		super("Configuration property name '" + name + "' is not valid");
+		super(new StringBuilder().append("Configuration property name '").append(name).append("' is not valid").toString());
 		this.name = name;
 		this.invalidCharacters = invalidCharacters;
 	}

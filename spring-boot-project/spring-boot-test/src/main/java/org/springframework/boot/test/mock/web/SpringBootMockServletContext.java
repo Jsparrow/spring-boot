@@ -25,6 +25,8 @@ import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mock.web.MockServletContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link MockServletContext} implementation for Spring Boot. Respects well-known Spring
@@ -35,6 +37,8 @@ import org.springframework.mock.web.MockServletContext;
  * @since 1.4.0
  */
 public class SpringBootMockServletContext extends MockServletContext {
+
+	private static final Logger logger = LoggerFactory.getLogger(SpringBootMockServletContext.class);
 
 	private static final String[] SPRING_BOOT_RESOURCE_LOCATIONS = new String[] { "classpath:META-INF/resources",
 			"classpath:resources", "classpath:static", "classpath:public" };
@@ -80,6 +84,7 @@ public class SpringBootMockServletContext extends MockServletContext {
 			return resource.exists();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}
@@ -103,6 +108,7 @@ public class SpringBootMockServletContext extends MockServletContext {
 				return this.emptyRootFolder.toURI().toURL();
 			}
 			catch (IOException ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}

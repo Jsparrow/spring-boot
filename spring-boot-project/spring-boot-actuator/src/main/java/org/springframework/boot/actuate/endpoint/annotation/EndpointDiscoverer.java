@@ -132,8 +132,8 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 			if (!ScopedProxyUtils.isScopedTarget(beanName)) {
 				EndpointBean endpointBean = createEndpointBean(beanName);
 				EndpointBean previous = byId.putIfAbsent(endpointBean.getId(), endpointBean);
-				Assert.state(previous == null, () -> "Found two endpoints with the id '" + endpointBean.getId() + "': '"
-						+ endpointBean.getBeanName() + "' and '" + previous.getBeanName() + "'");
+				Assert.state(previous == null, () -> new StringBuilder().append("Found two endpoints with the id '").append(endpointBean.getId()).append("': '").append(endpointBean.getBeanName()).append("' and '")
+						.append(previous.getBeanName()).append("'").toString());
 			}
 		}
 		return byId.values();
@@ -152,8 +152,7 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 		for (String beanName : beanNames) {
 			ExtensionBean extensionBean = createExtensionBean(beanName);
 			EndpointBean endpointBean = byId.get(extensionBean.getEndpointId());
-			Assert.state(endpointBean != null, () -> ("Invalid extension '" + extensionBean.getBeanName()
-					+ "': no endpoint found with id '" + extensionBean.getEndpointId() + "'"));
+			Assert.state(endpointBean != null, () -> (new StringBuilder().append("Invalid extension '").append(extensionBean.getBeanName()).append("': no endpoint found with id '").append(extensionBean.getEndpointId()).append("'").toString()));
 			addExtensionBean(endpointBean, extensionBean);
 		}
 	}
@@ -164,21 +163,17 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	}
 
 	private void addExtensionBean(EndpointBean endpointBean, ExtensionBean extensionBean) {
-		if (isExtensionExposed(endpointBean, extensionBean)) {
-			Assert.state(isEndpointExposed(endpointBean) || isEndpointFiltered(endpointBean),
-					() -> "Endpoint bean '" + endpointBean.getBeanName() + "' cannot support the extension bean '"
-							+ extensionBean.getBeanName() + "'");
-			endpointBean.addExtension(extensionBean);
+		if (!isExtensionExposed(endpointBean, extensionBean)) {
+			return;
 		}
+		Assert.state(isEndpointExposed(endpointBean) || isEndpointFiltered(endpointBean),
+				() -> new StringBuilder().append("Endpoint bean '").append(endpointBean.getBeanName()).append("' cannot support the extension bean '").append(extensionBean.getBeanName()).append("'").toString());
+		endpointBean.addExtension(extensionBean);
 	}
 
 	private Collection<E> convertToEndpoints(Collection<EndpointBean> endpointBeans) {
 		Set<E> endpoints = new LinkedHashSet<>();
-		for (EndpointBean endpointBean : endpointBeans) {
-			if (isEndpointExposed(endpointBean)) {
-				endpoints.add(convertToEndpoint(endpointBean));
-			}
-		}
+		endpointBeans.stream().filter(endpointBean -> isEndpointExposed(endpointBean)).forEach(endpointBean -> endpoints.add(convertToEndpoint(endpointBean)));
 		return Collections.unmodifiableSet(endpoints);
 	}
 
@@ -189,12 +184,9 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 		if (endpointBean.getExtensions().size() > 1) {
 			String extensionBeans = endpointBean.getExtensions().stream().map(ExtensionBean::getBeanName)
 					.collect(Collectors.joining(", "));
-			throw new IllegalStateException("Found multiple extensions for the endpoint bean "
-					+ endpointBean.getBeanName() + " (" + extensionBeans + ")");
+			throw new IllegalStateException(new StringBuilder().append("Found multiple extensions for the endpoint bean ").append(endpointBean.getBeanName()).append(" (").append(extensionBeans).append(")").toString());
 		}
-		for (ExtensionBean extensionBean : endpointBean.getExtensions()) {
-			addOperations(indexed, id, extensionBean.getBean(), true);
-		}
+		endpointBean.getExtensions().forEach(extensionBean -> addOperations(indexed, id, extensionBean.getBean(), true));
 		assertNoDuplicateOperations(endpointBean, indexed);
 		List<O> operations = indexed.values().stream().map(this::getLast).filter(Objects::nonNull)
 				.collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
@@ -205,14 +197,14 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 			boolean replaceLast) {
 		Set<OperationKey> replacedLast = new HashSet<>();
 		Collection<O> operations = this.operationsFactory.createOperations(id, target);
-		for (O operation : operations) {
+		operations.forEach(operation -> {
 			OperationKey key = createOperationKey(operation);
 			O last = getLast(indexed.get(key));
 			if (replaceLast && replacedLast.add(key) && last != null) {
 				indexed.get(key).remove(last);
 			}
 			indexed.add(key, operation);
-		}
+		});
 	}
 
 	private <T> T getLast(List<T> list) {
@@ -222,14 +214,14 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	private void assertNoDuplicateOperations(EndpointBean endpointBean, MultiValueMap<OperationKey, O> indexed) {
 		List<OperationKey> duplicates = indexed.entrySet().stream().filter((entry) -> entry.getValue().size() > 1)
 				.map(Map.Entry::getKey).collect(Collectors.toList());
-		if (!duplicates.isEmpty()) {
-			Set<ExtensionBean> extensions = endpointBean.getExtensions();
-			String extensionBeanNames = extensions.stream().map(ExtensionBean::getBeanName)
-					.collect(Collectors.joining(", "));
-			throw new IllegalStateException("Unable to map duplicate endpoint operations: " + duplicates.toString()
-					+ " to " + endpointBean.getBeanName()
-					+ (extensions.isEmpty() ? "" : " (" + extensionBeanNames + ")"));
+		if (duplicates.isEmpty()) {
+			return;
 		}
+		Set<ExtensionBean> extensions = endpointBean.getExtensions();
+		String extensionBeanNames = extensions.stream().map(ExtensionBean::getBeanName)
+				.collect(Collectors.joining(", "));
+		throw new IllegalStateException(new StringBuilder().append("Unable to map duplicate endpoint operations: ").append(duplicates.toString()).append(" to ").append(endpointBean.getBeanName())
+				.append(extensions.isEmpty() ? "" : " (" + extensionBeanNames + ")").toString());
 	}
 
 	private boolean isExtensionExposed(EndpointBean endpointBean, ExtensionBean extensionBean) {
@@ -262,12 +254,7 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	}
 
 	private boolean isEndpointFiltered(EndpointBean endpointBean) {
-		for (EndpointFilter<E> filter : this.filters) {
-			if (!isFilterMatch(filter, endpointBean)) {
-				return true;
-			}
-		}
-		return false;
+		return this.filters.stream().anyMatch(filter -> !isFilterMatch(filter, endpointBean));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -280,11 +267,11 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 		}
 		E endpoint = getFilterEndpoint(endpointBean);
 		Class<?> generic = ResolvableType.forClass(EndpointFilter.class, filter).resolveGeneric(0);
-		if (generic == null || generic.isInstance(endpoint)) {
-			EndpointFilter<E> instance = (EndpointFilter<E>) BeanUtils.instantiateClass(filter);
-			return isFilterMatch(instance, endpoint);
+		if (!(generic == null || generic.isInstance(endpoint))) {
+			return false;
 		}
-		return false;
+		EndpointFilter<E> instance = (EndpointFilter<E>) BeanUtils.instantiateClass(filter);
+		return isFilterMatch(instance, endpoint);
 	}
 
 	private boolean isFilterMatch(EndpointFilter<E> filter, EndpointBean endpointBean) {
@@ -472,7 +459,7 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 			MergedAnnotation<Endpoint> endpointAnnotation = MergedAnnotations
 					.from(endpointType, SearchStrategy.TYPE_HIERARCHY).get(Endpoint.class);
 			Assert.state(endpointAnnotation.isPresent(),
-					() -> "Extension " + endpointType.getName() + " does not specify an endpoint");
+					() -> new StringBuilder().append("Extension ").append(endpointType.getName()).append(" does not specify an endpoint").toString());
 			this.endpointId = EndpointId.of(environment, endpointAnnotation.getString("id"));
 			this.filter = extensionAnnotation.getClass("filter");
 		}

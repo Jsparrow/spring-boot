@@ -61,9 +61,7 @@ public class MetadataCollector {
 	}
 
 	public void processing(RoundEnvironment roundEnv) {
-		for (Element element : roundEnv.getRootElements()) {
-			markAsProcessed(element);
-		}
+		roundEnv.getRootElements().forEach(this::markAsProcessed);
 	}
 
 	private void markAsProcessed(Element element) {
@@ -78,29 +76,18 @@ public class MetadataCollector {
 
 	public boolean hasSimilarGroup(ItemMetadata metadata) {
 		if (!metadata.isOfItemType(ItemMetadata.ItemType.GROUP)) {
-			throw new IllegalStateException("item " + metadata + " must be a group");
+			throw new IllegalStateException(new StringBuilder().append("item ").append(metadata).append(" must be a group").toString());
 		}
-		for (ItemMetadata existing : this.metadataItems) {
-			if (existing.isOfItemType(ItemMetadata.ItemType.GROUP) && existing.getName().equals(metadata.getName())
-					&& existing.getType().equals(metadata.getType())) {
-				return true;
-			}
-		}
-		return false;
+		return this.metadataItems.stream().anyMatch(existing -> existing.isOfItemType(ItemMetadata.ItemType.GROUP) && existing.getName().equals(metadata.getName())
+				&& existing.getType().equals(metadata.getType()));
 	}
 
 	public ConfigurationMetadata getMetadata() {
 		ConfigurationMetadata metadata = new ConfigurationMetadata();
-		for (ItemMetadata item : this.metadataItems) {
-			metadata.add(item);
-		}
+		this.metadataItems.forEach(metadata::add);
 		if (this.previousMetadata != null) {
 			List<ItemMetadata> items = this.previousMetadata.getItems();
-			for (ItemMetadata item : items) {
-				if (shouldBeMerged(item)) {
-					metadata.add(item);
-				}
-			}
+			items.stream().filter(this::shouldBeMerged).forEach(metadata::add);
 		}
 		return metadata;
 	}

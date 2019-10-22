@@ -36,6 +36,8 @@ import org.springframework.boot.loader.tools.JarWriter.UnpackHandler;
 import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class that can be used to repackage an archive so that it can be executed using
@@ -47,6 +49,8 @@ import org.springframework.util.StringUtils;
  * @since 1.0.0
  */
 public class Repackager {
+
+	private static final Logger logger = LoggerFactory.getLogger(Repackager.class);
 
 	private static final String MAIN_CLASS_ATTRIBUTE = "Main-Class";
 
@@ -262,6 +266,7 @@ public class Repackager {
 			}
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}
@@ -316,9 +321,7 @@ public class Repackager {
 		String mainMethod = findMainMethod(source);
 		long duration = System.currentTimeMillis() - startTime;
 		if (duration > FIND_WARNING_TIMEOUT) {
-			for (MainClassTimeoutWarningListener listener : this.mainClassTimeoutListeners) {
-				listener.handleTimeoutWarning(duration, mainMethod);
-			}
+			this.mainClassTimeoutListeners.forEach(listener -> listener.handleTimeoutWarning(duration, mainMethod));
 		}
 		return mainMethod;
 	}
@@ -330,13 +333,13 @@ public class Repackager {
 
 	private void renameFile(File file, File dest) {
 		if (!file.renameTo(dest)) {
-			throw new IllegalStateException("Unable to rename '" + file + "' to '" + dest + "'");
+			throw new IllegalStateException(new StringBuilder().append("Unable to rename '").append(file).append("' to '").append(dest).append("'").toString());
 		}
 	}
 
 	private void deleteFile(File file) {
 		if (!file.delete()) {
-			throw new IllegalStateException("Unable to delete '" + file + "'");
+			throw new IllegalStateException(new StringBuilder().append("Unable to delete '").append(file).append("'").toString());
 		}
 	}
 
@@ -369,12 +372,12 @@ public class Repackager {
 
 		@Override
 		public JarArchiveEntry transform(JarArchiveEntry entry) {
-			if (entry.getName().equals("META-INF/INDEX.LIST")) {
+			if ("META-INF/INDEX.LIST".equals(entry.getName())) {
 				return null;
 			}
-			if ((entry.getName().startsWith("META-INF/") && !entry.getName().equals("META-INF/aop.xml")
+			if ((entry.getName().startsWith("META-INF/") && !"META-INF/aop.xml".equals(entry.getName())
 					&& !entry.getName().endsWith(".kotlin_module")) || entry.getName().startsWith("BOOT-INF/")
-					|| entry.getName().equals("module-info.class")) {
+					|| "module-info.class".equals(entry.getName())) {
 				return entry;
 			}
 			JarArchiveEntry renamedEntry = new JarArchiveEntry(this.namePrefix + entry.getName());
@@ -437,7 +440,7 @@ public class Repackager {
 		public String sha1Hash(String name) throws IOException {
 			Library library = this.libraryEntryNames.get(name);
 			if (library == null) {
-				throw new IllegalArgumentException("No library found for entry name '" + name + "'");
+				throw new IllegalArgumentException(new StringBuilder().append("No library found for entry name '").append(name).append("'").toString());
 			}
 			return FileUtils.sha1Hash(library.getFile());
 		}

@@ -96,9 +96,7 @@ class RepositoryConfigurationFactoryTests {
 	private void assertRepositoryConfiguration(List<RepositoryConfiguration> configurations, String... expectedNames) {
 		assertThat(configurations).hasSize(expectedNames.length);
 		Set<String> actualNames = new HashSet<>();
-		for (RepositoryConfiguration configuration : configurations) {
-			actualNames.add(configuration.getName());
-		}
+		configurations.forEach(configuration -> actualNames.add(configuration.getName()));
 		assertThat(actualNames).containsOnly(expectedNames);
 	}
 

@@ -62,22 +62,22 @@ class ManagementPortSampleSecureWebFluxTests {
 
 	@Test
 	void actuatorPathOnMainPortShouldNotMatch() {
-		this.webClient.get().uri("http://localhost:" + this.port + "/actuator", String.class).exchange().expectStatus()
+		this.webClient.get().uri(new StringBuilder().append("http://localhost:").append(this.port).append("/actuator").toString(), String.class).exchange().expectStatus()
 				.isUnauthorized();
-		this.webClient.get().uri("http://localhost:" + this.port + "/actuator/health", String.class).exchange()
+		this.webClient.get().uri(new StringBuilder().append("http://localhost:").append(this.port).append("/actuator/health").toString(), String.class).exchange()
 				.expectStatus().isUnauthorized();
 	}
 
 	@Test
 	void testSecureActuator() {
-		this.webClient.get().uri("http://localhost:" + this.managementPort + "/actuator/env", String.class).exchange()
+		this.webClient.get().uri(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/actuator/env").toString(), String.class).exchange()
 				.expectStatus().isUnauthorized();
 	}
 
 	@Test
 	void testInsecureActuator() {
 		String responseBody = this.webClient.get()
-				.uri("http://localhost:" + this.managementPort + "/actuator/health", String.class).exchange()
+				.uri(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/actuator/health").toString(), String.class).exchange()
 				.expectStatus().isOk().expectBody(String.class).returnResult().getResponseBody();
 		assertThat(responseBody).contains("\"status\":\"UP\"");
 	}

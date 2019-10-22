@@ -202,7 +202,7 @@ class FileSystemWatcherTests {
 		this.watcher.stopAfter(1);
 		Set<ChangedFiles> change = getSingleOnChange();
 		assertThat(change.size()).isEqualTo(2);
-		for (ChangedFiles changedFiles : change) {
+		change.forEach(changedFiles -> {
 			if (changedFiles.getSourceFolder().equals(folder1)) {
 				ChangedFile file = new ChangedFile(folder1, file1, Type.ADD);
 				assertThat(changedFiles.getFiles()).containsOnly(file);
@@ -211,7 +211,7 @@ class FileSystemWatcherTests {
 				ChangedFile file = new ChangedFile(folder2, file2, Type.ADD);
 				assertThat(changedFiles.getFiles()).containsOnly(file);
 			}
-		}
+		});
 	}
 
 	@Test
@@ -258,7 +258,7 @@ class FileSystemWatcherTests {
 		File file = touch(new File(folder, "file.txt"));
 		File trigger = touch(new File(folder, "trigger.txt"));
 		this.watcher.addSourceFolder(folder);
-		this.watcher.setTriggerFilter((candidate) -> candidate.getName().equals("trigger.txt"));
+		this.watcher.setTriggerFilter((candidate) -> "trigger.txt".equals(candidate.getName()));
 		this.watcher.start();
 		FileCopyUtils.copy("abc".getBytes(), file);
 		Thread.sleep(100);

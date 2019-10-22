@@ -57,11 +57,11 @@ public class JndiDataSourceAutoConfiguration {
 	}
 
 	private void excludeMBeanIfNecessary(Object candidate, String beanName, ApplicationContext context) {
-		for (MBeanExporter mbeanExporter : context.getBeansOfType(MBeanExporter.class).values()) {
+		context.getBeansOfType(MBeanExporter.class).values().forEach(mbeanExporter -> {
 			if (JmxUtils.isMBean(candidate.getClass())) {
 				mbeanExporter.addExcludedBean(beanName);
 			}
-		}
+		});
 	}
 
 }

@@ -62,6 +62,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base for testing classes that extends {@link AbstractReactiveWebServerFactory}.
@@ -70,6 +72,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 public abstract class AbstractReactiveWebServerFactoryTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(AbstractReactiveWebServerFactoryTests.class);
 	protected WebServer webServer;
 
 	@AfterEach
@@ -79,6 +82,7 @@ public abstract class AbstractReactiveWebServerFactoryTests {
 				this.webServer.stop();
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}
@@ -220,7 +224,7 @@ public abstract class AbstractReactiveWebServerFactoryTests {
 
 	protected WebClient.Builder getWebClient(HttpClient client) {
 		InetSocketAddress address = new InetSocketAddress(this.webServer.getPort());
-		String baseUrl = "http://" + address.getHostString() + ":" + address.getPort();
+		String baseUrl = new StringBuilder().append("http://").append(address.getHostString()).append(":").append(address.getPort()).toString();
 		return WebClient.builder().clientConnector(new ReactorClientHttpConnector(client)).baseUrl(baseUrl);
 	}
 

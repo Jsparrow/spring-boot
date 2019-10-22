@@ -379,7 +379,7 @@ class RabbitAutoConfigurationTests {
 				.withPropertyValues("spring.rabbitmq.dynamic:false")
 				.run((context) -> assertThatExceptionOfType(NoSuchBeanDefinitionException.class)
 						.isThrownBy(() -> context.getBean(AmqpAdmin.class))
-						.withMessageContaining("No qualifying bean of type '" + AmqpAdmin.class.getName() + "'"));
+						.withMessageContaining(new StringBuilder().append("No qualifying bean of type '").append(AmqpAdmin.class.getName()).append("'").toString()));
 	}
 
 	@Test
@@ -832,7 +832,7 @@ class RabbitAutoConfigurationTests {
 		@Bean
 		RabbitRetryTemplateCustomizer rabbitTemplateRetryTemplateCustomizer() {
 			return (target, template) -> {
-				if (target.equals(RabbitRetryTemplateCustomizer.Target.SENDER)) {
+				if (target == RabbitRetryTemplateCustomizer.Target.SENDER) {
 					template.setBackOffPolicy(this.backOffPolicy);
 				}
 			};
@@ -841,7 +841,7 @@ class RabbitAutoConfigurationTests {
 		@Bean
 		RabbitRetryTemplateCustomizer rabbitListenerRetryTemplateCustomizer() {
 			return (target, template) -> {
-				if (target.equals(RabbitRetryTemplateCustomizer.Target.LISTENER)) {
+				if (target == RabbitRetryTemplateCustomizer.Target.LISTENER) {
 					template.setRetryPolicy(this.retryPolicy);
 				}
 			};

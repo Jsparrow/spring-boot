@@ -272,7 +272,7 @@ public enum DatabaseDriver {
 			String urlWithoutPrefix = url.substring("jdbc".length()).toLowerCase(Locale.ENGLISH);
 			for (DatabaseDriver driver : values()) {
 				for (String urlPrefix : driver.getUrlPrefixes()) {
-					String prefix = ":" + urlPrefix + ":";
+					String prefix = new StringBuilder().append(":").append(urlPrefix).append(":").toString();
 					if (driver != UNKNOWN && urlWithoutPrefix.startsWith(prefix)) {
 						return driver;
 					}

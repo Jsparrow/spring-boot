@@ -143,16 +143,16 @@ public class EmbeddedMongoAutoConfiguration {
 	}
 
 	private IFeatureAwareVersion determineVersion(EmbeddedMongoProperties embeddedProperties) {
-		if (embeddedProperties.getFeatures() == null) {
-			for (Version version : Version.values()) {
-				if (version.asInDownloadPath().equals(embeddedProperties.getVersion())) {
-					return version;
-				}
-			}
-			return Versions.withFeatures(new GenericVersion(embeddedProperties.getVersion()));
+		if (embeddedProperties.getFeatures() != null) {
+			return Versions.withFeatures(new GenericVersion(embeddedProperties.getVersion()),
+					embeddedProperties.getFeatures().toArray(new Feature[0]));
 		}
-		return Versions.withFeatures(new GenericVersion(embeddedProperties.getVersion()),
-				embeddedProperties.getFeatures().toArray(new Feature[0]));
+		for (Version version : Version.values()) {
+			if (version.asInDownloadPath().equals(embeddedProperties.getVersion())) {
+				return version;
+			}
+		}
+		return Versions.withFeatures(new GenericVersion(embeddedProperties.getVersion()));
 	}
 
 	private InetAddress getHost() throws UnknownHostException {

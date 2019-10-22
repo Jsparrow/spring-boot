@@ -118,9 +118,9 @@ class DataSourceJmxConfigurationTests {
 
 	private void validateHikariMBeansRegistration(MBeanServer mBeanServer, String poolName, boolean expected)
 			throws MalformedObjectNameException {
-		assertThat(mBeanServer.isRegistered(new ObjectName("com.zaxxer.hikari:type=Pool (" + poolName + ")")))
+		assertThat(mBeanServer.isRegistered(new ObjectName(new StringBuilder().append("com.zaxxer.hikari:type=Pool (").append(poolName).append(")").toString())))
 				.isEqualTo(expected);
-		assertThat(mBeanServer.isRegistered(new ObjectName("com.zaxxer.hikari:type=PoolConfig (" + poolName + ")")))
+		assertThat(mBeanServer.isRegistered(new ObjectName(new StringBuilder().append("com.zaxxer.hikari:type=PoolConfig (").append(poolName).append(")").toString())))
 				.isEqualTo(expected);
 	}
 

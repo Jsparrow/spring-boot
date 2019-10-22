@@ -27,6 +27,8 @@ import java.util.Set;
 
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An application process ID.
@@ -35,6 +37,8 @@ import org.springframework.util.ObjectUtils;
  * @since 2.0.0
  */
 public class ApplicationPid {
+
+	private static final Logger logger = LoggerFactory.getLogger(ApplicationPid.class);
 
 	private static final PosixFilePermission[] WRITE_PERMISSIONS = { PosixFilePermission.OWNER_WRITE,
 			PosixFilePermission.GROUP_WRITE, PosixFilePermission.OTHERS_WRITE };
@@ -55,6 +59,7 @@ public class ApplicationPid {
 			return jvmName.split("@")[0];
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -121,6 +126,7 @@ public class ApplicationPid {
 			return false;
 		}
 		catch (UnsupportedOperationException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Assume that we can
 			return true;
 		}

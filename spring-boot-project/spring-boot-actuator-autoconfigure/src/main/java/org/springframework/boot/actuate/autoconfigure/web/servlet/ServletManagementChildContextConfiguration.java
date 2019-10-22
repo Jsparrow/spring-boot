@@ -160,12 +160,8 @@ class ServletManagementChildContextConfiguration {
 		}
 
 		private AccessLogValve findAccessLogValve(TomcatServletWebServerFactory factory) {
-			for (Valve engineValve : factory.getEngineValves()) {
-				if (engineValve instanceof AccessLogValve) {
-					return (AccessLogValve) engineValve;
-				}
-			}
-			return null;
+			return factory.getEngineValves().stream().filter(engineValve -> engineValve instanceof AccessLogValve).findFirst().map(engineValve -> (AccessLogValve) engineValve)
+					.orElse(null);
 		}
 
 	}
@@ -190,7 +186,7 @@ class ServletManagementChildContextConfiguration {
 
 		private void customizeServer(Server server) {
 			RequestLog requestLog = server.getRequestLog();
-			if (requestLog != null && requestLog instanceof CustomRequestLog) {
+			if (requestLog instanceof CustomRequestLog) {
 				customizeRequestLog((CustomRequestLog) requestLog);
 			}
 		}
@@ -203,11 +199,12 @@ class ServletManagementChildContextConfiguration {
 
 		private void customizeRequestLogWriter(RequestLogWriter writer) {
 			String filename = writer.getFileName();
-			if (StringUtils.hasLength(filename)) {
-				File file = new File(filename);
-				file = new File(file.getParentFile(), customizePrefix(file.getName()));
-				writer.setFilename(file.getPath());
+			if (!StringUtils.hasLength(filename)) {
+				return;
 			}
+			File file = new File(filename);
+			file = new File(file.getParentFile(), customizePrefix(file.getName()));
+			writer.setFilename(file.getPath());
 		}
 
 	}

@@ -74,7 +74,8 @@ public class ValueHint implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ValueHint{value=" + this.value + ", description='" + this.description + '\'' + '}';
+		return new StringBuilder().append("ValueHint{value=").append(this.value).append(", description='").append(this.description).append('\'')
+				.append('}').toString();
 	}
 
 }

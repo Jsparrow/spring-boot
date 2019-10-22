@@ -45,7 +45,7 @@ public class EnvironmentPostProcessorExample implements EnvironmentPostProcessor
 
 	private PropertySource<?> loadYaml(Resource path) {
 		if (!path.exists()) {
-			throw new IllegalArgumentException("Resource " + path + " does not exist");
+			throw new IllegalArgumentException(new StringBuilder().append("Resource ").append(path).append(" does not exist").toString());
 		}
 		try {
 			return this.loader.load("custom-resource", path).get(0);

@@ -86,7 +86,7 @@ class GrapeRootRepositorySystemSessionAutoConfigurationTests {
 
 		assertThat(this.session.getLocalRepository()).isNotNull();
 		assertThat(this.session.getLocalRepository().getBasedir().getAbsolutePath())
-				.endsWith(File.separatorChar + "foo" + File.separatorChar + "repository");
+				.endsWith(new StringBuilder().append(File.separatorChar).append("foo").append(File.separatorChar).append("repository").toString());
 	}
 
 	private class LocalRepositoryManagerAnswer implements Answer<LocalRepositoryManager> {

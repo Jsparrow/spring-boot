@@ -209,7 +209,7 @@ public class ServletRegistrationBean<T extends Servlet> extends DynamicRegistrat
 
 	@Override
 	public String toString() {
-		return getServletName() + " urls=" + getUrlMappings();
+		return new StringBuilder().append(getServletName()).append(" urls=").append(getUrlMappings()).toString();
 	}
 
 }

@@ -83,6 +83,29 @@ public abstract class HealthProperties {
 	}
 
 	/**
+	 * Options for showing items in responses from the {@link HealthEndpoint} web
+	 * extensions.
+	 */
+	public enum Show {
+
+		/**
+		 * Never show the item in the response.
+		 */
+		NEVER,
+
+		/**
+		 * Show the item in the response when accessed by an authorized user.
+		 */
+		WHEN_AUTHORIZED,
+
+		/**
+		 * Always show the item in the response.
+		 */
+		ALWAYS
+
+	}
+
+	/**
 	 * Status properties for the group.
 	 */
 	public static class Status {
@@ -111,29 +134,6 @@ public abstract class HealthProperties {
 		public Map<String, Integer> getHttpMapping() {
 			return this.httpMapping;
 		}
-
-	}
-
-	/**
-	 * Options for showing items in responses from the {@link HealthEndpoint} web
-	 * extensions.
-	 */
-	public enum Show {
-
-		/**
-		 * Never show the item in the response.
-		 */
-		NEVER,
-
-		/**
-		 * Show the item in the response when accessed by an authorized user.
-		 */
-		WHEN_AUTHORIZED,
-
-		/**
-		 * Always show the item in the response.
-		 */
-		ALWAYS
 
 	}
 

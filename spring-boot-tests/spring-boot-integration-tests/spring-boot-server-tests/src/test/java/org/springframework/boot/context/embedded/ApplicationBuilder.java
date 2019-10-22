@@ -142,15 +142,16 @@ class ApplicationBuilder {
 				new File(examplePackage, "ResourceHandlingApplication.java"));
 		// To allow aliased resources on Concourse Windows CI (See gh-15553) to be served
 		// as static resources.
-		if (this.container.equals("jetty")) {
+		if ("jetty".equals(this.container)) {
 			FileCopyUtils.copy(new File("src/test/java/com/example/JettyServerCustomizerConfig.java"),
 					new File(examplePackage, "JettyServerCustomizerConfig.java"));
 		}
-		if ("war".equals(this.packaging)) {
-			File srcMainWebapp = new File(appFolder, "src/main/webapp");
-			srcMainWebapp.mkdirs();
-			FileCopyUtils.copy("webapp resource", new FileWriter(new File(srcMainWebapp, "webapp-resource.txt")));
+		if (!"war".equals(this.packaging)) {
+			return;
 		}
+		File srcMainWebapp = new File(appFolder, "src/main/webapp");
+		srcMainWebapp.mkdirs();
+		FileCopyUtils.copy("webapp resource", new FileWriter(new File(srcMainWebapp, "webapp-resource.txt")));
 	}
 
 	private void packageApplication(File appFolder, File settingsXml) throws MavenInvocationException {

@@ -70,7 +70,7 @@ public class ConditionEvaluationReportLoggingListener
 	}
 
 	private boolean isInfoOrDebug(LogLevel logLevelForReport) {
-		return LogLevel.INFO.equals(logLevelForReport) || LogLevel.DEBUG.equals(logLevelForReport);
+		return LogLevel.INFO == logLevelForReport || LogLevel.DEBUG == logLevelForReport;
 	}
 
 	public LogLevel getLogLevelForReport() {
@@ -113,7 +113,7 @@ public class ConditionEvaluationReportLoggingListener
 			this.report = ConditionEvaluationReport.get(this.applicationContext.getBeanFactory());
 		}
 		if (!this.report.getConditionAndOutcomesBySource().isEmpty()) {
-			if (this.getLogLevelForReport().equals(LogLevel.INFO)) {
+			if (this.getLogLevelForReport() == LogLevel.INFO) {
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info(new ConditionEvaluationReportMessage(this.report));
 				}
@@ -133,8 +133,7 @@ public class ConditionEvaluationReportLoggingListener
 	}
 
 	private void logMessage(String logLevel) {
-		this.logger.info(String.format("%n%nError starting ApplicationContext. To display the "
-				+ "conditions report re-run your application with '" + logLevel + "' enabled."));
+		this.logger.info(String.format(new StringBuilder().append("%n%nError starting ApplicationContext. To display the ").append("conditions report re-run your application with '").append(logLevel).append("' enabled.").toString()));
 	}
 
 	private class ConditionEvaluationReportListener implements GenericApplicationListener {

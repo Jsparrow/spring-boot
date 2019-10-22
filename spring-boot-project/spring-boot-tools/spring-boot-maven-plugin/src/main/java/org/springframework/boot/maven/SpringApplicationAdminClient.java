@@ -30,6 +30,8 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A JMX client for the {@code SpringApplicationAdmin} MBean. Permits to obtain
@@ -38,6 +40,8 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Stephane Nicoll
  */
 class SpringApplicationAdminClient {
+
+	private static final Logger logger = LoggerFactory.getLogger(SpringApplicationAdminClient.class);
 
 	// Note: see SpringApplicationAdminJmxAutoConfiguration
 	static final String DEFAULT_OBJECT_NAME = "org.springframework.boot:type=Admin,name=SpringApplication";
@@ -63,6 +67,7 @@ class SpringApplicationAdminClient {
 			return (Boolean) this.connection.getAttribute(this.objectName, "Ready");
 		}
 		catch (InstanceNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false; // Instance not available yet
 		}
 		catch (AttributeNotFoundException ex) {
@@ -99,7 +104,8 @@ class SpringApplicationAdminClient {
 			return new ObjectName(name);
 		}
 		catch (MalformedObjectNameException ex) {
-			throw new IllegalArgumentException("Invalid jmx name '" + name + "'");
+			logger.error(ex.getMessage(), ex);
+			throw new IllegalArgumentException(new StringBuilder().append("Invalid jmx name '").append(name).append("'").toString());
 		}
 	}
 
@@ -111,7 +117,7 @@ class SpringApplicationAdminClient {
 	 * @throws IOException if the connection to that server failed
 	 */
 	static JMXConnector connect(int port) throws IOException {
-		String url = "service:jmx:rmi:///jndi/rmi://127.0.0.1:" + port + "/jmxrmi";
+		String url = new StringBuilder().append("service:jmx:rmi:///jndi/rmi://127.0.0.1:").append(port).append("/jmxrmi").toString();
 		JMXServiceURL serviceUrl = new JMXServiceURL(url);
 		return JMXConnectorFactory.connect(serviceUrl, null);
 	}

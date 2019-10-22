@@ -87,8 +87,17 @@ class MustacheAutoConfigurationServletIntegrationTests {
 
 	@Test
 	void testPartialPage() {
-		String body = new TestRestTemplate().getForObject("http://localhost:" + this.port + "/partial", String.class);
+		String body = new TestRestTemplate().getForObject(new StringBuilder().append("http://localhost:").append(this.port).append("/partial").toString(), String.class);
 		assertThat(body.contains("Hello World")).isTrue();
+	}
+
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@Import({ ServletWebServerFactoryAutoConfiguration.class, DispatcherServletAutoConfiguration.class,
+			PropertyPlaceholderAutoConfiguration.class })
+	protected @interface MinimalWebConfiguration {
+
 	}
 
 	@Configuration(proxyBeanMethods = false)
@@ -125,15 +134,6 @@ class MustacheAutoConfigurationServletIntegrationTests {
 		static void main(String[] args) {
 			SpringApplication.run(Application.class, args);
 		}
-
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@Import({ ServletWebServerFactoryAutoConfiguration.class, DispatcherServletAutoConfiguration.class,
-			PropertyPlaceholderAutoConfiguration.class })
-	protected @interface MinimalWebConfiguration {
 
 	}
 

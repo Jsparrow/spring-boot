@@ -25,12 +25,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @EnableAutoConfiguration
 @ComponentScan
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SampleSecureApplication implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleSecureApplication.class);
 	@Autowired
 	private SampleService service;
 
@@ -39,7 +42,7 @@ public class SampleSecureApplication implements CommandLineRunner {
 		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("user", "N/A",
 				AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER")));
 		try {
-			System.out.println(this.service.secure());
+			logger.info(this.service.secure());
 		}
 		finally {
 			SecurityContextHolder.clearContext();

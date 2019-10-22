@@ -77,7 +77,7 @@ public final class ChangedFile {
 		String folderName = StringUtils.cleanPath(folder.getPath());
 		String fileName = StringUtils.cleanPath(file.getPath());
 		Assert.state(fileName.startsWith(folderName),
-				() -> "The file " + fileName + " is not contained in the source folder " + folderName);
+				() -> new StringBuilder().append("The file ").append(fileName).append(" is not contained in the source folder ").append(folderName).toString());
 		return fileName.substring(folderName.length() + 1);
 	}
 
@@ -89,11 +89,11 @@ public final class ChangedFile {
 		if (obj == null) {
 			return false;
 		}
-		if (obj instanceof ChangedFile) {
-			ChangedFile other = (ChangedFile) obj;
-			return this.file.equals(other.file) && this.type.equals(other.type);
+		if (!(obj instanceof ChangedFile)) {
+			return super.equals(obj);
 		}
-		return super.equals(obj);
+		ChangedFile other = (ChangedFile) obj;
+		return this.file.equals(other.file) && this.type == other.type;
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public final class ChangedFile {
 
 	@Override
 	public String toString() {
-		return this.file + " (" + this.type + ")";
+		return new StringBuilder().append(this.file).append(" (").append(this.type).append(")").toString();
 	}
 
 	/**

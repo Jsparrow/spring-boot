@@ -28,6 +28,8 @@ import org.springframework.core.convert.ConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assumptions.assumingThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link InetAddressFormatter}.
@@ -35,6 +37,8 @@ import static org.junit.jupiter.api.Assumptions.assumingThat;
  * @author Phillip Webb
  */
 class InetAddressFormatterTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(InetAddressFormatterTests.class);
 
 	@ConversionServiceTest
 	void convertFromInetAddressToStringShouldConvert(ConversionService conversionService) throws UnknownHostException {
@@ -67,6 +71,7 @@ class InetAddressFormatterTests {
 			return true;
 		}
 		catch (UnknownHostException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

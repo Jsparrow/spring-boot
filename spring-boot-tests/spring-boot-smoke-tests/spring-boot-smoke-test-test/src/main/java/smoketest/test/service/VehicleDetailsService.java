@@ -31,7 +31,6 @@ public interface VehicleDetailsService {
 	 * @return vehicle details
 	 * @throws VehicleIdentificationNumberNotFoundException if the VIN is not known
 	 */
-	VehicleDetails getVehicleDetails(VehicleIdentificationNumber vin)
-			throws VehicleIdentificationNumberNotFoundException;
+	VehicleDetails getVehicleDetails(VehicleIdentificationNumber vin);
 
 }

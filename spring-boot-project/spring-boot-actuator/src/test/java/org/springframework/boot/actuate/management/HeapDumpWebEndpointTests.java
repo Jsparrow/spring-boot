@@ -36,7 +36,7 @@ class HeapDumpWebEndpointTests {
 		HeapDumpWebEndpoint slowEndpoint = new HeapDumpWebEndpoint(2500) {
 
 			@Override
-			protected HeapDumper createHeapDumper() throws HeapDumperUnavailableException {
+			protected HeapDumper createHeapDumper() {
 				return (file, live) -> {
 					dumpingLatch.countDown();
 					blockingLatch.await();

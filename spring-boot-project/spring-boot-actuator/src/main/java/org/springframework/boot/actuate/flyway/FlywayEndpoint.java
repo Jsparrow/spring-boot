@@ -117,12 +117,12 @@ public class FlywayEndpoint {
 
 		private final List<FlywayMigration> migrations;
 
-		private FlywayDescriptor(MigrationInfo[] migrations) {
-			this.migrations = Stream.of(migrations).map(FlywayMigration::new).collect(Collectors.toList());
-		}
-
 		public FlywayDescriptor(List<FlywayMigration> migrations) {
 			this.migrations = migrations;
+		}
+
+		private FlywayDescriptor(MigrationInfo[] migrations) {
+			this.migrations = Stream.of(migrations).map(FlywayMigration::new).collect(Collectors.toList());
 		}
 
 		public List<FlywayMigration> getMigrations() {

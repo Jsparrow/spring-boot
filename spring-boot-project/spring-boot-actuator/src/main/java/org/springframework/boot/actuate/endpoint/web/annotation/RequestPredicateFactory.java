@@ -121,11 +121,11 @@ class RequestPredicateFactory {
 		if (Resource.class.equals(method.getReturnType())) {
 			return true;
 		}
-		if (WebEndpointResponse.class.isAssignableFrom(method.getReturnType())) {
-			ResolvableType returnType = ResolvableType.forMethodReturnType(method);
-			return ResolvableType.forClass(Resource.class).isAssignableFrom(returnType.getGeneric(0));
+		if (!WebEndpointResponse.class.isAssignableFrom(method.getReturnType())) {
+			return false;
 		}
-		return false;
+		ResolvableType returnType = ResolvableType.forMethodReturnType(method);
+		return ResolvableType.forClass(Resource.class).isAssignableFrom(returnType.getGeneric(0));
 	}
 
 	private boolean consumesRequestBody(Method method) {

@@ -147,7 +147,7 @@ class EndpointMetadataGenerationTests extends AbstractMetadataGenerationTests {
 	}
 
 	private Metadata.MetadataItemCondition enabledFlag(String endpointId, String endpointSuffix, Boolean defaultValue) {
-		return Metadata.withEnabledFlag("management.endpoint." + endpointSuffix + ".enabled")
+		return Metadata.withEnabledFlag(new StringBuilder().append("management.endpoint.").append(endpointSuffix).append(".enabled").toString())
 				.withDefaultValue(defaultValue)
 				.withDescription(String.format("Whether to enable the %s endpoint.", endpointId));
 	}
@@ -157,7 +157,7 @@ class EndpointMetadataGenerationTests extends AbstractMetadataGenerationTests {
 	}
 
 	private Metadata.MetadataItemCondition cacheTtl(String endpointId) {
-		return Metadata.withProperty("management.endpoint." + endpointId + ".cache.time-to-live").ofType(Duration.class)
+		return Metadata.withProperty(new StringBuilder().append("management.endpoint.").append(endpointId).append(".cache.time-to-live").toString()).ofType(Duration.class)
 				.withDefaultValue("0ms").withDescription("Maximum time that a response can be cached.");
 	}
 

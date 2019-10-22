@@ -131,11 +131,11 @@ public class ConditionOutcome {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() == obj.getClass()) {
-			ConditionOutcome other = (ConditionOutcome) obj;
-			return (this.match == other.match && ObjectUtils.nullSafeEquals(this.message, other.message));
+		if (getClass() != obj.getClass()) {
+			return super.equals(obj);
 		}
-		return super.equals(obj);
+		ConditionOutcome other = (ConditionOutcome) obj;
+		return (this.match == other.match && ObjectUtils.nullSafeEquals(this.message, other.message));
 	}
 
 	@Override

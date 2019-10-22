@@ -77,17 +77,18 @@ public class ConfigurationBeanFactoryMetadata implements ApplicationContextAware
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = (ConfigurableApplicationContext) applicationContext;
 	}
 
 	static void register(BeanDefinitionRegistry registry) {
-		if (!registry.containsBeanDefinition(BEAN_NAME)) {
-			GenericBeanDefinition definition = new GenericBeanDefinition();
-			definition.setBeanClass(ConfigurationBeanFactoryMetadata.class);
-			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			registry.registerBeanDefinition(ConfigurationBeanFactoryMetadata.BEAN_NAME, definition);
+		if (registry.containsBeanDefinition(BEAN_NAME)) {
+			return;
 		}
+		GenericBeanDefinition definition = new GenericBeanDefinition();
+		definition.setBeanClass(ConfigurationBeanFactoryMetadata.class);
+		definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		registry.registerBeanDefinition(ConfigurationBeanFactoryMetadata.BEAN_NAME, definition);
 	}
 
 }

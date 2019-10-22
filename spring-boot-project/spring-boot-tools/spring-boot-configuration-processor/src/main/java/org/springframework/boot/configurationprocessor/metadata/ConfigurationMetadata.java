@@ -78,12 +78,8 @@ public class ConfigurationMetadata {
 	 * @param metadata the {@link ConfigurationMetadata} instance to merge
 	 */
 	public void merge(ConfigurationMetadata metadata) {
-		for (ItemMetadata additionalItem : metadata.getItems()) {
-			mergeItemMetadata(additionalItem);
-		}
-		for (ItemHint itemHint : metadata.getHints()) {
-			add(itemHint);
-		}
+		metadata.getItems().forEach(this::mergeItemMetadata);
+		metadata.getHints().forEach(this::add);
 	}
 
 	/**
@@ -153,12 +149,7 @@ public class ConfigurationMetadata {
 		if (candidates.size() == 1) {
 			return candidates.get(0);
 		}
-		for (ItemMetadata candidate : candidates) {
-			if (nullSafeEquals(candidate.getSourceType(), metadata.getSourceType())) {
-				return candidate;
-			}
-		}
-		return null;
+		return candidates.stream().filter(candidate -> nullSafeEquals(candidate.getSourceType(), metadata.getSourceType())).findFirst().orElse(null);
 	}
 
 	private boolean nullSafeEquals(Object o1, Object o2) {
@@ -196,9 +187,7 @@ public class ConfigurationMetadata {
 
 	private static <T extends Comparable<T>> List<T> flattenValues(Map<?, List<T>> map) {
 		List<T> content = new ArrayList<>();
-		for (List<T> values : map.values()) {
-			content.addAll(values);
-		}
+		map.values().forEach(content::addAll);
 		Collections.sort(content);
 		return content;
 	}

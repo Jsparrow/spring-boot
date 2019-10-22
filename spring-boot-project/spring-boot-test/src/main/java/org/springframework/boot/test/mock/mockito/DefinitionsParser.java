@@ -78,12 +78,9 @@ class DefinitionsParser {
 		if (StringUtils.hasLength(annotation.name())) {
 			Assert.state(typesToMock.size() == 1, "The name attribute can only be used when mocking a single class");
 		}
-		for (ResolvableType typeToMock : typesToMock) {
-			MockDefinition definition = new MockDefinition(annotation.name(), typeToMock, annotation.extraInterfaces(),
-					annotation.answer(), annotation.serializable(), annotation.reset(),
-					QualifierDefinition.forElement(element));
-			addDefinition(element, definition, "mock");
-		}
+		typesToMock.stream().map(typeToMock -> new MockDefinition(annotation.name(), typeToMock, annotation.extraInterfaces(),
+				annotation.answer(), annotation.serializable(), annotation.reset(),
+				QualifierDefinition.forElement(element))).forEach(definition -> addDefinition(element, definition, "mock"));
 	}
 
 	private void parseSpyBeanAnnotation(SpyBean annotation, AnnotatedElement element) {
@@ -92,20 +89,18 @@ class DefinitionsParser {
 		if (StringUtils.hasLength(annotation.name())) {
 			Assert.state(typesToSpy.size() == 1, "The name attribute can only be used when spying a single class");
 		}
-		for (ResolvableType typeToSpy : typesToSpy) {
-			SpyDefinition definition = new SpyDefinition(annotation.name(), typeToSpy, annotation.reset(),
-					annotation.proxyTargetAware(), QualifierDefinition.forElement(element));
-			addDefinition(element, definition, "spy");
-		}
+		typesToSpy.stream().map(typeToSpy -> new SpyDefinition(annotation.name(), typeToSpy, annotation.reset(),
+				annotation.proxyTargetAware(), QualifierDefinition.forElement(element))).forEach(definition -> addDefinition(element, definition, "spy"));
 	}
 
 	private void addDefinition(AnnotatedElement element, Definition definition, String type) {
 		boolean isNewDefinition = this.definitions.add(definition);
-		Assert.state(isNewDefinition, () -> "Duplicate " + type + " definition " + definition);
-		if (element instanceof Field) {
-			Field field = (Field) element;
-			this.definitionFields.put(definition, field);
+		Assert.state(isNewDefinition, () -> new StringBuilder().append("Duplicate ").append(type).append(" definition ").append(definition).toString());
+		if (!(element instanceof Field)) {
+			return;
 		}
+		Field field = (Field) element;
+		this.definitionFields.put(definition, field);
 	}
 
 	private Set<ResolvableType> getOrDeduceTypes(AnnotatedElement element, Class<?>[] value) {

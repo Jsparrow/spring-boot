@@ -32,6 +32,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import org.springframework.boot.loader.tools.JavaExecutable;
 import org.springframework.boot.loader.tools.RunProcess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Run an executable archive application.
@@ -46,6 +48,8 @@ import org.springframework.boot.loader.tools.RunProcess;
 		requiresDependencyResolution = ResolutionScope.TEST)
 @Execute(phase = LifecyclePhase.TEST_COMPILE)
 public class RunMojo extends AbstractRunMojo {
+
+	private static final Logger logger = LoggerFactory.getLogger(RunMojo.class);
 
 	private static final int EXIT_CODE_SIGINT = 130;
 
@@ -91,7 +95,7 @@ public class RunMojo extends AbstractRunMojo {
 
 	private boolean isJava13OrLater() {
 		for (Method method : String.class.getMethods()) {
-			if (method.getName().equals("stripIndent")) {
+			if ("stripIndent".equals(method.getName())) {
 				return true;
 			}
 		}
@@ -143,6 +147,7 @@ public class RunMojo extends AbstractRunMojo {
 						thread.join();
 					}
 					catch (InterruptedException ex) {
+						logger.error(ex.getMessage(), ex);
 						Thread.currentThread().interrupt();
 					}
 				}
@@ -166,6 +171,7 @@ public class RunMojo extends AbstractRunMojo {
 			}
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

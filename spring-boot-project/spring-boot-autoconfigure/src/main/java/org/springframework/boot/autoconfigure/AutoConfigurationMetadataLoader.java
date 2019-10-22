@@ -53,7 +53,7 @@ final class AutoConfigurationMetadataLoader {
 			return loadMetadata(properties);
 		}
 		catch (IOException ex) {
-			throw new IllegalArgumentException("Unable to load @ConditionalOnClass location [" + path + "]", ex);
+			throw new IllegalArgumentException(new StringBuilder().append("Unable to load @ConditionalOnClass location [").append(path).append("]").toString(), ex);
 		}
 	}
 
@@ -106,7 +106,7 @@ final class AutoConfigurationMetadataLoader {
 
 		@Override
 		public String get(String className, String key, String defaultValue) {
-			String value = this.properties.getProperty(className + "." + key);
+			String value = this.properties.getProperty(new StringBuilder().append(className).append(".").append(key).toString());
 			return (value != null) ? value : defaultValue;
 		}
 

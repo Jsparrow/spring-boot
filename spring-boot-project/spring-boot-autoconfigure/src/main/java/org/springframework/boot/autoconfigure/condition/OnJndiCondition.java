@@ -27,6 +27,8 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jndi.JndiLocatorDelegate;
 import org.springframework.jndi.JndiLocatorSupport;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Condition} that checks for JNDI locations.
@@ -37,6 +39,8 @@ import org.springframework.util.StringUtils;
 @Order(Ordered.LOWEST_PRECEDENCE - 20)
 class OnJndiCondition extends SpringBootCondition {
 
+	private static final Logger logger = LoggerFactory.getLogger(OnJndiCondition.class);
+
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
 		AnnotationAttributes annotationAttributes = AnnotationAttributes
@@ -46,6 +50,7 @@ class OnJndiCondition extends SpringBootCondition {
 			return getMatchOutcome(locations);
 		}
 		catch (NoClassDefFoundError ex) {
+			logger.error(ex.getMessage(), ex);
 			return ConditionOutcome
 					.noMatch(ConditionMessage.forCondition(ConditionalOnJndi.class).because("JNDI class not found"));
 		}
@@ -62,10 +67,10 @@ class OnJndiCondition extends SpringBootCondition {
 		}
 		JndiLocator locator = getJndiLocator(locations);
 		String location = locator.lookupFirstLocation();
-		String details = "(" + StringUtils.arrayToCommaDelimitedString(locations) + ")";
+		String details = new StringBuilder().append("(").append(StringUtils.arrayToCommaDelimitedString(locations)).append(")").toString();
 		if (location != null) {
 			return ConditionOutcome.match(ConditionMessage.forCondition(ConditionalOnJndi.class, details)
-					.foundExactly("\"" + location + "\""));
+					.foundExactly(new StringBuilder().append("\"").append(location).append("\"").toString()));
 		}
 		return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnJndi.class, details)
 				.didNotFind("any matching JNDI location").atAll());
@@ -81,6 +86,7 @@ class OnJndiCondition extends SpringBootCondition {
 
 	protected static class JndiLocator extends JndiLocatorSupport {
 
+		private final Logger logger1 = LoggerFactory.getLogger(JndiLocator.class);
 		private String[] locations;
 
 		public JndiLocator(String[] locations) {
@@ -94,6 +100,7 @@ class OnJndiCondition extends SpringBootCondition {
 					return location;
 				}
 				catch (NamingException ex) {
+					logger1.error(ex.getMessage(), ex);
 					// Swallow and continue
 				}
 			}

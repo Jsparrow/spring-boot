@@ -216,7 +216,7 @@ class BasicErrorControllerIntegrationTests {
 
 	private String createUrl(String path) {
 		int port = this.context.getEnvironment().getProperty("local.server.port", int.class);
-		return "http://localhost:" + port + path;
+		return new StringBuilder().append("http://localhost:").append(port).append(path).toString();
 	}
 
 	private void load(String... arguments) {

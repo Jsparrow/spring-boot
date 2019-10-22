@@ -33,6 +33,8 @@ import java.util.zip.ZipEntry;
 
 import org.springframework.boot.loader.data.RandomAccessData;
 import org.springframework.boot.loader.data.RandomAccessDataFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extended variant of {@link java.util.jar.JarFile} that behaves in the same way but
@@ -49,6 +51,8 @@ import org.springframework.boot.loader.data.RandomAccessDataFile;
  * @since 1.0.0
  */
 public class JarFile extends java.util.jar.JarFile {
+
+	private static final Logger logger = LoggerFactory.getLogger(JarFile.class);
 
 	private static final String MANIFEST_NAME = "META-INF/MANIFEST.MF";
 
@@ -258,7 +262,7 @@ public class JarFile extends java.util.jar.JarFile {
 			return createJarFileFromEntry(entry);
 		}
 		catch (Exception ex) {
-			throw new IOException("Unable to open nested jar file '" + entry.getName() + "'", ex);
+			throw new IOException(new StringBuilder().append("Unable to open nested jar file '").append(entry.getName()).append("'").toString(), ex);
 		}
 	}
 
@@ -277,19 +281,17 @@ public class JarFile extends java.util.jar.JarFile {
 			}
 			return null;
 		};
-		return new JarFile(this.rootFile, this.pathFromRoot + "!/" + entry.getName().substring(0, name.length() - 1),
+		return new JarFile(this.rootFile, new StringBuilder().append(this.pathFromRoot).append("!/").append(entry.getName().substring(0, name.length() - 1)).toString(),
 				this.data, filter, JarFileType.NESTED_DIRECTORY, this.manifestSupplier);
 	}
 
 	private JarFile createJarFileFromFileEntry(JarEntry entry) throws IOException {
 		if (entry.getMethod() != ZipEntry.STORED) {
 			throw new IllegalStateException(
-					"Unable to open nested entry '" + entry.getName() + "'. It has been compressed and nested "
-							+ "jar files must be stored without compression. Please check the "
-							+ "mechanism used to create your executable jar file");
+					new StringBuilder().append("Unable to open nested entry '").append(entry.getName()).append("'. It has been compressed and nested ").append("jar files must be stored without compression. Please check the ").append("mechanism used to create your executable jar file").toString());
 		}
 		RandomAccessData entryData = this.entries.getEntryData(entry.getName());
-		return new JarFile(this.rootFile, this.pathFromRoot + "!/" + entry.getName(), entryData,
+		return new JarFile(this.rootFile, new StringBuilder().append(this.pathFromRoot).append("!/").append(entry.getName()).toString(), entryData,
 				JarFileType.NESTED_JAR);
 	}
 
@@ -327,7 +329,7 @@ public class JarFile extends java.util.jar.JarFile {
 	public URL getUrl() throws MalformedURLException {
 		if (this.url == null) {
 			Handler handler = new Handler(this);
-			String file = this.rootFile.getFile().toURI() + this.pathFromRoot + "!/";
+			String file = new StringBuilder().append(this.rootFile.getFile().toURI()).append(this.pathFromRoot).append("!/").toString();
 			file = file.replace("file:////", "file://"); // Fix UNC paths
 			this.url = new URL("jar", "", -1, file, handler);
 		}
@@ -394,7 +396,7 @@ public class JarFile extends java.util.jar.JarFile {
 	public static void registerUrlProtocolHandler() {
 		String handlers = System.getProperty(PROTOCOL_HANDLER, "");
 		System.setProperty(PROTOCOL_HANDLER,
-				("".equals(handlers) ? HANDLERS_PACKAGE : handlers + "|" + HANDLERS_PACKAGE));
+				("".equals(handlers) ? HANDLERS_PACKAGE : new StringBuilder().append(handlers).append("|").append(HANDLERS_PACKAGE).toString()));
 		resetCachedUrlHandlers();
 	}
 
@@ -408,6 +410,7 @@ public class JarFile extends java.util.jar.JarFile {
 			URL.setURLStreamHandlerFactory(null);
 		}
 		catch (Error ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}

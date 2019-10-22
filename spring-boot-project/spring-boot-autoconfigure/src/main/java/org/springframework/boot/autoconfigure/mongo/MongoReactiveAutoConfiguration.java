@@ -90,21 +90,23 @@ public class MongoReactiveAutoConfiguration {
 
 		@Override
 		public void customize(Builder builder) {
-			if (!isStreamFactoryFactoryDefined(this.settings.getIfAvailable())) {
-				NioEventLoopGroup eventLoopGroup = new NioEventLoopGroup();
-				this.eventLoopGroup = eventLoopGroup;
-				builder.streamFactoryFactory(
-						NettyStreamFactoryFactory.builder().eventLoopGroup(eventLoopGroup).build());
+			if (isStreamFactoryFactoryDefined(this.settings.getIfAvailable())) {
+				return;
 			}
+			NioEventLoopGroup eventLoopGroup = new NioEventLoopGroup();
+			this.eventLoopGroup = eventLoopGroup;
+			builder.streamFactoryFactory(
+					NettyStreamFactoryFactory.builder().eventLoopGroup(eventLoopGroup).build());
 		}
 
 		@Override
 		public void destroy() {
 			EventLoopGroup eventLoopGroup = this.eventLoopGroup;
-			if (eventLoopGroup != null) {
-				eventLoopGroup.shutdownGracefully().awaitUninterruptibly();
-				this.eventLoopGroup = null;
+			if (eventLoopGroup == null) {
+				return;
 			}
+			eventLoopGroup.shutdownGracefully().awaitUninterruptibly();
+			this.eventLoopGroup = null;
 		}
 
 		private boolean isStreamFactoryFactoryDefined(MongoClientSettings settings) {

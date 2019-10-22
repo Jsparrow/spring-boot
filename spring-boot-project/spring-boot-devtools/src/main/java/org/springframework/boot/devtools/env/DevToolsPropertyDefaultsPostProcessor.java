@@ -33,6 +33,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnvironmentPostProcessor} to add properties that make sense when working at
@@ -45,6 +47,8 @@ import org.springframework.util.ClassUtils;
  */
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class DevToolsPropertyDefaultsPostProcessor implements EnvironmentPostProcessor {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(DevToolsPropertyDefaultsPostProcessor.class);
 
 	private static final Log logger = DevToolsLogFactory.getLog(DevToolsPropertyDefaultsPostProcessor.class);
 
@@ -78,15 +82,15 @@ public class DevToolsPropertyDefaultsPostProcessor implements EnvironmentPostPro
 
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		if (DevToolsEnablementDeducer.shouldEnable(Thread.currentThread()) && isLocalApplication(environment)) {
-			if (canAddProperties(environment)) {
-				logger.info("Devtools property defaults active! Set '" + ENABLED + "' to 'false' to disable");
-				environment.getPropertySources().addLast(new MapPropertySource("devtools", PROPERTIES));
-			}
-			if (isWebApplication(environment) && !environment.containsProperty(WEB_LOGGING)) {
-				logger.info("For additional web related logging consider setting the '" + WEB_LOGGING
-						+ "' property to 'DEBUG'");
-			}
+		if (!(DevToolsEnablementDeducer.shouldEnable(Thread.currentThread()) && isLocalApplication(environment))) {
+			return;
+		}
+		if (canAddProperties(environment)) {
+			logger.info(new StringBuilder().append("Devtools property defaults active! Set '").append(ENABLED).append("' to 'false' to disable").toString());
+			environment.getPropertySources().addLast(new MapPropertySource("devtools", PROPERTIES));
+		}
+		if (isWebApplication(environment) && !environment.containsProperty(WEB_LOGGING)) {
+			logger.info(new StringBuilder().append("For additional web related logging consider setting the '").append(WEB_LOGGING).append("' property to 'DEBUG'").toString());
 		}
 	}
 
@@ -107,6 +111,7 @@ public class DevToolsPropertyDefaultsPostProcessor implements EnvironmentPostPro
 			return (restarter != null && restarter.getInitialUrls() != null);
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			return false;
 		}
 	}
@@ -130,6 +135,7 @@ public class DevToolsPropertyDefaultsPostProcessor implements EnvironmentPostPro
 			return ClassUtils.resolveClassName(candidate, classLoader);
 		}
 		catch (IllegalArgumentException ex) {
+			logger1.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

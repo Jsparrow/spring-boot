@@ -116,6 +116,8 @@ import org.springframework.web.servlet.resource.VersionResourceResolver;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for {@link EnableWebMvc Web MVC}.
@@ -281,12 +283,12 @@ public class WebMvcAutoConfiguration {
 
 		@Override
 		public MessageCodesResolver getMessageCodesResolver() {
-			if (this.mvcProperties.getMessageCodesResolverFormat() != null) {
-				DefaultMessageCodesResolver resolver = new DefaultMessageCodesResolver();
-				resolver.setMessageCodeFormatter(this.mvcProperties.getMessageCodesResolverFormat());
-				return resolver;
+			if (this.mvcProperties.getMessageCodesResolverFormat() == null) {
+				return null;
 			}
-			return null;
+			DefaultMessageCodesResolver resolver = new DefaultMessageCodesResolver();
+			resolver.setMessageCodeFormatter(this.mvcProperties.getMessageCodesResolverFormat());
+			return resolver;
 		}
 
 		@Override
@@ -339,6 +341,8 @@ public class WebMvcAutoConfiguration {
 	 */
 	@Configuration(proxyBeanMethods = false)
 	public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration implements ResourceLoaderAware {
+
+		private final Logger logger1 = LoggerFactory.getLogger(EnableWebMvcConfiguration.class);
 
 		private final ResourceProperties resourceProperties;
 
@@ -414,6 +418,7 @@ public class WebMvcAutoConfiguration {
 				return resource.exists() && (resource.getURL() != null);
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				return false;
 			}
 		}
@@ -450,6 +455,7 @@ public class WebMvcAutoConfiguration {
 				return this.beanFactory.getBean(ConfigurableWebBindingInitializer.class);
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger1.error(ex.getMessage(), ex);
 				return super.getConfigurableWebBindingInitializer(mvcConversionService, mvcValidator);
 			}
 		}
@@ -466,11 +472,7 @@ public class WebMvcAutoConfiguration {
 		protected void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
 			super.extendHandlerExceptionResolvers(exceptionResolvers);
 			if (this.mvcProperties.isLogResolvedException()) {
-				for (HandlerExceptionResolver resolver : exceptionResolvers) {
-					if (resolver instanceof AbstractHandlerExceptionResolver) {
-						((AbstractHandlerExceptionResolver) resolver).setWarnLogCategory(resolver.getClass().getName());
-					}
-				}
+				exceptionResolvers.stream().filter(resolver -> resolver instanceof AbstractHandlerExceptionResolver).forEach(resolver -> ((AbstractHandlerExceptionResolver) resolver).setWarnLogCategory(resolver.getClass().getName()));
 			}
 		}
 

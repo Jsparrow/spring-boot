@@ -55,7 +55,7 @@ class FilteredReactiveWebContextResource extends AbstractResource {
 
 	@Override
 	public String getDescription() {
-		return "ReactiveWebContext resource [" + this.path + "]";
+		return new StringBuilder().append("ReactiveWebContext resource [").append(this.path).append("]").toString();
 	}
 
 	@Override

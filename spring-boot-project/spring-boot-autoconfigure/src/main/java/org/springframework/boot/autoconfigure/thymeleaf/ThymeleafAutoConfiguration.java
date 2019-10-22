@@ -100,12 +100,12 @@ public class ThymeleafAutoConfiguration {
 		@PostConstruct
 		void checkTemplateLocationExists() {
 			boolean checkTemplateLocation = this.properties.isCheckTemplateLocation();
-			if (checkTemplateLocation) {
-				TemplateLocation location = new TemplateLocation(this.properties.getPrefix());
-				if (!location.exists(this.applicationContext)) {
-					logger.warn("Cannot find template location: " + location + " (please add some templates or check "
-							+ "your Thymeleaf configuration)");
-				}
+			if (!checkTemplateLocation) {
+				return;
+			}
+			TemplateLocation location = new TemplateLocation(this.properties.getPrefix());
+			if (!location.exists(this.applicationContext)) {
+				logger.warn(new StringBuilder().append("Cannot find template location: ").append(location).append(" (please add some templates or check ").append("your Thymeleaf configuration)").toString());
 			}
 		}
 

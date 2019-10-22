@@ -85,9 +85,7 @@ public final class ConfigurationMetadataRepositoryJsonBuilder {
 	 */
 	public ConfigurationMetadataRepository build() {
 		SimpleConfigurationMetadataRepository result = new SimpleConfigurationMetadataRepository();
-		for (SimpleConfigurationMetadataRepository repository : this.repositories) {
-			result.include(repository);
-		}
+		this.repositories.forEach(result::include);
 		return result;
 	}
 
@@ -104,12 +102,12 @@ public final class ConfigurationMetadataRepositoryJsonBuilder {
 	private SimpleConfigurationMetadataRepository create(RawConfigurationMetadata metadata) {
 		SimpleConfigurationMetadataRepository repository = new SimpleConfigurationMetadataRepository();
 		repository.add(metadata.getSources());
-		for (ConfigurationMetadataItem item : metadata.getItems()) {
+		metadata.getItems().forEach(item -> {
 			ConfigurationMetadataSource source = metadata.getSource(item);
 			repository.add(item, source);
-		}
+		});
 		Map<String, ConfigurationMetadataProperty> allProperties = repository.getAllProperties();
-		for (ConfigurationMetadataHint hint : metadata.getHints()) {
+		metadata.getHints().forEach(hint -> {
 			ConfigurationMetadataProperty property = allProperties.get(hint.getId());
 			if (property != null) {
 				addValueHints(property, hint);
@@ -126,7 +124,7 @@ public final class ConfigurationMetadataRepositoryJsonBuilder {
 					}
 				}
 			}
-		}
+		});
 		return repository;
 	}
 

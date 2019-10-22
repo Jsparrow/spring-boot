@@ -74,8 +74,7 @@ class ElasticsearchDataAutoConfigurationTests {
 	void defaultTransportBeansAreRegistered() {
 		this.contextRunner
 				.withPropertyValues(
-						"spring.data.elasticsearch.cluster-nodes:" + elasticsearch.getTcpHost().getHostString() + ":"
-								+ elasticsearch.getTcpHost().getPort(),
+						new StringBuilder().append("spring.data.elasticsearch.cluster-nodes:").append(elasticsearch.getTcpHost().getHostString()).append(":").append(elasticsearch.getTcpHost().getPort()).toString(),
 						"spring.data.elasticsearch.cluster-name:docker-cluster")
 				.run((context) -> assertThat(context).hasSingleBean(ElasticsearchTemplate.class)
 						.hasSingleBean(SimpleElasticsearchMappingContext.class)

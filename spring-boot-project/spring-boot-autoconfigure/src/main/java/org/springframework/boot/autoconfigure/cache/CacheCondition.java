@@ -27,6 +27,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.ClassMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * General cache condition used with all cache configuration classes.
@@ -36,6 +38,8 @@ import org.springframework.core.type.ClassMetadata;
  * @author Madhura Bhave
  */
 class CacheCondition extends SpringBootCondition {
+
+	private static final Logger logger = LoggerFactory.getLogger(CacheCondition.class);
 
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -56,6 +60,7 @@ class CacheCondition extends SpringBootCondition {
 			}
 		}
 		catch (BindException ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 		return ConditionOutcome.noMatch(message.because("unknown cache type"));
 	}

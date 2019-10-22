@@ -50,7 +50,7 @@ public class ParentContextCloserApplicationListener
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext context) throws BeansException {
+	public void setApplicationContext(ApplicationContext context) {
 		this.context = context;
 	}
 
@@ -60,10 +60,11 @@ public class ParentContextCloserApplicationListener
 	}
 
 	private void maybeInstallListenerInParent(ConfigurableApplicationContext child) {
-		if (child == this.context && child.getParent() instanceof ConfigurableApplicationContext) {
-			ConfigurableApplicationContext parent = (ConfigurableApplicationContext) child.getParent();
-			parent.addApplicationListener(createContextCloserListener(child));
+		if (!(child == this.context && child.getParent() instanceof ConfigurableApplicationContext)) {
+			return;
 		}
+		ConfigurableApplicationContext parent = (ConfigurableApplicationContext) child.getParent();
+		parent.addApplicationListener(createContextCloserListener(child));
 	}
 
 	/**
@@ -103,11 +104,11 @@ public class ParentContextCloserApplicationListener
 			if (obj == null) {
 				return false;
 			}
-			if (obj instanceof ContextCloserListener) {
-				ContextCloserListener other = (ContextCloserListener) obj;
-				return ObjectUtils.nullSafeEquals(this.childContext.get(), other.childContext.get());
+			if (!(obj instanceof ContextCloserListener)) {
+				return super.equals(obj);
 			}
-			return super.equals(obj);
+			ContextCloserListener other = (ContextCloserListener) obj;
+			return ObjectUtils.nullSafeEquals(this.childContext.get(), other.childContext.get());
 		}
 
 		@Override

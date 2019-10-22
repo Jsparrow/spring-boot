@@ -52,7 +52,7 @@ class WelcomePageIntegrationTests {
 
 	@Test
 	void contentStrategyWithWelcomePage() throws Exception {
-		RequestEntity<?> entity = RequestEntity.get(new URI("http://localhost:" + this.port + "/"))
+		RequestEntity<?> entity = RequestEntity.get(new URI(new StringBuilder().append("http://localhost:").append(this.port).append("/").toString()))
 				.header("Accept", MediaType.ALL.toString()).build();
 		ResponseEntity<String> content = this.template.exchange(entity, String.class);
 		assertThat(content.getBody()).contains("/custom-");

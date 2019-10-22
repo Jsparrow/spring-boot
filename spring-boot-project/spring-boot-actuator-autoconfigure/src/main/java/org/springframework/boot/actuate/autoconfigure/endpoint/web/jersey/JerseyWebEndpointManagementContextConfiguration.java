@@ -81,7 +81,7 @@ class JerseyWebEndpointManagementContextConfiguration {
 
 	private boolean shouldRegisterLinksMapping(Environment environment, String basePath) {
 		return StringUtils.hasText(basePath)
-				|| ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT);
+				|| ManagementPortType.get(environment) == ManagementPortType.DIFFERENT;
 	}
 
 	/**
@@ -105,7 +105,6 @@ class JerseyWebEndpointManagementContextConfiguration {
 		JerseyWebEndpointsResourcesRegistrar(ResourceConfig resourceConfig, WebEndpointsSupplier webEndpointsSupplier,
 				ServletEndpointsSupplier servletEndpointsSupplier, EndpointMediaTypes endpointMediaTypes,
 				String basePath, boolean shouldRegisterLinks) {
-			super();
 			this.resourceConfig = resourceConfig;
 			this.webEndpointsSupplier = webEndpointsSupplier;
 			this.servletEndpointsSupplier = servletEndpointsSupplier;

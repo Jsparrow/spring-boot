@@ -25,6 +25,8 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.core.Ordered;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link BeanFactoryPostProcessor} to set lazy-init on bean definitions that are not
@@ -40,8 +42,10 @@ import org.springframework.core.Ordered;
  */
 public final class LazyInitializationBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
+	private static final Logger logger = LoggerFactory.getLogger(LazyInitializationBeanFactoryPostProcessor.class);
+
 	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Take care not to force the eager init of factory beans when getting filters
 		Collection<LazyInitializationExcludeFilter> filters = beanFactory
 				.getBeansOfType(LazyInitializationExcludeFilter.class, false, false).values();
@@ -71,6 +75,7 @@ public final class LazyInitializationBeanFactoryPostProcessor implements BeanFac
 			return beanFactory.getType(beanName, false);
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

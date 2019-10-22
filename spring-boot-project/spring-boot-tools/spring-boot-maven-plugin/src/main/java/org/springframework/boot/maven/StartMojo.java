@@ -39,6 +39,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import org.springframework.boot.loader.tools.JavaExecutable;
 import org.springframework.boot.loader.tools.RunProcess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Start a spring application. Contrary to the {@code run} goal, this does not block and
@@ -53,6 +55,8 @@ import org.springframework.boot.loader.tools.RunProcess;
 @Mojo(name = "start", requiresProject = true, defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST,
 		requiresDependencyResolution = ResolutionScope.TEST)
 public class StartMojo extends AbstractRunMojo {
+
+	private static final Logger logger = LoggerFactory.getLogger(StartMojo.class);
 
 	private static final String ENABLE_MBEAN_PROPERTY = "--spring.application.admin.enabled=true";
 
@@ -156,20 +160,21 @@ public class StartMojo extends AbstractRunMojo {
 			if (client.isReady()) {
 				return;
 			}
-			String message = "Spring application is not ready yet, waiting " + wait + "ms (attempt " + (i + 1) + ")";
+			String message = new StringBuilder().append("Spring application is not ready yet, waiting ").append(wait).append("ms (attempt ").append(i + 1).append(")").toString();
 			getLog().debug(message);
 			synchronized (this.lock) {
 				try {
 					this.lock.wait(wait);
 				}
 				catch (InterruptedException ex) {
+					logger.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 					throw new IllegalStateException("Interrupted while waiting for Spring Boot app to start.");
 				}
 			}
 		}
 		throw new MojoExecutionException(
-				"Spring application did not start before the configured timeout (" + (wait * maxAttempts) + "ms");
+				new StringBuilder().append("Spring application did not start before the configured timeout (").append(wait * maxAttempts).append("ms").toString());
 	}
 
 	private void waitForSpringApplication() throws MojoFailureException, MojoExecutionException {
@@ -194,8 +199,7 @@ public class StartMojo extends AbstractRunMojo {
 			getLog().debug("Connecting to local MBeanServer at port " + this.jmxPort);
 			try (JMXConnector connector = execute(this.wait, this.maxAttempts, new CreateJmxConnector(this.jmxPort))) {
 				if (connector == null) {
-					throw new MojoExecutionException("JMX MBean server was not reachable before the configured "
-							+ "timeout (" + (this.wait * this.maxAttempts) + "ms");
+					throw new MojoExecutionException(new StringBuilder().append("JMX MBean server was not reachable before the configured ").append("timeout (").append(this.wait * this.maxAttempts).append("ms").toString());
 				}
 				getLog().debug("Connected to local MBeanServer at port " + this.jmxPort);
 				MBeanServerConnection connection = connector.getMBeanServerConnection();
@@ -241,20 +245,21 @@ public class StartMojo extends AbstractRunMojo {
 			if (result != null) {
 				return result;
 			}
-			String message = "Spring application is not ready yet, waiting " + wait + "ms (attempt " + (i + 1) + ")";
+			String message = new StringBuilder().append("Spring application is not ready yet, waiting ").append(wait).append("ms (attempt ").append(i + 1).append(")").toString();
 			getLog().debug(message);
 			synchronized (this.lock) {
 				try {
 					this.lock.wait(wait);
 				}
 				catch (InterruptedException ex) {
+					logger.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 					throw new IllegalStateException("Interrupted while waiting for Spring Boot app to start.");
 				}
 			}
 		}
 		throw new MojoExecutionException(
-				"Spring application did not start before the configured timeout (" + (wait * maxAttempts) + "ms");
+				new StringBuilder().append("Spring application did not start before the configured timeout (").append(wait * maxAttempts).append("ms").toString());
 	}
 
 	private class CreateJmxConnector implements Callable<JMXConnector> {
@@ -272,7 +277,7 @@ public class StartMojo extends AbstractRunMojo {
 			}
 			catch (IOException ex) {
 				if (hasCauseWithType(ex, ConnectException.class)) {
-					String message = "MBean server at port " + this.port + " is not up yet...";
+					String message = new StringBuilder().append("MBean server at port ").append(this.port).append(" is not up yet...").toString();
 					getLog().debug(message);
 					return null;
 				}

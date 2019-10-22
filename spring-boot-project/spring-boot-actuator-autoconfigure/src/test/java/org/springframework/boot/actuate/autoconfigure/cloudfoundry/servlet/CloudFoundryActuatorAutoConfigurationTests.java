@@ -251,7 +251,7 @@ class CloudFoundryActuatorAutoConfigurationTests {
 			}
 		}
 		throw new IllegalStateException(
-				"No operation found with request path " + requestPath + " from " + endpoint.getOperations());
+				new StringBuilder().append("No operation found with request path ").append(requestPath).append(" from ").append(endpoint.getOperations()).toString());
 	}
 
 	@Endpoint(id = "test")

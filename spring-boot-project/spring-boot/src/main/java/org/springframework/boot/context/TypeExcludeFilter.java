@@ -54,7 +54,7 @@ public class TypeExcludeFilter implements TypeFilter, BeanFactoryAware {
 	private Collection<TypeExcludeFilter> delegates;
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 
@@ -82,12 +82,12 @@ public class TypeExcludeFilter implements TypeFilter, BeanFactoryAware {
 
 	@Override
 	public boolean equals(Object obj) {
-		throw new IllegalStateException("TypeExcludeFilter " + getClass() + " has not implemented equals");
+		throw new IllegalStateException(new StringBuilder().append("TypeExcludeFilter ").append(getClass()).append(" has not implemented equals").toString());
 	}
 
 	@Override
 	public int hashCode() {
-		throw new IllegalStateException("TypeExcludeFilter " + getClass() + " has not implemented hashCode");
+		throw new IllegalStateException(new StringBuilder().append("TypeExcludeFilter ").append(getClass()).append(" has not implemented hashCode").toString());
 	}
 
 }

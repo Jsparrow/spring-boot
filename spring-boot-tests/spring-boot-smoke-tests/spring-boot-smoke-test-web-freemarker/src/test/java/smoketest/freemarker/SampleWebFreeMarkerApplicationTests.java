@@ -16,8 +16,6 @@
 
 package smoketest.freemarker;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 
 /**
  * Basic integration tests for FreeMarker application.
@@ -55,7 +54,7 @@ class SampleWebFreeMarkerApplicationTests {
 	@Test
 	void testFreeMarkerErrorTemplate() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
 		ResponseEntity<String> responseEntity = this.testRestTemplate.exchange("/does-not-exist", HttpMethod.GET,

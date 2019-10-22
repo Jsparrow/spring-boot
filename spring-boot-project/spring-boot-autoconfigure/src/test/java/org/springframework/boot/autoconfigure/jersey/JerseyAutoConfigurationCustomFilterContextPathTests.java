@@ -64,6 +64,16 @@ class JerseyAutoConfigurationCustomFilterContextPathTests {
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@Configuration
+	@Import({ ServletWebServerFactoryAutoConfiguration.class, JerseyAutoConfiguration.class,
+			PropertyPlaceholderAutoConfiguration.class })
+	protected @interface MinimalWebConfiguration {
+
+	}
+
 	@MinimalWebConfiguration
 	@ApplicationPath("/rest")
 	@Path("/hello")
@@ -84,16 +94,6 @@ class JerseyAutoConfigurationCustomFilterContextPathTests {
 		static void main(String[] args) {
 			SpringApplication.run(Application.class, args);
 		}
-
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@Configuration
-	@Import({ ServletWebServerFactoryAutoConfiguration.class, JerseyAutoConfiguration.class,
-			PropertyPlaceholderAutoConfiguration.class })
-	protected @interface MinimalWebConfiguration {
 
 	}
 

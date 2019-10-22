@@ -223,12 +223,12 @@ class MessageSourceAutoConfigurationTests {
 		}
 
 		@Override
-		public String getMessage(String code, Object[] args, Locale locale) throws NoSuchMessageException {
+		public String getMessage(String code, Object[] args, Locale locale) {
 			return code;
 		}
 
 		@Override
-		public String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException {
+		public String getMessage(MessageSourceResolvable resolvable, Locale locale) {
 			return resolvable.getCodes()[0];
 		}
 

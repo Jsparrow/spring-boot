@@ -166,7 +166,7 @@ public class JsonTestersAutoConfiguration {
 	static class JsonMarshalTestersBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter {
 
 		@Override
-		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		public Object postProcessAfterInitialization(Object bean, String beanName) {
 			ReflectionUtils.doWithFields(bean.getClass(), (field) -> processField(bean, field));
 			return bean;
 		}

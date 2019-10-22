@@ -75,7 +75,7 @@ class DependencyCustomizerTests {
 		List<AnnotationNode> grabAnnotations = this.classNode.getAnnotations(new ClassNode(Grab.class));
 		assertThat(grabAnnotations).hasSize(1);
 		AnnotationNode annotationNode = grabAnnotations.get(0);
-		assertGrabAnnotation(annotationNode, "org.springframework.boot", "spring-boot-starter-logging", "1.2.3", null,
+		assertGrabAnnotation(annotationNode, "org.springframework.boot", "spring-boot-starter-logging", null,
 				null, true);
 	}
 
@@ -85,7 +85,7 @@ class DependencyCustomizerTests {
 		List<AnnotationNode> grabAnnotations = this.classNode.getAnnotations(new ClassNode(Grab.class));
 		assertThat(grabAnnotations).hasSize(1);
 		AnnotationNode annotationNode = grabAnnotations.get(0);
-		assertGrabAnnotation(annotationNode, "org.springframework.boot", "spring-boot-starter-logging", "1.2.3", null,
+		assertGrabAnnotation(annotationNode, "org.springframework.boot", "spring-boot-starter-logging", null,
 				null, false);
 	}
 
@@ -95,8 +95,7 @@ class DependencyCustomizerTests {
 		List<AnnotationNode> grabAnnotations = this.classNode.getAnnotations(new ClassNode(Grab.class));
 		assertThat(grabAnnotations).hasSize(1);
 		AnnotationNode annotationNode = grabAnnotations.get(0);
-		assertGrabAnnotation(annotationNode, "org.springframework.boot", "spring-boot-starter-logging", "1.2.3",
-				"my-classifier", "my-type", false);
+		assertGrabAnnotation(annotationNode, "org.springframework.boot", "spring-boot-starter-logging", "my-classifier", "my-type", false);
 	}
 
 	@Test
@@ -138,8 +137,7 @@ class DependencyCustomizerTests {
 		assertThat(this.classNode.getAnnotations(new ClassNode(Grab.class))).hasSize(1);
 	}
 
-	private void assertGrabAnnotation(AnnotationNode annotationNode, String group, String module, String version,
-			String classifier, String type, boolean transitive) {
+	private void assertGrabAnnotation(AnnotationNode annotationNode, String group, String module, String classifier, String type, boolean transitive) {
 		assertThat(getMemberValue(annotationNode, "group")).isEqualTo(group);
 		assertThat(getMemberValue(annotationNode, "module")).isEqualTo(module);
 		if (type == null) {

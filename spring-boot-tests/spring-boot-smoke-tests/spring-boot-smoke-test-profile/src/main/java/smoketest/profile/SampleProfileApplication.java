@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SampleProfileApplication implements CommandLineRunner {
@@ -30,12 +32,13 @@ public class SampleProfileApplication implements CommandLineRunner {
 	// injected bean service. Also demonstrates how you can use @Value to inject
 	// command line args ('--name=whatever') or application properties
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleProfileApplication.class);
 	@Autowired
 	private MessageService helloWorldService;
 
 	@Override
 	public void run(String... args) {
-		System.out.println(this.helloWorldService.getMessage());
+		logger.info(this.helloWorldService.getMessage());
 	}
 
 	public static void main(String[] args) {

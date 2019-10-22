@@ -109,7 +109,7 @@ class LoggingApplicationListenerTests {
 	private CapturedOutput output;
 
 	@BeforeEach
-	void init(CapturedOutput output) throws SecurityException, IOException {
+	void init(CapturedOutput output) throws IOException {
 		this.output = output;
 		this.logFile = new File(this.tempDir.toFile(), "foo.log");
 		LogManager.getLogManager().readConfiguration(JavaLoggingSystem.class.getResourceAsStream("logging.properties"));
@@ -523,10 +523,10 @@ class LoggingApplicationListenerTests {
 
 	@Test
 	void logFilePropertiesCanReferenceSystemProperties() {
-		addPropertiesToEnvironment(this.context, "logging.file.name=" + this.tempDir + "${PID}.log");
+		addPropertiesToEnvironment(this.context, new StringBuilder().append("logging.file.name=").append(this.tempDir).append("${PID}.log").toString());
 		this.initializer.initialize(this.context.getEnvironment(), this.context.getClassLoader());
 		assertThat(System.getProperty(LoggingSystemProperties.LOG_FILE))
-				.isEqualTo(this.tempDir + new ApplicationPid().toString() + ".log");
+				.isEqualTo(new StringBuilder().append(this.tempDir).append(new ApplicationPid().toString()).append(".log").toString());
 	}
 
 	@Test
@@ -649,7 +649,7 @@ class LoggingApplicationListenerTests {
 
 		@Override
 		public Runnable getShutdownHandler() {
-			return () -> TestShutdownHandlerLoggingSystem.shutdownLatch.countDown();
+			return TestShutdownHandlerLoggingSystem.shutdownLatch::countDown;
 		}
 
 	}

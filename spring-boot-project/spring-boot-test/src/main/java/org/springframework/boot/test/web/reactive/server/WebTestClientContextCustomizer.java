@@ -47,6 +47,8 @@ import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ContextCustomizer} for {@link WebTestClient}.
@@ -98,7 +100,7 @@ class WebTestClientContextCustomizer implements ContextCustomizer {
 		private BeanFactory beanFactory;
 
 		@Override
-		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		public void setBeanFactory(BeanFactory beanFactory) {
 			this.beanFactory = beanFactory;
 		}
 
@@ -108,7 +110,7 @@ class WebTestClientContextCustomizer implements ContextCustomizer {
 		}
 
 		@Override
-		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 			if (BeanFactoryUtils.beanNamesForTypeIncludingAncestors((ListableBeanFactory) this.beanFactory,
 					WebTestClient.class, false, false).length == 0) {
 				registry.registerBeanDefinition(WebTestClient.class.getName(),
@@ -118,7 +120,7 @@ class WebTestClientContextCustomizer implements ContextCustomizer {
 		}
 
 		@Override
-		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		}
 
 	}
@@ -128,12 +130,14 @@ class WebTestClientContextCustomizer implements ContextCustomizer {
 	 */
 	public static class WebTestClientFactory implements FactoryBean<WebTestClient>, ApplicationContextAware {
 
+		private final Logger logger = LoggerFactory.getLogger(WebTestClientFactory.class);
+
 		private ApplicationContext applicationContext;
 
 		private WebTestClient object;
 
 		@Override
-		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		public void setApplicationContext(ApplicationContext applicationContext) {
 			this.applicationContext = applicationContext;
 		}
 
@@ -158,7 +162,7 @@ class WebTestClientContextCustomizer implements ContextCustomizer {
 		private WebTestClient createWebTestClient() {
 			boolean sslEnabled = isSslEnabled(this.applicationContext);
 			String port = this.applicationContext.getEnvironment().getProperty("local.server.port", "8080");
-			String baseUrl = (sslEnabled ? "https" : "http") + "://localhost:" + port;
+			String baseUrl = new StringBuilder().append(sslEnabled ? "https" : "http").append("://localhost:").append(port).toString();
 			WebTestClient.Builder builder = WebTestClient.bindToServer();
 			customizeWebTestClientBuilder(builder, this.applicationContext);
 			customizeWebTestClientCodecs(builder, this.applicationContext);
@@ -172,15 +176,14 @@ class WebTestClientContextCustomizer implements ContextCustomizer {
 				return webServerFactory.getSsl() != null && webServerFactory.getSsl().isEnabled();
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 				return false;
 			}
 		}
 
 		private void customizeWebTestClientBuilder(WebTestClient.Builder clientBuilder, ApplicationContext context) {
-			for (WebTestClientBuilderCustomizer customizer : context
-					.getBeansOfType(WebTestClientBuilderCustomizer.class).values()) {
-				customizer.customize(clientBuilder);
-			}
+			context
+					.getBeansOfType(WebTestClientBuilderCustomizer.class).values().forEach(customizer -> customizer.customize(clientBuilder));
 		}
 
 		private void customizeWebTestClientCodecs(WebTestClient.Builder clientBuilder, ApplicationContext context) {

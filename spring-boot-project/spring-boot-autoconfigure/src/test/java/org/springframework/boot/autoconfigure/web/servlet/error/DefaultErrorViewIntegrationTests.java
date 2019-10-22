@@ -90,7 +90,7 @@ class DefaultErrorViewIntegrationTests {
 
 	@Test
 	void testErrorWithSpelEscape() throws Exception {
-		String spel = "${T(" + getClass().getName() + ").injectCall()}";
+		String spel = new StringBuilder().append("${T(").append(getClass().getName()).append(").injectCall()}").toString();
 		MvcResult response = this.mockMvc.perform(get("/error")
 				.requestAttr("javax.servlet.error.exception", new RuntimeException(spel)).accept(MediaType.TEXT_HTML))
 				.andExpect(status().is5xxServerError()).andReturn();

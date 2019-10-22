@@ -55,7 +55,7 @@ class IdeApplicationLauncher extends AbstractApplicationLauncher {
 
 	@Override
 	protected String getDescription(String packaging) {
-		return "IDE run " + packaging + " project";
+		return new StringBuilder().append("IDE run ").append(packaging).append(" project").toString();
 	}
 
 	@Override

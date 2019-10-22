@@ -32,6 +32,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Integration tests for Spring Boot's embedded servlet container support when developing
@@ -42,6 +44,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @EmbeddedServletContainerTest(packaging = "war",
 		launchers = { BootRunApplicationLauncher.class, IdeApplicationLauncher.class })
 public class EmbeddedServletContainerWarDevelopmentIntegrationTests {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(EmbeddedServletContainerWarDevelopmentIntegrationTests.class);
 
 	@TestTemplate
 	public void metaInfResourceFromDependencyIsAvailableViaHttp(RestTemplate rest) {
@@ -89,7 +94,8 @@ public class EmbeddedServletContainerWarDevelopmentIntegrationTests {
 			return reader.lines().collect(Collectors.toList());
 		}
 		catch (IOException ex) {
-			throw new RuntimeException("Failed to read lines from input '" + input + "'");
+			logger.error(ex.getMessage(), ex);
+			throw new RuntimeException(new StringBuilder().append("Failed to read lines from input '").append(input).append("'").toString());
 		}
 	}
 

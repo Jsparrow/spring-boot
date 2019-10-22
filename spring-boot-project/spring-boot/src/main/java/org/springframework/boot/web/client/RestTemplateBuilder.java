@@ -630,9 +630,7 @@ public class RestTemplateBuilder {
 		}
 		restTemplate.getInterceptors().addAll(this.interceptors);
 		if (!CollectionUtils.isEmpty(this.customizers)) {
-			for (RestTemplateCustomizer customizer : this.customizers) {
-				customizer.customize(restTemplate);
-			}
+			this.customizers.forEach(customizer -> customizer.customize(restTemplate));
 		}
 		return restTemplate;
 	}
@@ -651,10 +649,9 @@ public class RestTemplateBuilder {
 		else if (this.detectRequestFactory) {
 			requestFactory = new ClientHttpRequestFactorySupplier().get();
 		}
-		if (requestFactory != null) {
-			if (this.requestFactoryCustomizer != null) {
-				this.requestFactoryCustomizer.accept(requestFactory);
-			}
+		boolean condition = requestFactory != null && this.requestFactoryCustomizer != null;
+		if (condition) {
+			this.requestFactoryCustomizer.accept(requestFactory);
 		}
 		return requestFactory;
 	}
@@ -779,8 +776,7 @@ public class RestTemplateBuilder {
 			if (method != null) {
 				return method;
 			}
-			throw new IllegalStateException("Request factory " + requestFactory.getClass()
-					+ " does not have a suitable " + methodName + " method");
+			throw new IllegalStateException(new StringBuilder().append("Request factory ").append(requestFactory.getClass()).append(" does not have a suitable ").append(methodName).append(" method").toString());
 		}
 
 		private void invoke(ClientHttpRequestFactory requestFactory, Method method, Object... parameters) {

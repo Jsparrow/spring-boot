@@ -16,8 +16,6 @@
 
 package org.springframework.boot.autoconfigure.logging;
 
-import java.util.Arrays;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -45,6 +43,7 @@ import org.springframework.mock.web.MockServletContext;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import java.util.Collections;
 
 /**
  * Tests for {@link ConditionEvaluationReportLoggingListener}.
@@ -95,7 +94,7 @@ class ConditionEvaluationReportLoggingListenerTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 		this.initializer.initialize(context);
 		context.register(Config.class);
-		ConditionEvaluationReport.get(context.getBeanFactory()).recordExclusions(Arrays.asList("com.foo.Bar"));
+		ConditionEvaluationReport.get(context.getBeanFactory()).recordExclusions(Collections.singletonList("com.foo.Bar"));
 		context.refresh();
 		withDebugLogging(() -> this.initializer.onApplicationEvent(new ContextRefreshedEvent(context)));
 		assertThat(output).contains("not a servlet web application (OnWebApplicationCondition)");

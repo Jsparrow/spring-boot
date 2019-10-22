@@ -142,9 +142,7 @@ class WebEndpointDiscovererTests {
 	void getEndpointsWhenWhenEndpointHasTwoOperationsWithTheSameNameShouldThrowException() {
 		load(ClashingOperationsEndpointConfiguration.class,
 				(discoverer) -> assertThatIllegalStateException().isThrownBy(discoverer::getEndpoints)
-						.withMessageContaining("Unable to map duplicate endpoint operations: "
-								+ "[web request predicate GET to path 'test' "
-								+ "produces: application/json] to clashingOperationsEndpoint"));
+						.withMessageContaining(new StringBuilder().append("Unable to map duplicate endpoint operations: ").append("[web request predicate GET to path 'test' ").append("produces: application/json] to clashingOperationsEndpoint").toString()));
 	}
 
 	@Test
@@ -251,9 +249,7 @@ class WebEndpointDiscovererTests {
 				return false;
 			}
 			Map<WebOperationRequestPredicate, Long> matchCounts = new HashMap<>();
-			for (WebOperationRequestPredicate predicate : predicates) {
-				matchCounts.put(predicate, Stream.of(matchers).filter((matcher) -> matcher.matches(predicate)).count());
-			}
+			predicates.forEach(predicate -> matchCounts.put(predicate, Stream.of(matchers).filter((matcher) -> matcher.matches(predicate)).count()));
 			return matchCounts.values().stream().noneMatch((count) -> count != 1);
 		}, Arrays.toString(matchers));
 	}
@@ -637,8 +633,8 @@ class WebEndpointDiscovererTests {
 
 		@Override
 		public String toString() {
-			return "Request predicate with path = '" + this.path + "', httpMethod = '" + this.httpMethod
-					+ "', produces = '" + this.produces + "'";
+			return new StringBuilder().append("Request predicate with path = '").append(this.path).append("', httpMethod = '").append(this.httpMethod).append("', produces = '")
+					.append(this.produces).append("'").toString();
 		}
 
 	}

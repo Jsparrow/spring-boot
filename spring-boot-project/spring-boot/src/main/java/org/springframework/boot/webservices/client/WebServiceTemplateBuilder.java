@@ -473,9 +473,7 @@ public class WebServiceTemplateBuilder {
 	private void applyCustomizers(WebServiceTemplate webServiceTemplate,
 			Set<WebServiceTemplateCustomizer> customizers) {
 		if (!CollectionUtils.isEmpty(customizers)) {
-			for (WebServiceTemplateCustomizer customizer : customizers) {
-				customizer.customize(webServiceTemplate);
-			}
+			customizers.forEach(customizer -> customizer.customize(webServiceTemplate));
 		}
 	}
 

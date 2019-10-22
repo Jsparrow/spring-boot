@@ -19,13 +19,17 @@ package smoketest.ant;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SampleAntApplication implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleAntApplication.class);
+
 	@Override
 	public void run(String... args) {
-		System.out.println("Spring Boot Ant Example");
+		logger.info("Spring Boot Ant Example");
 	}
 
 	public static void main(String[] args) {

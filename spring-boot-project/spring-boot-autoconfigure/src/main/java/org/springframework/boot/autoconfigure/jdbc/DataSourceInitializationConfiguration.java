@@ -45,15 +45,16 @@ class DataSourceInitializationConfiguration {
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
 				BeanDefinitionRegistry registry) {
-			if (!registry.containsBeanDefinition(BEAN_NAME)) {
-				GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-				beanDefinition.setBeanClass(DataSourceInitializerPostProcessor.class);
-				beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-				// We don't need this one to be post processed otherwise it can cause a
-				// cascade of bean instantiation that we would rather avoid.
-				beanDefinition.setSynthetic(true);
-				registry.registerBeanDefinition(BEAN_NAME, beanDefinition);
+			if (registry.containsBeanDefinition(BEAN_NAME)) {
+				return;
 			}
+			GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+			beanDefinition.setBeanClass(DataSourceInitializerPostProcessor.class);
+			beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			// We don't need this one to be post processed otherwise it can cause a
+			// cascade of bean instantiation that we would rather avoid.
+			beanDefinition.setSynthetic(true);
+			registry.registerBeanDefinition(BEAN_NAME, beanDefinition);
 		}
 
 	}

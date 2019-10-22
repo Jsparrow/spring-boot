@@ -32,7 +32,7 @@ public class PortInUseException extends WebServerException {
 	 * @param port the port that was in use
 	 */
 	public PortInUseException(int port) {
-		super("Port " + port + " is already in use", null);
+		super(new StringBuilder().append("Port ").append(port).append(" is already in use").toString(), null);
 		this.port = port;
 	}
 

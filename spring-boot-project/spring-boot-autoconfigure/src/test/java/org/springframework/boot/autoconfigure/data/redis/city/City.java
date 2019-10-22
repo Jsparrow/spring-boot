@@ -37,12 +37,12 @@ public class City implements Serializable {
 
 	private String map;
 
-	protected City() {
-	}
-
 	public City(String name, String country) {
 		this.name = name;
 		this.country = country;
+	}
+
+	protected City() {
 	}
 
 	public String getName() {
@@ -63,7 +63,7 @@ public class City implements Serializable {
 
 	@Override
 	public String toString() {
-		return getName() + "," + getState() + "," + getCountry();
+		return new StringBuilder().append(getName()).append(",").append(getState()).append(",").append(getCountry()).toString();
 	}
 
 }

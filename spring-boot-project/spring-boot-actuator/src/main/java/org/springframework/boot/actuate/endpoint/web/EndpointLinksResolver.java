@@ -55,7 +55,7 @@ public class EndpointLinksResolver {
 	public EndpointLinksResolver(Collection<? extends ExposableEndpoint<?>> endpoints, String basePath) {
 		this.endpoints = endpoints;
 		if (logger.isInfoEnabled()) {
-			logger.info("Exposing " + endpoints.size() + " endpoint(s) beneath base path '" + basePath + "'");
+			logger.info(new StringBuilder().append("Exposing ").append(endpoints.size()).append(" endpoint(s) beneath base path '").append(basePath).append("'").toString());
 		}
 	}
 
@@ -90,9 +90,7 @@ public class EndpointLinksResolver {
 	}
 
 	private void collectLinks(Map<String, Link> links, ExposableWebEndpoint endpoint, String normalizedUrl) {
-		for (WebOperation operation : endpoint.getOperations()) {
-			links.put(operation.getId(), createLink(normalizedUrl, operation));
-		}
+		endpoint.getOperations().forEach(operation -> links.put(operation.getId(), createLink(normalizedUrl, operation)));
 	}
 
 	private Link createLink(String requestUrl, WebOperation operation) {

@@ -50,6 +50,8 @@ class DataRedisTestIntegrationTests {
 	@Container
 	public static RedisContainer redis = new RedisContainer();
 
+	private static final Charset CHARSET = StandardCharsets.UTF_8;
+
 	@Autowired
 	private RedisOperations<Object, Object> operations;
 
@@ -58,8 +60,6 @@ class DataRedisTestIntegrationTests {
 
 	@Autowired
 	private ApplicationContext applicationContext;
-
-	private static final Charset CHARSET = StandardCharsets.UTF_8;
 
 	@Test
 	void testRepository() {

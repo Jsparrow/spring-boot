@@ -69,11 +69,11 @@ public final class ChangedFiles implements Iterable<ChangedFile> {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof ChangedFiles) {
-			ChangedFiles other = (ChangedFiles) obj;
-			return this.sourceFolder.equals(other.sourceFolder) && this.files.equals(other.files);
+		if (!(obj instanceof ChangedFiles)) {
+			return super.equals(obj);
 		}
-		return super.equals(obj);
+		ChangedFiles other = (ChangedFiles) obj;
+		return this.sourceFolder.equals(other.sourceFolder) && this.files.equals(other.files);
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public final class ChangedFiles implements Iterable<ChangedFile> {
 
 	@Override
 	public String toString() {
-		return this.sourceFolder + " " + this.files;
+		return new StringBuilder().append(this.sourceFolder).append(" ").append(this.files).toString();
 	}
 
 }

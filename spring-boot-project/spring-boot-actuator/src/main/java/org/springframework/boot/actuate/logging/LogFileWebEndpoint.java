@@ -63,11 +63,11 @@ public class LogFileWebEndpoint {
 		if (this.externalFile != null) {
 			return new FileSystemResource(this.externalFile);
 		}
-		if (this.logFile == null) {
-			logger.debug("Missing 'logging.file.name' or 'logging.file.path' properties");
-			return null;
+		if (this.logFile != null) {
+			return new FileSystemResource(this.logFile.toString());
 		}
-		return new FileSystemResource(this.logFile.toString());
+		logger.debug("Missing 'logging.file.name' or 'logging.file.path' properties");
+		return null;
 	}
 
 }

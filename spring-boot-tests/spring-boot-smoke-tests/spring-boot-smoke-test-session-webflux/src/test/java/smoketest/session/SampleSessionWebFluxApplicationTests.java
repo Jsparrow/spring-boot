@@ -48,7 +48,7 @@ class SampleSessionWebFluxApplicationTests {
 
 	@Test
 	void userDefinedMappingsSecureByDefault() throws Exception {
-		WebClient webClient = this.webClientBuilder.baseUrl("http://localhost:" + this.port + "/").build();
+		WebClient webClient = this.webClientBuilder.baseUrl(new StringBuilder().append("http://localhost:").append(this.port).append("/").toString()).build();
 		ClientResponse response = webClient.get().header("Authorization", getBasicAuth()).exchange()
 				.block(Duration.ofSeconds(30));
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK);

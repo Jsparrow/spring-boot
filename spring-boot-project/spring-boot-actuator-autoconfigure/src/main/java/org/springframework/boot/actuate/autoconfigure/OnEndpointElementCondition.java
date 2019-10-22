@@ -59,19 +59,19 @@ public abstract class OnEndpointElementCondition extends SpringBootCondition {
 
 	protected ConditionOutcome getEndpointOutcome(ConditionContext context, String endpointName) {
 		Environment environment = context.getEnvironment();
-		String enabledProperty = this.prefix + endpointName + ".enabled";
-		if (environment.containsProperty(enabledProperty)) {
-			boolean match = environment.getProperty(enabledProperty, Boolean.class, true);
-			return new ConditionOutcome(match, ConditionMessage.forCondition(this.annotationType)
-					.because(this.prefix + endpointName + ".enabled is " + match));
+		String enabledProperty = new StringBuilder().append(this.prefix).append(endpointName).append(".enabled").toString();
+		if (!environment.containsProperty(enabledProperty)) {
+			return null;
 		}
-		return null;
+		boolean match = environment.getProperty(enabledProperty, Boolean.class, true);
+		return new ConditionOutcome(match, ConditionMessage.forCondition(this.annotationType)
+				.because(new StringBuilder().append(this.prefix).append(endpointName).append(".enabled is ").append(match).toString()));
 	}
 
 	protected ConditionOutcome getDefaultEndpointsOutcome(ConditionContext context) {
 		boolean match = Boolean.valueOf(context.getEnvironment().getProperty(this.prefix + "defaults.enabled", "true"));
 		return new ConditionOutcome(match, ConditionMessage.forCondition(this.annotationType)
-				.because(this.prefix + "defaults.enabled is considered " + match));
+				.because(new StringBuilder().append(this.prefix).append("defaults.enabled is considered ").append(match).toString()));
 	}
 
 }

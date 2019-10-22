@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The "main" method located from a running thread.
@@ -28,6 +30,7 @@ import org.springframework.util.Assert;
  */
 class MainMethod {
 
+	private static final Logger logger = LoggerFactory.getLogger(MainMethod.class);
 	private final Method method;
 
 	MainMethod() {
@@ -60,6 +63,7 @@ class MainMethod {
 			}
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 		return null;

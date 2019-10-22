@@ -53,28 +53,28 @@ class BindValidationFailureAnalyzer extends AbstractFailureAnalyzer<Throwable> {
 		}
 		org.springframework.validation.BindException bindException = findCause(rootFailure,
 				org.springframework.validation.BindException.class);
-		if (bindException != null) {
-			List<ObjectError> errors = bindException.getAllErrors();
-			return new ExceptionDetails(errors, bindException.getTarget(), bindException);
+		if (bindException == null) {
+			return null;
 		}
-		return null;
+		List<ObjectError> errors = bindException.getAllErrors();
+		return new ExceptionDetails(errors, bindException.getTarget(), bindException);
 	}
 
 	private FailureAnalysis analyzeBindValidationException(ExceptionDetails details) {
 		StringBuilder description = new StringBuilder(
 				String.format("Binding to target %s failed:%n", details.getTarget()));
-		for (ObjectError error : details.getErrors()) {
+		details.getErrors().forEach(error -> {
 			if (error instanceof FieldError) {
 				appendFieldError(description, (FieldError) error);
 			}
 			description.append(String.format("%n    Reason: %s%n", error.getDefaultMessage()));
-		}
+		});
 		return getFailureAnalysis(description, details.getCause());
 	}
 
 	private void appendFieldError(StringBuilder description, FieldError error) {
 		Origin origin = Origin.from(error);
-		description.append(String.format("%n    Property: %s", error.getObjectName() + "." + error.getField()));
+		description.append(String.format("%n    Property: %s", new StringBuilder().append(error.getObjectName()).append(".").append(error.getField()).toString()));
 		description.append(String.format("%n    Value: %s", error.getRejectedValue()));
 		if (origin != null) {
 			description.append(String.format("%n    Origin: %s", origin));

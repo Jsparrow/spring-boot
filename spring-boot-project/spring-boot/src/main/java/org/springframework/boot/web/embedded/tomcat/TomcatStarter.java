@@ -58,8 +58,7 @@ class TomcatStarter implements ServletContainerInitializer {
 			// Prevent Tomcat from logging and re-throwing when we know we can
 			// deal with it in the main thread, but log for information here.
 			if (logger.isErrorEnabled()) {
-				logger.error("Error starting Tomcat context. Exception: " + ex.getClass().getName() + ". Message: "
-						+ ex.getMessage());
+				logger.error(new StringBuilder().append("Error starting Tomcat context. Exception: ").append(ex.getClass().getName()).append(". Message: ").append(ex.getMessage()).toString());
 			}
 		}
 	}

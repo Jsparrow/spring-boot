@@ -26,11 +26,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 @RabbitListener(queues = "foo")
 @EnableScheduling
 public class SampleAmqpSimpleApplication {
+
+	private static final Logger logger = LoggerFactory.getLogger(SampleAmqpSimpleApplication.class);
 
 	@Bean
 	public Sender mySender() {
@@ -44,7 +48,7 @@ public class SampleAmqpSimpleApplication {
 
 	@RabbitHandler
 	public void process(@Payload String foo) {
-		System.out.println(new Date() + ": " + foo);
+		logger.info(new StringBuilder().append(new Date()).append(": ").append(foo).toString());
 	}
 
 	public static void main(String[] args) {

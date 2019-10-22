@@ -265,30 +265,24 @@ public class CommandRunner implements Iterable<Command> {
 
 	protected void showUsage() {
 		Log.infoPrint("usage: " + this.name);
-		for (Command command : this.commands) {
-			if (isOptionCommand(command)) {
-				Log.infoPrint("[--" + command.getName() + "] ");
-			}
-		}
+		this.commands.stream().filter(this::isOptionCommand).forEach(command -> Log.infoPrint(new StringBuilder().append("[--").append(command.getName()).append("] ").toString()));
 		Log.info("");
 		Log.info("       <command> [<args>]");
 		Log.info("");
 		Log.info("Available commands are:");
-		for (Command command : this.commands) {
-			if (!isOptionCommand(command) && !isHiddenCommand(command)) {
-				String usageHelp = command.getUsageHelp();
-				String description = command.getDescription();
-				Log.info(String.format("%n  %1$s %2$-15s%n    %3$s", command.getName(),
-						(usageHelp != null) ? usageHelp : "", (description != null) ? description : ""));
-			}
-		}
+		this.commands.stream().filter(command -> !isOptionCommand(command) && !isHiddenCommand(command)).forEach(command -> {
+			String usageHelp = command.getUsageHelp();
+			String description = command.getDescription();
+			Log.info(String.format("%n  %1$s %2$-15s%n    %3$s", command.getName(),
+					(usageHelp != null) ? usageHelp : "", (description != null) ? description : ""));
+		});
 		Log.info("");
 		Log.info("Common options:");
 		Log.info(String.format("%n  %1$s %2$-15s%n    %3$s", "--debug", "Verbose mode",
 				"Print additional status information for the command you are running"));
 		Log.info("");
 		Log.info("");
-		Log.info("See '" + this.name + "help <command>' for more information on a specific command.");
+		Log.info(new StringBuilder().append("See '").append(this.name).append("help <command>' for more information on a specific command.").toString());
 	}
 
 	protected void printStackTrace(Exception ex) {

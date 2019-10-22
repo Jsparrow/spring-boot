@@ -208,12 +208,7 @@ public final class Metadata {
 		}
 
 		private ItemMetadata getFirstItemWithName(ConfigurationMetadata metadata, String name) {
-			for (ItemMetadata item : metadata.getItems()) {
-				if (item.isOfItemType(this.itemType) && name.equals(item.getName())) {
-					return item;
-				}
-			}
-			return null;
+			return metadata.getItems().stream().filter(item -> item.isOfItemType(this.itemType) && name.equals(item.getName())).findFirst().orElse(null);
 		}
 
 	}
@@ -271,12 +266,7 @@ public final class Metadata {
 		}
 
 		private ItemHint getFirstHintWithName(ConfigurationMetadata metadata, String name) {
-			for (ItemHint hint : metadata.getHints()) {
-				if (name.equals(hint.getName())) {
-					return hint;
-				}
-			}
-			return null;
+			return metadata.getHints().stream().filter(hint -> name.equals(hint.getName())).findFirst().orElse(null);
 		}
 
 		public MetadataHintCondition withValue(int index, Object value, String description) {

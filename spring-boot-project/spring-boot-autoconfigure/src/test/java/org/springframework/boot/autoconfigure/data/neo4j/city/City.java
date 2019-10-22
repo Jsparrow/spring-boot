@@ -67,7 +67,7 @@ public class City implements Serializable {
 
 	@Override
 	public String toString() {
-		return getName() + "," + getState() + "," + getCountry();
+		return new StringBuilder().append(getName()).append(",").append(getState()).append(",").append(getCountry()).toString();
 	}
 
 }

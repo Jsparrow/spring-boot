@@ -34,6 +34,8 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.server.WebServerException;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link WebServer} that can be used to control an Undertow web server. Usually this
@@ -48,6 +50,8 @@ import org.springframework.util.StringUtils;
  * @since 2.0.0
  */
 public class UndertowWebServer implements WebServer {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(UndertowWebServer.class);
 
 	private static final Log logger = LogFactory.getLog(UndertowWebServer.class);
 
@@ -86,7 +90,7 @@ public class UndertowWebServer implements WebServer {
 	}
 
 	@Override
-	public void start() throws WebServerException {
+	public void start() {
 		synchronized (this.monitor) {
 			if (this.started) {
 				return;
@@ -129,6 +133,7 @@ public class UndertowWebServer implements WebServer {
 			}
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}
@@ -159,12 +164,11 @@ public class UndertowWebServer implements WebServer {
 				ports.add(new UndertowWebServer.Port(-1, "unknown"));
 			}
 			else {
-				for (BoundChannel channel : extractChannels()) {
-					ports.add(getPortFromChannel(channel));
-				}
+				extractChannels().forEach(channel -> ports.add(getPortFromChannel(channel)));
 			}
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Continue
 		}
 		return ports;
@@ -179,24 +183,25 @@ public class UndertowWebServer implements WebServer {
 
 	private UndertowWebServer.Port getPortFromChannel(BoundChannel channel) {
 		SocketAddress socketAddress = channel.getLocalAddress();
-		if (socketAddress instanceof InetSocketAddress) {
-			Field sslField = ReflectionUtils.findField(channel.getClass(), "ssl");
-			String protocol = (sslField != null) ? "https" : "http";
-			return new UndertowWebServer.Port(((InetSocketAddress) socketAddress).getPort(), protocol);
+		if (!(socketAddress instanceof InetSocketAddress)) {
+			return null;
 		}
-		return null;
+		Field sslField = ReflectionUtils.findField(channel.getClass(), "ssl");
+		String protocol = (sslField != null) ? "https" : "http";
+		return new UndertowWebServer.Port(((InetSocketAddress) socketAddress).getPort(), protocol);
 	}
 
 	private List<UndertowWebServer.Port> getConfiguredPorts() {
 		List<UndertowWebServer.Port> ports = new ArrayList<>();
-		for (Object listener : extractListeners()) {
+		extractListeners().forEach(listener -> {
 			try {
 				ports.add(getPortFromListener(listener));
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				// Continue
 			}
-		}
+		});
 		return ports;
 	}
 
@@ -218,7 +223,7 @@ public class UndertowWebServer implements WebServer {
 	}
 
 	@Override
-	public void stop() throws WebServerException {
+	public void stop() {
 		synchronized (this.monitor) {
 			if (!this.started) {
 				return;
@@ -285,7 +290,7 @@ public class UndertowWebServer implements WebServer {
 
 		@Override
 		public String toString() {
-			return this.number + " (" + this.protocol + ")";
+			return new StringBuilder().append(this.number).append(" (").append(this.protocol).append(")").toString();
 		}
 
 	}

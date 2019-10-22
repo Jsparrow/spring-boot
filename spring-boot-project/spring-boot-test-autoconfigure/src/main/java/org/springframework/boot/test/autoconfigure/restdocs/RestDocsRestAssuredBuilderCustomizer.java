@@ -44,7 +44,7 @@ class RestDocsRestAssuredBuilderCustomizer implements InitializingBean {
 		String host = this.properties.getUriHost();
 		map.from(this.properties::getUriScheme)
 				.when((scheme) -> StringUtils.hasText(scheme) && StringUtils.hasText(host))
-				.to((scheme) -> this.delegate.baseUri(scheme + "://" + host));
+				.to((scheme) -> this.delegate.baseUri(new StringBuilder().append(scheme).append("://").append(host).toString()));
 		map.from(this.properties::getUriPort).whenNonNull().to(this.delegate::port);
 	}
 

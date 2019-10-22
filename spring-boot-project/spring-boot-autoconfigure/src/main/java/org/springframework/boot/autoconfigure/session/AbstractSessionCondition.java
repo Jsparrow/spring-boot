@@ -26,6 +26,8 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.AnnotationMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for Servlet and reactive session conditions.
@@ -37,6 +39,7 @@ import org.springframework.core.type.AnnotationMetadata;
  */
 abstract class AbstractSessionCondition extends SpringBootCondition {
 
+	private static final Logger logger = LoggerFactory.getLogger(AbstractSessionCondition.class);
 	private final WebApplicationType webApplicationType;
 
 	protected AbstractSessionCondition(WebApplicationType webApplicationType) {
@@ -61,6 +64,7 @@ abstract class AbstractSessionCondition extends SpringBootCondition {
 					.orElse(ConditionOutcome.noMatch(message.didNotFind("spring.session.store-type property").atAll()));
 		}
 		catch (BindException ex) {
+			logger.error(ex.getMessage(), ex);
 			return ConditionOutcome.noMatch(message.found("invalid spring.session.store-type property").atAll());
 		}
 	}

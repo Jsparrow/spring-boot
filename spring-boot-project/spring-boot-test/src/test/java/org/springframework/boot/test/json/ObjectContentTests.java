@@ -61,7 +61,7 @@ class ObjectContentTests {
 	@Test
 	void toStringWhenHasTypeShouldReturnString() {
 		ObjectContent<ExampleObject> content = new ObjectContent<>(TYPE, OBJECT);
-		assertThat(content.toString()).isEqualTo("ObjectContent " + OBJECT + " created from " + TYPE);
+		assertThat(content.toString()).isEqualTo(new StringBuilder().append("ObjectContent ").append(OBJECT).append(" created from ").append(TYPE).toString());
 	}
 
 	@Test

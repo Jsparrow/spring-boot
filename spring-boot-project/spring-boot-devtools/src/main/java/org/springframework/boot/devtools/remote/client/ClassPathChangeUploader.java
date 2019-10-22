@@ -47,6 +47,8 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Listens and pushes any classpath updates to a remote endpoint.
@@ -56,6 +58,8 @@ import org.springframework.util.FileCopyUtils;
  * @since 1.3.0
  */
 public class ClassPathChangeUploader implements ApplicationListener<ClassPathChangedEvent> {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(ClassPathChangeUploader.class);
 
 	private static final Map<ChangedFile.Type, ClassLoaderFile.Kind> TYPE_MAPPINGS;
 
@@ -80,7 +84,8 @@ public class ClassPathChangeUploader implements ApplicationListener<ClassPathCha
 			this.uri = new URL(url).toURI();
 		}
 		catch (URISyntaxException | MalformedURLException ex) {
-			throw new IllegalArgumentException("Malformed URL '" + url + "'");
+			logger1.error(ex.getMessage(), ex);
+			throw new IllegalArgumentException(new StringBuilder().append("Malformed URL '").append(url).append("'").toString());
 		}
 		this.requestFactory = requestFactory;
 	}
@@ -109,13 +114,12 @@ public class ClassPathChangeUploader implements ApplicationListener<ClassPathCha
 					ClientHttpResponse response = request.execute();
 					HttpStatus statusCode = response.getStatusCode();
 					Assert.state(statusCode == HttpStatus.OK,
-							() -> "Unexpected " + statusCode + " response uploading class files");
+							() -> new StringBuilder().append("Unexpected ").append(statusCode).append(" response uploading class files").toString());
 					logUpload(classLoaderFiles);
 					return;
 				}
 				catch (SocketException ex) {
-					logger.warn("A failure occurred when uploading to " + this.uri
-							+ ". Upload will be retried in 2 seconds");
+					logger.warn(new StringBuilder().append("A failure occurred when uploading to ").append(this.uri).append(". Upload will be retried in 2 seconds").toString());
 					logger.debug("Upload failure", ex);
 					Thread.sleep(2000);
 				}
@@ -129,7 +133,7 @@ public class ClassPathChangeUploader implements ApplicationListener<ClassPathCha
 
 	private void logUpload(ClassLoaderFiles classLoaderFiles) {
 		int size = classLoaderFiles.size();
-		logger.info("Uploaded " + size + " class " + ((size != 1) ? "resources" : "resource"));
+		logger.info(new StringBuilder().append("Uploaded ").append(size).append(" class ").append((size != 1) ? "resources" : "resource").toString());
 	}
 
 	private byte[] serialize(ClassLoaderFiles classLoaderFiles) throws IOException {

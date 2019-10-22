@@ -59,7 +59,7 @@ public class SystemEnvironmentOrigin implements Origin {
 
 	@Override
 	public String toString() {
-		return "System Environment Property \"" + this.property + "\"";
+		return new StringBuilder().append("System Environment Property \"").append(this.property).append("\"").toString();
 	}
 
 }

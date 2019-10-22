@@ -53,6 +53,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link LoggingSystem} for <a href="https://logback.qos.ch">logback</a>.
@@ -64,6 +65,8 @@ import org.springframework.util.StringUtils;
  * @since 1.0.0
  */
 public class LogbackLoggingSystem extends Slf4JLoggingSystem {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(LogbackLoggingSystem.class);
 
 	private static final String CONFIGURATION_FILE_PROPERTY = "logback.configurationFile";
 
@@ -119,8 +122,7 @@ public class LogbackLoggingSystem extends Slf4JLoggingSystem {
 		loggerContext.getTurboFilterList().remove(FILTER);
 		markAsInitialized(loggerContext);
 		if (StringUtils.hasText(System.getProperty(CONFIGURATION_FILE_PROPERTY))) {
-			getLogger(LogbackLoggingSystem.class.getName()).warn("Ignoring '" + CONFIGURATION_FILE_PROPERTY
-					+ "' system property. Please use 'logging.config' instead.");
+			getLogger(LogbackLoggingSystem.class.getName()).warn(new StringBuilder().append("Ignoring '").append(CONFIGURATION_FILE_PROPERTY).append("' system property. Please use 'logging.config' instead.").toString());
 		}
 	}
 
@@ -159,12 +161,10 @@ public class LogbackLoggingSystem extends Slf4JLoggingSystem {
 		}
 		List<Status> statuses = loggerContext.getStatusManager().getCopyOfStatusList();
 		StringBuilder errors = new StringBuilder();
-		for (Status status : statuses) {
-			if (status.getLevel() == Status.ERROR) {
-				errors.append((errors.length() > 0) ? String.format("%n") : "");
-				errors.append(status.toString());
-			}
-		}
+		statuses.stream().filter(status -> status.getLevel() == Status.ERROR).forEach(status -> {
+			errors.append((errors.length() > 0) ? String.format("%n") : "");
+			errors.append(status.toString());
+		});
 		if (errors.length() > 0) {
 			throw new IllegalStateException(String.format("Logback configuration error detected: %n%s", errors));
 		}
@@ -225,9 +225,7 @@ public class LogbackLoggingSystem extends Slf4JLoggingSystem {
 	@Override
 	public List<LoggerConfiguration> getLoggerConfigurations() {
 		List<LoggerConfiguration> result = new ArrayList<>();
-		for (ch.qos.logback.classic.Logger logger : getLoggerContext().getLoggerList()) {
-			result.add(getLoggerConfiguration(logger));
-		}
+		getLoggerContext().getLoggerList().forEach(logger -> result.add(getLoggerConfiguration(logger)));
 		result.sort(CONFIGURATION_COMPARATOR);
 		return result;
 	}
@@ -280,11 +278,7 @@ public class LogbackLoggingSystem extends Slf4JLoggingSystem {
 		ILoggerFactory factory = StaticLoggerBinder.getSingleton().getLoggerFactory();
 		Assert.isInstanceOf(LoggerContext.class, factory,
 				String.format(
-						"LoggerFactory is not a Logback LoggerContext but Logback is on "
-								+ "the classpath. Either remove Logback or the competing "
-								+ "implementation (%s loaded from %s). If you are using "
-								+ "WebLogic you will need to add 'org.slf4j' to "
-								+ "prefer-application-packages in WEB-INF/weblogic.xml",
+						new StringBuilder().append("LoggerFactory is not a Logback LoggerContext but Logback is on ").append("the classpath. Either remove Logback or the competing ").append("implementation (%s loaded from %s). If you are using ").append("WebLogic you will need to add 'org.slf4j' to ").append("prefer-application-packages in WEB-INF/weblogic.xml").toString(),
 						factory.getClass(), getLocation(factory)));
 		return (LoggerContext) factory;
 	}
@@ -298,6 +292,7 @@ public class LogbackLoggingSystem extends Slf4JLoggingSystem {
 			}
 		}
 		catch (SecurityException ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Unable to determine location
 		}
 		return "unknown location";

@@ -57,7 +57,7 @@ class DatabaseDriverClassNameTests {
 
 	private List<String> getInterfaceNames(String className) throws IOException {
 		// Use ASM to avoid unwanted side-effects of loading JDBC drivers
-		ClassReader classReader = new ClassReader(getClass().getResourceAsStream("/" + className + ".class"));
+		ClassReader classReader = new ClassReader(getClass().getResourceAsStream(new StringBuilder().append("/").append(className).append(".class").toString()));
 		List<String> interfaceNames = new ArrayList<>();
 		for (String name : classReader.getInterfaces()) {
 			interfaceNames.add(name);

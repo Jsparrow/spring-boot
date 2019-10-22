@@ -54,7 +54,7 @@ class SampleAtmosphereApplicationTests {
 	void chatEndpoint() {
 		ConfigurableApplicationContext context = new SpringApplicationBuilder(ClientConfiguration.class,
 				PropertyPlaceholderAutoConfiguration.class)
-						.properties("websocket.uri:ws://localhost:" + this.port + "/chat/websocket")
+						.properties(new StringBuilder().append("websocket.uri:ws://localhost:").append(this.port).append("/chat/websocket").toString())
 						.run("--spring.main.web-application-type=none");
 		long count = context.getBean(ClientConfiguration.class).latch.getCount();
 		AtomicReference<String> messagePayloadReference = context.getBean(ClientConfiguration.class).messagePayload;
@@ -107,7 +107,7 @@ class SampleAtmosphereApplicationTests {
 
 				@Override
 				protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-					logger.info("Received: " + message + " (" + ClientConfiguration.this.latch.getCount() + ")");
+					logger.info(new StringBuilder().append("Received: ").append(message).append(" (").append(ClientConfiguration.this.latch.getCount()).append(")").toString());
 					session.close();
 					ClientConfiguration.this.messagePayload.set(message.getPayload());
 					ClientConfiguration.this.latch.countDown();

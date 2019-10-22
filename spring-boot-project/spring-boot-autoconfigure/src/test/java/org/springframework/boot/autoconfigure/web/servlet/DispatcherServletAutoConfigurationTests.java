@@ -274,7 +274,7 @@ class DispatcherServletAutoConfigurationTests {
 		}
 
 		@Override
-		public MultipartHttpServletRequest resolveMultipart(HttpServletRequest request) throws MultipartException {
+		public MultipartHttpServletRequest resolveMultipart(HttpServletRequest request) {
 			return null;
 		}
 

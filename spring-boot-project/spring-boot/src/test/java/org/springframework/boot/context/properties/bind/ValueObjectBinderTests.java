@@ -220,6 +220,14 @@ class ValueObjectBinderTests {
 		assertThat(bean.getDate().toString()).isEqualTo("2019-05-10");
 	}
 
+	public enum ExampleEnum {
+
+		FOO_BAR,
+
+		BAR_BAZ
+
+	}
+
 	static class ExampleValueBean {
 
 		private final int intValue;
@@ -260,14 +268,6 @@ class ValueObjectBinderTests {
 		ExampleEnum getEnumValue() {
 			return this.enumValue;
 		}
-
-	}
-
-	public enum ExampleEnum {
-
-		FOO_BAR,
-
-		BAR_BAZ
 
 	}
 

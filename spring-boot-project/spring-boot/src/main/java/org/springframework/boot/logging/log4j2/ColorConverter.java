@@ -106,29 +106,24 @@ public final class ColorConverter extends LogEventPatternConverter {
 
 	@Override
 	public boolean handlesThrowable() {
-		for (PatternFormatter formatter : this.formatters) {
-			if (formatter.handlesThrowable()) {
-				return true;
-			}
-		}
-		return super.handlesThrowable();
+		return this.formatters.stream().filter(PatternFormatter::handlesThrowable).findFirst().map(formatter -> true)
+				.orElse(super.handlesThrowable());
 	}
 
 	@Override
 	public void format(LogEvent event, StringBuilder toAppendTo) {
 		StringBuilder buf = new StringBuilder();
-		for (PatternFormatter formatter : this.formatters) {
-			formatter.format(event, buf);
+		this.formatters.forEach(formatter -> formatter.format(event, buf));
+		if (buf.length() <= 0) {
+			return;
 		}
-		if (buf.length() > 0) {
-			AnsiElement element = this.styling;
-			if (element == null) {
-				// Assume highlighting
-				element = LEVELS.get(event.getLevel().intLevel());
-				element = (element != null) ? element : AnsiColor.GREEN;
-			}
-			appendAnsiString(toAppendTo, buf.toString(), element);
+		AnsiElement element = this.styling;
+		if (element == null) {
+			// Assume highlighting
+			element = LEVELS.get(event.getLevel().intLevel());
+			element = (element != null) ? element : AnsiColor.GREEN;
 		}
+		appendAnsiString(toAppendTo, buf.toString(), element);
 	}
 
 	protected void appendAnsiString(StringBuilder toAppendTo, String in, AnsiElement element) {

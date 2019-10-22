@@ -98,7 +98,7 @@ class Saml2RelyingPartyRegistrationConfiguration {
 
 	private RSAPrivateKey readPrivateKey(Resource location) {
 		Assert.state(location != null, "No private key location specified");
-		Assert.state(location.exists(), "Private key location '" + location + "' does not exist");
+		Assert.state(location.exists(), new StringBuilder().append("Private key location '").append(location).append("' does not exist").toString());
 		try (InputStream inputStream = location.getInputStream()) {
 			return RsaKeyConverters.pkcs8().convert(inputStream);
 		}
@@ -109,7 +109,7 @@ class Saml2RelyingPartyRegistrationConfiguration {
 
 	private X509Certificate readCertificate(Resource location) {
 		Assert.state(location != null, "No certificate location specified");
-		Assert.state(location.exists(), "Certificate  location '" + location + "' does not exist");
+		Assert.state(location.exists(), new StringBuilder().append("Certificate  location '").append(location).append("' does not exist").toString());
 		try (InputStream inputStream = location.getInputStream()) {
 			return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(inputStream);
 		}

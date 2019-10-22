@@ -19,7 +19,6 @@ package org.springframework.boot.devtools.remote.client;
 import java.net.InetSocketAddress;
 import java.net.Proxy.Type;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,6 +58,7 @@ import org.springframework.http.client.InterceptingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import java.util.Collections;
 
 /**
  * Configuration used to connect to remote Spring Boot applications.
@@ -89,7 +89,7 @@ public class RemoteClientConfiguration implements InitializingBean {
 
 	@Bean
 	public ClientHttpRequestFactory clientHttpRequestFactory() {
-		List<ClientHttpRequestInterceptor> interceptors = Arrays.asList(getSecurityInterceptor());
+		List<ClientHttpRequestInterceptor> interceptors = Collections.singletonList(getSecurityInterceptor());
 		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 		Proxy proxy = this.properties.getRemote().getProxy();
 		if (proxy.getHost() != null && proxy.getPort() != null) {
@@ -119,8 +119,7 @@ public class RemoteClientConfiguration implements InitializingBean {
 			logger.warn("Remote restart is disabled.");
 		}
 		if (!this.remoteUrl.startsWith("https://")) {
-			logger.warn("The connection to " + this.remoteUrl
-					+ " is insecure. You should use a URL starting with 'https://'.");
+			logger.warn(new StringBuilder().append("The connection to ").append(this.remoteUrl).append(" is insecure. You should use a URL starting with 'https://'.").toString());
 		}
 	}
 
@@ -223,7 +222,7 @@ public class RemoteClientConfiguration implements InitializingBean {
 		@Bean
 		ClassPathChangeUploader classPathChangeUploader(ClientHttpRequestFactory requestFactory,
 				@Value("${remoteUrl}") String remoteUrl) {
-			String url = remoteUrl + this.properties.getRemote().getContextPath() + "/restart";
+			String url = new StringBuilder().append(remoteUrl).append(this.properties.getRemote().getContextPath()).append("/restart").toString();
 			return new ClassPathChangeUploader(url, requestFactory);
 		}
 

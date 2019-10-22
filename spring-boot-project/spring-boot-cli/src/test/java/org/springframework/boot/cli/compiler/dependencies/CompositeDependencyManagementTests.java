@@ -16,8 +16,6 @@
 
 package org.springframework.boot.cli.compiler.dependencies;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -25,6 +23,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import java.util.Collections;
 
 /**
  * Tests for {@link CompositeDependencyManagement}
@@ -79,9 +78,9 @@ class CompositeDependencyManagementTests {
 	@Test
 	void getDependencies() {
 		given(this.dependencyManagement1.getDependencies())
-				.willReturn(Arrays.asList(new Dependency("test", "artifact", "1.2.3")));
+				.willReturn(Collections.singletonList(new Dependency("test", "artifact", "1.2.3")));
 		given(this.dependencyManagement2.getDependencies())
-				.willReturn(Arrays.asList(new Dependency("test", "artifact", "1.2.4")));
+				.willReturn(Collections.singletonList(new Dependency("test", "artifact", "1.2.4")));
 		assertThat(new CompositeDependencyManagement(this.dependencyManagement1, this.dependencyManagement2)
 				.getDependencies()).containsOnly(new Dependency("test", "artifact", "1.2.3"),
 						new Dependency("test", "artifact", "1.2.4"));

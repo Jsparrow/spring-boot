@@ -124,16 +124,17 @@ public class SpringApplicationRunner {
 	private Class<?>[] compile() throws IOException {
 		Class<?>[] compiledSources = this.compiler.compile(this.sources);
 		if (compiledSources.length == 0) {
-			throw new RuntimeException("No classes found in '" + Arrays.toString(this.sources) + "'");
+			throw new RuntimeException(new StringBuilder().append("No classes found in '").append(Arrays.toString(this.sources)).append("'").toString());
 		}
 		return compiledSources;
 	}
 
 	private void monitorForChanges() {
-		if (this.fileWatchThread == null && this.configuration.isWatchForFileChanges()) {
-			this.fileWatchThread = new FileWatchThread();
-			this.fileWatchThread.start();
+		if (!(this.fileWatchThread == null && this.configuration.isWatchForFileChanges())) {
+			return;
 		}
+		this.fileWatchThread = new FileWatchThread();
+		this.fileWatchThread.start();
 	}
 
 	/**
@@ -211,14 +212,11 @@ public class SpringApplicationRunner {
 			super("filewatcher-" + (watcherCounter++));
 			this.previous = 0;
 			this.sources = getSourceFiles();
-			for (File file : this.sources) {
-				if (file.exists()) {
-					long current = file.lastModified();
-					if (current > this.previous) {
-						this.previous = current;
-					}
+			this.sources.stream().filter(File::exists).mapToLong(File::lastModified).forEach(current -> {
+				if (current > this.previous) {
+					this.previous = current;
 				}
-			}
+			});
 			setDaemon(false);
 		}
 
@@ -226,7 +224,7 @@ public class SpringApplicationRunner {
 			List<File> sources = new ArrayList<>();
 			for (String source : SpringApplicationRunner.this.sources) {
 				List<String> paths = ResourceUtils.getUrls(source, SpringApplicationRunner.this.compiler.getLoader());
-				for (String path : paths) {
+				paths.forEach(path -> {
 					try {
 						URL url = new URL(path);
 						if ("file".equals(url.getProtocol())) {
@@ -236,7 +234,7 @@ public class SpringApplicationRunner {
 					catch (MalformedURLException ex) {
 						// Ignore
 					}
-				}
+				});
 			}
 			return sources;
 		}

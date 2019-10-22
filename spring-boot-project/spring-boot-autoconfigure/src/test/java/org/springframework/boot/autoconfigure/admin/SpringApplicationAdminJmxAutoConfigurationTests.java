@@ -44,6 +44,8 @@ import org.springframework.jmx.export.MBeanExporter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.fail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link SpringApplicationAdminJmxAutoConfiguration}.
@@ -52,6 +54,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Andy Wilkinson
  */
 class SpringApplicationAdminJmxAutoConfigurationTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(SpringApplicationAdminJmxAutoConfigurationTests.class);
 
 	private static final String ENABLE_ADMIN_PROP = "spring.application.admin.enabled=true";
 
@@ -87,6 +91,7 @@ class SpringApplicationAdminJmxAutoConfigurationTests {
 						this.server.getObjectInstance(createObjectName(customJmxName));
 					}
 					catch (InstanceNotFoundException ex) {
+						logger.error(ex.getMessage(), ex);
 						fail("Admin MBean should have been exposed with custom name");
 					}
 					assertThatExceptionOfType(InstanceNotFoundException.class)

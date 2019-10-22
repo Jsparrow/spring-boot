@@ -33,6 +33,8 @@ import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configure the HTTP compression on a Reactor Netty request/response handler.
@@ -42,6 +44,8 @@ import org.springframework.util.StringUtils;
  * @author Brian Clozel
  */
 final class CompressionCustomizer implements NettyServerCustomizer {
+
+	private static final Logger logger = LoggerFactory.getLogger(CompressionCustomizer.class);
 
 	private static final CompressionPredicate ALWAYS_COMPRESS = (request, response) -> true;
 
@@ -79,6 +83,7 @@ final class CompressionCustomizer implements NettyServerCustomizer {
 				return mimeTypes.stream().anyMatch((candidate) -> candidate.isCompatibleWith(contentMimeType));
 			}
 			catch (InvalidMimeTypeException ex) {
+				logger.error(ex.getMessage(), ex);
 				return false;
 			}
 		};

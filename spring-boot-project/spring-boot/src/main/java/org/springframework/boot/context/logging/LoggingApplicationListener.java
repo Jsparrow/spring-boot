@@ -54,6 +54,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link ApplicationListener} that configures the {@link LoggingSystem}. If the
@@ -89,6 +91,8 @@ import org.springframework.util.StringUtils;
  * @see LoggingSystem#get(ClassLoader)
  */
 public class LoggingApplicationListener implements GenericApplicationListener {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(LoggingApplicationListener.class);
 
 	private static final ConfigurationPropertyName LOGGING_LEVEL = ConfigurationPropertyName.of("logging.level");
 
@@ -290,19 +294,20 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 	}
 
 	private void initializeEarlyLoggingLevel(ConfigurableEnvironment environment) {
-		if (this.parseArgs && this.springBootLogging == null) {
-			if (isSet(environment, "debug")) {
-				this.springBootLogging = LogLevel.DEBUG;
-			}
-			if (isSet(environment, "trace")) {
-				this.springBootLogging = LogLevel.TRACE;
-			}
+		if (!(this.parseArgs && this.springBootLogging == null)) {
+			return;
+		}
+		if (isSet(environment, "debug")) {
+			this.springBootLogging = LogLevel.DEBUG;
+		}
+		if (isSet(environment, "trace")) {
+			this.springBootLogging = LogLevel.TRACE;
 		}
 	}
 
 	private boolean isSet(ConfigurableEnvironment environment, String property) {
 		String value = environment.getProperty(property);
-		return (value != null && !value.equals("false"));
+		return (value != null && !"false".equals(value));
 	}
 
 	private void initializeSystem(ConfigurableEnvironment environment, LoggingSystem system, LogFile logFile) {
@@ -318,8 +323,8 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 			}
 			catch (Exception ex) {
 				// NOTE: We can't use the logger here to report the problem
-				System.err.println("Logging system failed to initialize using configuration from '" + logConfig + "'");
-				ex.printStackTrace(System.err);
+				logger1.error(new StringBuilder().append("Logging system failed to initialize using configuration from '").append(logConfig).append("'").toString());
+				logger1.error(ex.getMessage(), ex);
 				throw new IllegalStateException(ex);
 			}
 		}
@@ -338,10 +343,11 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 	}
 
 	private void bindLoggerGroups(ConfigurableEnvironment environment) {
-		if (this.loggerGroups != null) {
-			Binder binder = Binder.get(environment);
-			binder.bind(LOGGING_GROUP, STRING_STRINGS_MAP).ifBound(this.loggerGroups::putAll);
+		if (this.loggerGroups == null) {
+			return;
 		}
+		Binder binder = Binder.get(environment);
+		binder.bind(LOGGING_GROUP, STRING_STRINGS_MAP).ifBound(this.loggerGroups::putAll);
 	}
 
 	/**
@@ -416,18 +422,20 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 				system.setLogLevel(name, level);
 			}
 			catch (RuntimeException ex) {
-				this.logger.error("Cannot set level '" + level + "' for '" + name + "'");
+				logger1.error(ex.getMessage(), ex);
+				this.logger.error(new StringBuilder().append("Cannot set level '").append(level).append("' for '").append(name).append("'").toString());
 			}
 		};
 	}
 
 	private void registerShutdownHookIfNecessary(Environment environment, LoggingSystem loggingSystem) {
 		boolean registerShutdownHook = environment.getProperty(REGISTER_SHUTDOWN_HOOK_PROPERTY, Boolean.class, false);
-		if (registerShutdownHook) {
-			Runnable shutdownHandler = loggingSystem.getShutdownHandler();
-			if (shutdownHandler != null && shutdownHookRegistered.compareAndSet(false, true)) {
-				registerShutdownHook(new Thread(shutdownHandler));
-			}
+		if (!registerShutdownHook) {
+			return;
+		}
+		Runnable shutdownHandler = loggingSystem.getShutdownHandler();
+		if (shutdownHandler != null && shutdownHookRegistered.compareAndSet(false, true)) {
+			registerShutdownHook(new Thread(shutdownHandler));
 		}
 	}
 

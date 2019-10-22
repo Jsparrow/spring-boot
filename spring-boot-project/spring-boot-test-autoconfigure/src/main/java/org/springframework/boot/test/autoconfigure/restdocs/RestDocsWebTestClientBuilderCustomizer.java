@@ -48,8 +48,8 @@ class RestDocsWebTestClientBuilderCustomizer implements WebTestClientBuilderCust
 	private void customizeBaseUrl(WebTestClient.Builder builder) {
 		String scheme = this.properties.getUriScheme();
 		String host = this.properties.getUriHost();
-		String baseUrl = (StringUtils.hasText(scheme) ? scheme : "http") + "://"
-				+ (StringUtils.hasText(host) ? host : "localhost");
+		String baseUrl = new StringBuilder().append(StringUtils.hasText(scheme) ? scheme : "http").append("://").append(StringUtils.hasText(host) ? host : "localhost")
+				.toString();
 		Integer port = this.properties.getUriPort();
 		if (!isStandardPort(scheme, port)) {
 			baseUrl += ":" + port;
@@ -61,7 +61,7 @@ class RestDocsWebTestClientBuilderCustomizer implements WebTestClientBuilderCust
 		if (port == null) {
 			return true;
 		}
-		return (scheme.equals("http") && port == 80) || (scheme.equals("https") && port == 443);
+		return ("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443);
 	}
 
 }

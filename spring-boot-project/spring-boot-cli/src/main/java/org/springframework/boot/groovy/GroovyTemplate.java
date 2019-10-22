@@ -37,17 +37,17 @@ import org.codehaus.groovy.control.CompilationFailedException;
  */
 public abstract class GroovyTemplate {
 
-	public static String template(String name) throws IOException, CompilationFailedException, ClassNotFoundException {
+	public static String template(String name) throws IOException, ClassNotFoundException {
 		return template(name, Collections.emptyMap());
 	}
 
 	public static String template(String name, Map<String, ?> model)
-			throws IOException, CompilationFailedException, ClassNotFoundException {
+			throws IOException, ClassNotFoundException {
 		return template(new GStringTemplateEngine(), name, model);
 	}
 
 	public static String template(TemplateEngine engine, String name, Map<String, ?> model)
-			throws IOException, CompilationFailedException, ClassNotFoundException {
+			throws IOException, ClassNotFoundException {
 		Writable writable = getTemplate(engine, name).make(model);
 		StringWriter result = new StringWriter();
 		writable.writeTo(result);
@@ -55,7 +55,7 @@ public abstract class GroovyTemplate {
 	}
 
 	private static Template getTemplate(TemplateEngine engine, String name)
-			throws CompilationFailedException, ClassNotFoundException, IOException {
+			throws ClassNotFoundException, IOException {
 
 		File file = new File("templates", name);
 		if (file.exists()) {

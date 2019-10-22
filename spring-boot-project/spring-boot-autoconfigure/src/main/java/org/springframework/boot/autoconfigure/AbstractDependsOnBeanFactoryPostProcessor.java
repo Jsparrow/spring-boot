@@ -104,14 +104,13 @@ public abstract class AbstractDependsOnBeanFactoryPostProcessor implements BeanF
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-		for (String beanName : getBeanNames(beanFactory)) {
-			BeanDefinition definition = getBeanDefinition(beanName, beanFactory);
+		getBeanNames(beanFactory).stream().map(beanName -> getBeanDefinition(beanName, beanFactory)).forEach(definition -> {
 			String[] dependencies = definition.getDependsOn();
 			for (String dependencyName : this.dependsOn.apply(beanFactory)) {
 				dependencies = StringUtils.addStringToArray(dependencies, dependencyName);
 			}
 			definition.setDependsOn(dependencies);
-		}
+		});
 	}
 
 	private Set<String> getBeanNames(ListableBeanFactory beanFactory) {

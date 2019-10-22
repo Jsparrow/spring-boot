@@ -23,10 +23,14 @@ import java.util.Random;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Profile("app")
 class SampleClient {
+
+	private static final Logger logger = LoggerFactory.getLogger(SampleClient.class);
 
 	private static final List<String> SAMPLE_COUNTRY_CODES = Arrays.asList("AF", "AX", "AL", "DZ", "AS", "AD", "AO",
 			"AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM",
@@ -56,7 +60,7 @@ class SampleClient {
 	@Scheduled(fixedDelay = 500)
 	void retrieveCountry() {
 		String randomCode = SAMPLE_COUNTRY_CODES.get(this.random.nextInt(SAMPLE_COUNTRY_CODES.size()));
-		System.out.println("Looking for country with code '" + randomCode + "'");
+		logger.info(new StringBuilder().append("Looking for country with code '").append(randomCode).append("'").toString());
 		this.countryService.findByCode(randomCode);
 	}
 

@@ -40,11 +40,11 @@ public class TestExecutionSummary extends ReflectiveWrapper {
 
 	public Throwable getFailure() throws Throwable {
 		List<?> failures = (List<?>) this.type.getMethod("getFailures").invoke(this.instance);
-		if (!CollectionUtils.isEmpty(failures)) {
-			Object failure = failures.get(0);
-			return (Throwable) this.failureType.getMethod("getException").invoke(failure);
+		if (CollectionUtils.isEmpty(failures)) {
+			return null;
 		}
-		return null;
+		Object failure = failures.get(0);
+		return (Throwable) this.failureType.getMethod("getException").invoke(failure);
 	}
 
 }

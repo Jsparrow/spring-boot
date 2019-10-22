@@ -37,6 +37,8 @@ import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.unit.DataSize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default logback configuration used by Spring Boot. Uses {@link LogbackConfigurator} to
@@ -50,10 +52,9 @@ import org.springframework.util.unit.DataSize;
  */
 class DefaultLogbackConfiguration {
 
-	private static final String CONSOLE_LOG_PATTERN = "%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} "
-			+ "%clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} "
-			+ "%clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} "
-			+ "%clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}";
+	private static final Logger logger = LoggerFactory.getLogger(DefaultLogbackConfiguration.class);
+
+	private static final String CONSOLE_LOG_PATTERN = new StringBuilder().append("%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} ").append("%clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} ").append("%clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} ").append("%clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}").toString();
 
 	private static final String FILE_LOG_PATTERN = "%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} "
 			+ "${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}";
@@ -75,13 +76,13 @@ class DefaultLogbackConfiguration {
 		if (environment == null) {
 			return new PropertySourcesPropertyResolver(null);
 		}
-		if (environment instanceof ConfigurableEnvironment) {
-			PropertySourcesPropertyResolver resolver = new PropertySourcesPropertyResolver(
-					((ConfigurableEnvironment) environment).getPropertySources());
-			resolver.setIgnoreUnresolvableNestedPlaceholders(true);
-			return resolver;
+		if (!(environment instanceof ConfigurableEnvironment)) {
+			return environment;
 		}
-		return environment;
+		PropertySourcesPropertyResolver resolver = new PropertySourcesPropertyResolver(
+				((ConfigurableEnvironment) environment).getPropertySources());
+		resolver.setIgnoreUnresolvableNestedPlaceholders(true);
+		return resolver;
 	}
 
 	void apply(LogbackConfigurator config) {
@@ -158,6 +159,7 @@ class DefaultLogbackConfiguration {
 			rollingPolicy.setMaxFileSize(new FileSize(maxFileSize.toBytes()));
 		}
 		catch (NoSuchMethodError ex) {
+			logger.error(ex.getMessage(), ex);
 			// Logback < 1.1.8 used String configuration
 			Method method = ReflectionUtils.findMethod(SizeAndTimeBasedRollingPolicy.class, "setMaxFileSize",
 					String.class);
@@ -174,6 +176,7 @@ class DefaultLogbackConfiguration {
 			return DataSize.parse(value);
 		}
 		catch (IllegalArgumentException ex) {
+			logger.error(ex.getMessage(), ex);
 			FileSize fileSize = FileSize.valueOf(value);
 			return DataSize.ofBytes(fileSize.getSize());
 		}

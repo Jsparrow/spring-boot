@@ -49,7 +49,7 @@ class AutoConfiguredReactiveHealthContributorRegistry extends DefaultReactiveHea
 
 	private void assertDoesNotClashWithGroup(String name) {
 		Assert.state(!this.groupNames.contains(name),
-				() -> "ReactiveHealthContributor with name \"" + name + "\" clashes with group");
+				() -> new StringBuilder().append("ReactiveHealthContributor with name \"").append(name).append("\" clashes with group").toString());
 	}
 
 }

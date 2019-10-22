@@ -31,9 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class OAuth2ClientRegistrationRepositoryConfigurationTests {
 
-	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner();
-
 	private static final String REGISTRATION_PREFIX = "spring.security.oauth2.client.registration";
+
+	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner();
 
 	@Test
 	void clientRegistrationRepositoryBeanShouldNotBeCreatedWhenPropertiesAbsent() {

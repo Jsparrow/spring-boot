@@ -66,7 +66,7 @@ class HttpTunnelIntegrationTests {
 		AnnotationConfigServletWebServerApplicationContext context = new AnnotationConfigServletWebServerApplicationContext();
 		context.register(ServerConfiguration.class);
 		context.refresh();
-		String url = "http://localhost:" + context.getWebServer().getPort() + "/hello";
+		String url = new StringBuilder().append("http://localhost:").append(context.getWebServer().getPort()).append("/hello").toString();
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(url, String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).isEqualTo("Hello World");
@@ -82,7 +82,7 @@ class HttpTunnelIntegrationTests {
 		TestPropertyValues.of("server.port:" + serverContext.getWebServer().getPort()).applyTo(tunnelContext);
 		tunnelContext.register(TunnelConfiguration.class);
 		tunnelContext.refresh();
-		String url = "http://localhost:" + tunnelContext.getBean(TestTunnelClient.class).port + "/hello";
+		String url = new StringBuilder().append("http://localhost:").append(tunnelContext.getBean(TestTunnelClient.class).port).append("/hello").toString();
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(url, String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).isEqualTo("Hello World");
@@ -127,7 +127,7 @@ class HttpTunnelIntegrationTests {
 
 		@Bean
 		TunnelClient tunnelClient(@Value("${server.port}") int serverPort) {
-			String url = "http://localhost:" + serverPort + "/httptunnel";
+			String url = new StringBuilder().append("http://localhost:").append(serverPort).append("/httptunnel").toString();
 			TunnelConnection connection = new HttpTunnelConnection(url, new SimpleClientHttpRequestFactory());
 			return new TestTunnelClient(0, connection);
 		}

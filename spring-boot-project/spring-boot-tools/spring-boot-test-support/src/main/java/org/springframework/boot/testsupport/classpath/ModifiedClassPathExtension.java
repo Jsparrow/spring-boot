@@ -32,6 +32,8 @@ import org.springframework.boot.testsupport.junit.platform.LauncherDiscoveryRequ
 import org.springframework.boot.testsupport.junit.platform.LauncherDiscoveryRequestBuilder;
 import org.springframework.boot.testsupport.junit.platform.SummaryGeneratingListener;
 import org.springframework.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A custom {@link Extension} that runs tests using a modified class path. Entries are
@@ -43,6 +45,8 @@ import org.springframework.util.ReflectionUtils;
  * @author Christoph Dreis
  */
 class ModifiedClassPathExtension implements InvocationInterceptor {
+
+	private static final Logger logger = LoggerFactory.getLogger(ModifiedClassPathExtension.class);
 
 	@Override
 	public void interceptBeforeAllMethod(Invocation<Void> invocation,
@@ -80,7 +84,7 @@ class ModifiedClassPathExtension implements InvocationInterceptor {
 	}
 
 	private void runTestWithModifiedClassPath(ReflectiveInvocationContext<Method> invocationContext,
-			ExtensionContext extensionContext) throws ClassNotFoundException, Throwable {
+			ExtensionContext extensionContext) throws Throwable {
 		Class<?> testClass = extensionContext.getRequiredTestClass();
 		Method testMethod = invocationContext.getExecutable();
 		ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
@@ -95,7 +99,7 @@ class ModifiedClassPathExtension implements InvocationInterceptor {
 	}
 
 	private void runTest(ClassLoader classLoader, String testClassName, String testMethodName)
-			throws ClassNotFoundException, Throwable {
+			throws Throwable {
 		Class<?> testClass = classLoader.loadClass(testClassName);
 		Method testMethod = ReflectionUtils.findMethod(testClass, testMethodName);
 		LauncherDiscoveryRequest request = new LauncherDiscoveryRequestBuilder(classLoader)
@@ -125,6 +129,7 @@ class ModifiedClassPathExtension implements InvocationInterceptor {
 			ReflectionUtils.setField(field, invocation, new AtomicBoolean(true));
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 

@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for resolving placeholders in texts. Usually applied to file paths.
@@ -37,6 +39,8 @@ import java.util.Set;
  * @see System#getProperty(String)
  */
 public abstract class SystemPropertyUtils {
+
+	private static final Logger logger = LoggerFactory.getLogger(SystemPropertyUtils.class);
 
 	/**
 	 * Prefix for system property placeholders: "${".
@@ -101,7 +105,7 @@ public abstract class SystemPropertyUtils {
 				String originalPlaceholder = placeholder;
 				if (!visitedPlaceholders.add(originalPlaceholder)) {
 					throw new IllegalArgumentException(
-							"Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
+							new StringBuilder().append("Circular placeholder reference '").append(originalPlaceholder).append("' in property definitions").toString());
 				}
 				// Recursive invocation, parsing placeholders contained in the
 				// placeholder
@@ -189,8 +193,8 @@ public abstract class SystemPropertyUtils {
 			}
 		}
 		catch (Throwable ex) {
-			System.err.println("Could not resolve key '" + key + "' in '" + text
-					+ "' as system property or in environment: " + ex);
+			logger.error(new StringBuilder().append("Could not resolve key '").append(key).append("' in '").append(text).append("' as system property or in environment: ").append(ex)
+					.toString());
 		}
 		return defaultValue;
 	}
@@ -202,7 +206,7 @@ public abstract class SystemPropertyUtils {
 			if (substringMatch(buf, index, PLACEHOLDER_SUFFIX)) {
 				if (withinNestedPlaceholder > 0) {
 					withinNestedPlaceholder--;
-					index = index + PLACEHOLDER_SUFFIX.length();
+					index += PLACEHOLDER_SUFFIX.length();
 				}
 				else {
 					return index;
@@ -210,7 +214,7 @@ public abstract class SystemPropertyUtils {
 			}
 			else if (substringMatch(buf, index, SIMPLE_PREFIX)) {
 				withinNestedPlaceholder++;
-				index = index + SIMPLE_PREFIX.length();
+				index += SIMPLE_PREFIX.length();
 			}
 			else {
 				index++;

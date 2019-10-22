@@ -135,7 +135,7 @@ class FailureAnalyzersTests {
 		}
 
 		@Override
-		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		public void setBeanFactory(BeanFactory beanFactory) {
 			failureAnalyzer.setBeanFactory(beanFactory);
 		}
 

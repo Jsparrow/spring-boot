@@ -68,6 +68,8 @@ import org.springframework.util.Assert;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link QuartzAutoConfiguration}.
@@ -441,6 +443,8 @@ class QuartzAutoConfigurationTests {
 
 	public static class FooJob extends QuartzJobBean {
 
+		private final Logger logger = LoggerFactory.getLogger(FooJob.class);
+
 		@Autowired
 		private Environment env;
 
@@ -448,7 +452,7 @@ class QuartzAutoConfigurationTests {
 
 		@Override
 		protected void executeInternal(JobExecutionContext context) {
-			System.out.println(this.env.getProperty("test-name", "unknown") + " - " + this.jobDataKey);
+			logger.info(new StringBuilder().append(this.env.getProperty("test-name", "unknown")).append(" - ").append(this.jobDataKey).toString());
 		}
 
 		public void setJobDataKey(String jobDataKey) {

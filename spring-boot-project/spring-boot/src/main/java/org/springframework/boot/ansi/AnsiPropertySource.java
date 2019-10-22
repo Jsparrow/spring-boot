@@ -26,6 +26,8 @@ import java.util.function.IntFunction;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link PropertyResolver} for {@link AnsiStyle}, {@link AnsiColor},
@@ -137,6 +139,7 @@ public class AnsiPropertySource extends PropertySource<AnsiElement> {
 	 */
 	private static class Ansi8BitColorMapping extends Mapping {
 
+		private final Logger logger = LoggerFactory.getLogger(Ansi8BitColorMapping.class);
 		private final IntFunction<Ansi8BitColor> factory;
 
 		Ansi8BitColorMapping(String prefix, IntFunction<Ansi8BitColor> factory) {
@@ -151,6 +154,7 @@ public class AnsiPropertySource extends PropertySource<AnsiElement> {
 					return this.factory.apply(Integer.parseInt(postfix));
 				}
 				catch (IllegalArgumentException ex) {
+					logger.error(ex.getMessage(), ex);
 				}
 			}
 			return null;

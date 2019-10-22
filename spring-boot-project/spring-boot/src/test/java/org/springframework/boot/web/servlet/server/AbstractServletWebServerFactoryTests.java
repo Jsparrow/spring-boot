@@ -127,6 +127,8 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base for testing classes that extends {@link AbstractServletWebServerFactory}.
@@ -138,6 +140,8 @@ import static org.mockito.Mockito.verify;
  */
 @ExtendWith(OutputCaptureExtension.class)
 public abstract class AbstractServletWebServerFactoryTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(AbstractServletWebServerFactoryTests.class);
 
 	@TempDir
 	protected File tempDir;
@@ -153,6 +157,7 @@ public abstract class AbstractServletWebServerFactoryTests {
 				this.webServer.stop();
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}
@@ -250,7 +255,7 @@ public abstract class AbstractServletWebServerFactoryTests {
 		factory.setPort(specificPort);
 		this.webServer = factory.getWebServer(exampleServletRegistration());
 		this.webServer.start();
-		assertThat(getResponse("http://localhost:" + specificPort + "/hello")).isEqualTo("Hello World");
+		assertThat(getResponse(new StringBuilder().append("http://localhost:").append(specificPort).append("/hello").toString())).isEqualTo("Hello World");
 		assertThat(this.webServer.getPort()).isEqualTo(specificPort);
 	}
 
@@ -648,7 +653,7 @@ public abstract class AbstractServletWebServerFactoryTests {
 		this.webServer = factory.getWebServer(sessionServletRegistration());
 		this.webServer.start();
 		String s3 = getResponse(getLocalUrl("/session"));
-		String message = "Session error s1=" + s1 + " s2=" + s2 + " s3=" + s3;
+		String message = new StringBuilder().append("Session error s1=").append(s1).append(" s2=").append(s2).append(" s3=").append(s3).toString();
 		assertThat(s2.split(":")[0]).as(message).isEqualTo(s1.split(":")[1]);
 		assertThat(s3.split(":")[0]).as(message).isEqualTo(s2.split(":")[1]);
 	}
@@ -781,9 +786,7 @@ public abstract class AbstractServletWebServerFactoryTests {
 		Collection<MimeMappings.Mapping> expectedMimeMappings = MimeMappings.DEFAULT.getAll();
 		configuredMimeMappings.forEach(
 				(key, value) -> assertThat(expectedMimeMappings).contains(new MimeMappings.Mapping(key, value)));
-		for (MimeMappings.Mapping mapping : expectedMimeMappings) {
-			assertThat(configuredMimeMappings).containsEntry(mapping.getExtension(), mapping.getMimeType());
-		}
+		expectedMimeMappings.forEach(mapping -> assertThat(configuredMimeMappings).containsEntry(mapping.getExtension(), mapping.getMimeType()));
 		assertThat(configuredMimeMappings.size()).isEqualTo(expectedMimeMappings.size());
 	}
 
@@ -824,26 +827,22 @@ public abstract class AbstractServletWebServerFactoryTests {
 
 	@Test
 	protected void portClashOfPrimaryConnectorResultsInPortInUseException() throws IOException {
-		doWithBlockedPort((port) -> {
-			assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
-				AbstractServletWebServerFactory factory = getFactory();
-				factory.setPort(port);
-				AbstractServletWebServerFactoryTests.this.webServer = factory.getWebServer();
-				AbstractServletWebServerFactoryTests.this.webServer.start();
-			}).satisfies((ex) -> handleExceptionCausedByBlockedPortOnPrimaryConnector(ex, port));
-		});
+		doWithBlockedPort((port) -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
+			AbstractServletWebServerFactory factory = getFactory();
+			factory.setPort(port);
+			AbstractServletWebServerFactoryTests.this.webServer = factory.getWebServer();
+			AbstractServletWebServerFactoryTests.this.webServer.start();
+		}).satisfies((ex) -> handleExceptionCausedByBlockedPortOnPrimaryConnector(ex, port)));
 	}
 
 	@Test
 	void portClashOfSecondaryConnectorResultsInPortInUseException() throws IOException {
-		doWithBlockedPort((port) -> {
-			assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
-				AbstractServletWebServerFactory factory = getFactory();
-				addConnector(port, factory);
-				AbstractServletWebServerFactoryTests.this.webServer = factory.getWebServer();
-				AbstractServletWebServerFactoryTests.this.webServer.start();
-			}).satisfies((ex) -> handleExceptionCausedByBlockedPortOnSecondaryConnector(ex, port));
-		});
+		doWithBlockedPort((port) -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
+			AbstractServletWebServerFactory factory = getFactory();
+			addConnector(port, factory);
+			AbstractServletWebServerFactoryTests.this.webServer = factory.getWebServer();
+			AbstractServletWebServerFactoryTests.this.webServer.start();
+		}).satisfies((ex) -> handleExceptionCausedByBlockedPortOnSecondaryConnector(ex, port)));
 	}
 
 	@Test
@@ -1026,11 +1025,11 @@ public abstract class AbstractServletWebServerFactoryTests {
 	}
 
 	protected String getLocalUrl(String scheme, String resourcePath) {
-		return scheme + "://localhost:" + this.webServer.getPort() + resourcePath;
+		return new StringBuilder().append(scheme).append("://localhost:").append(this.webServer.getPort()).append(resourcePath).toString();
 	}
 
 	protected String getLocalUrl(int port, String resourcePath) {
-		return "http://localhost:" + port + resourcePath;
+		return new StringBuilder().append("http://localhost:").append(port).append(resourcePath).toString();
 	}
 
 	protected String getResponse(String url, String... headers) throws IOException, URISyntaxException {
@@ -1141,6 +1140,7 @@ public abstract class AbstractServletWebServerFactoryTests {
 				break;
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 		try {

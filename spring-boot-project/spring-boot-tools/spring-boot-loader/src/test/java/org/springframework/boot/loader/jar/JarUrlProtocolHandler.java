@@ -46,12 +46,13 @@ class JarUrlProtocolHandler implements BeforeEachCallback, AfterEachCallback {
 	public void afterEach(ExtensionContext context) throws Exception {
 		Map<File, JarFile> rootFileCache = ((SoftReference<Map<File, JarFile>>) ReflectionTestUtils
 				.getField(Handler.class, "rootFileCache")).get();
-		if (rootFileCache != null) {
-			for (JarFile rootJarFile : rootFileCache.values()) {
-				rootJarFile.close();
-			}
-			rootFileCache.clear();
+		if (rootFileCache == null) {
+			return;
 		}
+		for (JarFile rootJarFile : rootFileCache.values()) {
+			rootJarFile.close();
+		}
+		rootFileCache.clear();
 	}
 
 }

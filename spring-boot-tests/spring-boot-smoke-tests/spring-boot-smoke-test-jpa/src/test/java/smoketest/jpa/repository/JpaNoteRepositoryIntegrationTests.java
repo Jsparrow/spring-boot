@@ -42,9 +42,7 @@ class JpaNoteRepositoryIntegrationTests {
 	void findsAllNotes() {
 		List<Note> notes = this.repository.findAll();
 		assertThat(notes).hasSize(4);
-		for (Note note : notes) {
-			assertThat(note.getTags().size()).isGreaterThan(0);
-		}
+		notes.forEach(note -> assertThat(note.getTags().size()).isGreaterThan(0));
 	}
 
 }

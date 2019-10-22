@@ -19,6 +19,8 @@ package org.springframework.boot.context.properties.source;
 import java.util.Locale;
 
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName.Form;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link PropertyMapper} for system environment variables. Names are mapped by removing
@@ -34,6 +36,7 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
  */
 final class SystemEnvironmentPropertyMapper implements PropertyMapper {
 
+	private static final Logger logger = LoggerFactory.getLogger(SystemEnvironmentPropertyMapper.class);
 	public static final PropertyMapper INSTANCE = new SystemEnvironmentPropertyMapper();
 
 	@Override
@@ -61,6 +64,7 @@ final class SystemEnvironmentPropertyMapper implements PropertyMapper {
 			return ConfigurationPropertyName.adapt(propertySourceName, '_', this::processElementValue);
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -97,7 +101,7 @@ final class SystemEnvironmentPropertyMapper implements PropertyMapper {
 
 	private CharSequence processElementValue(CharSequence value) {
 		String result = value.toString().toLowerCase(Locale.ENGLISH);
-		return isNumber(result) ? "[" + result + "]" : result;
+		return isNumber(result) ? new StringBuilder().append("[").append(result).append("]").toString() : result;
 	}
 
 	private static boolean isNumber(String string) {

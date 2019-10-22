@@ -82,7 +82,7 @@ public class LocalHostUriTemplateHandler extends RootUriTemplateHandler {
 	public String getRootUri() {
 		String port = this.environment.getProperty("local.server.port", "8080");
 		String contextPath = this.environment.getProperty(PREFIX + "context-path", "");
-		return this.scheme + "://localhost:" + port + contextPath;
+		return new StringBuilder().append(this.scheme).append("://localhost:").append(port).append(contextPath).toString();
 	}
 
 }

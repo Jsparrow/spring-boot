@@ -135,7 +135,7 @@ public class Neo4jProperties implements ApplicationContextAware {
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+	public void setApplicationContext(ApplicationContext ctx) {
 		this.classLoader = ctx.getClassLoader();
 	}
 

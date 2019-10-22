@@ -85,11 +85,11 @@ public class ConfigurationWarningsApplicationContextInitializer
 		}
 
 		@Override
-		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		}
 
 		@Override
-		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 			for (Check check : this.checks) {
 				String message = check.getWarning(registry);
 				if (StringUtils.hasLength(message)) {
@@ -143,8 +143,7 @@ public class ConfigurationWarningsApplicationContextInitializer
 			if (problematicPackages.isEmpty()) {
 				return null;
 			}
-			return "Your ApplicationContext is unlikely to start due to a @ComponentScan of "
-					+ StringUtils.collectionToDelimitedString(problematicPackages, ", ") + ".";
+			return new StringBuilder().append("Your ApplicationContext is unlikely to start due to a @ComponentScan of ").append(StringUtils.collectionToDelimitedString(problematicPackages, ", ")).append(".").toString();
 		}
 
 		protected Set<String> getComponentScanningPackages(BeanDefinitionRegistry registry) {
@@ -163,13 +162,14 @@ public class ConfigurationWarningsApplicationContextInitializer
 		private void addComponentScanningPackages(Set<String> packages, AnnotationMetadata metadata) {
 			AnnotationAttributes attributes = AnnotationAttributes
 					.fromMap(metadata.getAnnotationAttributes(ComponentScan.class.getName(), true));
-			if (attributes != null) {
-				addPackages(packages, attributes.getStringArray("value"));
-				addPackages(packages, attributes.getStringArray("basePackages"));
-				addClasses(packages, attributes.getStringArray("basePackageClasses"));
-				if (packages.isEmpty()) {
-					packages.add(ClassUtils.getPackageName(metadata.getClassName()));
-				}
+			if (attributes == null) {
+				return;
+			}
+			addPackages(packages, attributes.getStringArray("value"));
+			addPackages(packages, attributes.getStringArray("basePackages"));
+			addClasses(packages, attributes.getStringArray("basePackageClasses"));
+			if (packages.isEmpty()) {
+				packages.add(ClassUtils.getPackageName(metadata.getClassName()));
 			}
 		}
 
@@ -189,11 +189,7 @@ public class ConfigurationWarningsApplicationContextInitializer
 
 		private List<String> getProblematicPackages(Set<String> scannedPackages) {
 			List<String> problematicPackages = new ArrayList<>();
-			for (String scannedPackage : scannedPackages) {
-				if (isProblematicPackage(scannedPackage)) {
-					problematicPackages.add(getDisplayName(scannedPackage));
-				}
-			}
+			scannedPackages.stream().filter(this::isProblematicPackage).forEach(scannedPackage -> problematicPackages.add(getDisplayName(scannedPackage)));
 			return problematicPackages;
 		}
 
@@ -208,7 +204,7 @@ public class ConfigurationWarningsApplicationContextInitializer
 			if (scannedPackage == null || scannedPackage.isEmpty()) {
 				return "the default package";
 			}
-			return "'" + scannedPackage + "'";
+			return new StringBuilder().append("'").append(scannedPackage).append("'").toString();
 		}
 
 	}

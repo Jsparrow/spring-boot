@@ -25,6 +25,8 @@ import java.security.CodeSource;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.JarFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that exposes the Spring Boot version. Fetches the
@@ -43,6 +45,8 @@ import java.util.jar.JarFile;
  * @since 1.3.0
  */
 public final class SpringBootVersion {
+
+	private static final Logger logger = LoggerFactory.getLogger(SpringBootVersion.class);
 
 	private SpringBootVersion() {
 	}
@@ -77,6 +81,7 @@ public final class SpringBootVersion {
 			}
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

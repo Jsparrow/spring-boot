@@ -142,7 +142,7 @@ class RemoteDevToolsAutoConfigurationTests {
 		this.context = getContext(
 				() -> loadContext("spring.devtools.remote.secret:supersecret", "server.servlet.context-path:/test"));
 		DispatcherFilter filter = this.context.getBean(DispatcherFilter.class);
-		this.request.setRequestURI("/test" + DEFAULT_CONTEXT_PATH + "/restart");
+		this.request.setRequestURI(new StringBuilder().append("/test").append(DEFAULT_CONTEXT_PATH).append("/restart").toString());
 		this.request.addHeader(DEFAULT_SECRET_HEADER_NAME, "supersecret");
 		filter.doFilter(this.request, this.response, this.chain);
 		assertRestartInvoked(true);

@@ -61,7 +61,7 @@ class FolderSnapshotTests {
 		File file = new File(this.tempDir, "file");
 		file.createNewFile();
 		assertThatIllegalArgumentException().isThrownBy(() -> new FolderSnapshot(file))
-				.withMessageContaining("Folder '" + file + "' must not be a file");
+				.withMessageContaining(new StringBuilder().append("Folder '").append(file).append("' must not be a file").toString());
 	}
 
 	@Test
@@ -110,7 +110,7 @@ class FolderSnapshotTests {
 	void getChangedFilesSnapshotMustBeTheSameSourceFolder() throws Exception {
 		assertThatIllegalArgumentException().isThrownBy(
 				() -> this.initialSnapshot.getChangedFiles(new FolderSnapshot(createTestFolderStructure()), null))
-				.withMessageContaining("Snapshot source folder must be '" + this.folder + "'");
+				.withMessageContaining(new StringBuilder().append("Snapshot source folder must be '").append(this.folder).append("'").toString());
 	}
 
 	@Test

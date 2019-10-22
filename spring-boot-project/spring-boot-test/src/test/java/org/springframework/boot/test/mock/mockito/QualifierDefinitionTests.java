@@ -123,6 +123,12 @@ class QualifierDefinitionTests {
 				.isNotEqualTo(differentDirectQualifier1);
 	}
 
+	@Qualifier
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface CustomQualifier {
+
+	}
+
 	@Configuration(proxyBeanMethods = false)
 	static class ConfigA {
 
@@ -156,12 +162,6 @@ class QualifierDefinitionTests {
 		@MockBean
 		@CustomQualifier
 		private Object customQualifier;
-
-	}
-
-	@Qualifier
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface CustomQualifier {
 
 	}
 

@@ -53,7 +53,7 @@ public class DependencyResolutionContext {
 	}
 
 	private String getIdentifier(String groupId, String artifactId) {
-		return groupId + ":" + artifactId;
+		return new StringBuilder().append(groupId).append(":").append(artifactId).toString();
 	}
 
 	public ArtifactCoordinatesResolver getArtifactCoordinatesResolver() {
@@ -78,25 +78,22 @@ public class DependencyResolutionContext {
 
 	public void addManagedDependencies(List<Dependency> dependencies) {
 		this.managedDependencies.addAll(dependencies);
-		for (Dependency dependency : dependencies) {
-			this.managedDependencyByGroupAndArtifact.put(getIdentifier(dependency), dependency);
-		}
+		dependencies.forEach(dependency -> this.managedDependencyByGroupAndArtifact.put(getIdentifier(dependency), dependency));
 	}
 
 	public void addDependencyManagement(DependencyManagement dependencyManagement) {
-		for (org.springframework.boot.cli.compiler.dependencies.Dependency dependency : dependencyManagement
-				.getDependencies()) {
+		dependencyManagement
+				.getDependencies().stream().map(dependency -> {
 			List<Exclusion> aetherExclusions = new ArrayList<>();
-			for (org.springframework.boot.cli.compiler.dependencies.Dependency.Exclusion exclusion : dependency
-					.getExclusions()) {
-				aetherExclusions.add(new Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*"));
-			}
-			Dependency aetherDependency = new Dependency(new DefaultArtifact(dependency.getGroupId(),
-					dependency.getArtifactId(), "jar", dependency.getVersion()), JavaScopes.COMPILE, false,
-					aetherExclusions);
-			this.managedDependencies.add(0, aetherDependency);
-			this.managedDependencyByGroupAndArtifact.put(getIdentifier(aetherDependency), aetherDependency);
-		}
+			dependency
+						.getExclusions().forEach(exclusion -> aetherExclusions.add(new Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*")));
+			return new Dependency(new DefaultArtifact(dependency.getGroupId(),
+						dependency.getArtifactId(), "jar", dependency.getVersion()), JavaScopes.COMPILE, false,
+						aetherExclusions);
+		}).forEach(aetherDependency -> {
+					this.managedDependencies.add(0, aetherDependency);
+					this.managedDependencyByGroupAndArtifact.put(getIdentifier(aetherDependency), aetherDependency);
+				});
 		this.dependencyManagement = (this.dependencyManagement != null)
 				? new CompositeDependencyManagement(dependencyManagement, this.dependencyManagement)
 				: dependencyManagement;

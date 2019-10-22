@@ -41,7 +41,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @author Brian Clozel
  * @since 2.0.0
  */
-public class WebFluxEndpointHandlerMapping extends AbstractWebFluxEndpointHandlerMapping implements InitializingBean {
+public class WebFluxEndpointHandlerMapping extends AbstractWebFluxEndpointHandlerMapping {
 
 	private final EndpointLinksResolver linksResolver;
 

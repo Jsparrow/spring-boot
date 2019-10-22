@@ -51,7 +51,7 @@ public class ErrorPageRegistrarBeanPostProcessor implements BeanPostProcessor, B
 	}
 
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		if (bean instanceof ErrorPageRegistry) {
 			postProcessBeforeInitialization((ErrorPageRegistry) bean);
 		}
@@ -59,14 +59,12 @@ public class ErrorPageRegistrarBeanPostProcessor implements BeanPostProcessor, B
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		return bean;
 	}
 
 	private void postProcessBeforeInitialization(ErrorPageRegistry registry) {
-		for (ErrorPageRegistrar registrar : getRegistrars()) {
-			registrar.registerErrorPages(registry);
-		}
+		getRegistrars().forEach(registrar -> registrar.registerErrorPages(registry));
 	}
 
 	private Collection<ErrorPageRegistrar> getRegistrars() {

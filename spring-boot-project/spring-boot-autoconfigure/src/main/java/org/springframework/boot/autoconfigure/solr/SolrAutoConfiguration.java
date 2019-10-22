@@ -16,7 +16,6 @@
 
 package org.springframework.boot.autoconfigure.solr;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -30,6 +29,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
+import java.util.Collections;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for Solr.
@@ -46,7 +46,7 @@ public class SolrAutoConfiguration {
 	@ConditionalOnMissingBean
 	public SolrClient solrClient(SolrProperties properties) {
 		if (StringUtils.hasText(properties.getZkHost())) {
-			return new CloudSolrClient.Builder(Arrays.asList(properties.getZkHost()), Optional.empty()).build();
+			return new CloudSolrClient.Builder(Collections.singletonList(properties.getZkHost()), Optional.empty()).build();
 		}
 		return new HttpSolrClient.Builder(properties.getHost()).build();
 	}

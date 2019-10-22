@@ -42,8 +42,7 @@ public class UserVehicleService {
 		this.vehicleDetailsService = vehicleDetailsService;
 	}
 
-	public VehicleDetails getVehicleDetails(String username)
-			throws UserNameNotFoundException, VehicleIdentificationNumberNotFoundException {
+	public VehicleDetails getVehicleDetails(String username) {
 		Assert.notNull(username, "Username must not be null");
 		User user = this.userRepository.findByUsername(username);
 		if (user == null) {

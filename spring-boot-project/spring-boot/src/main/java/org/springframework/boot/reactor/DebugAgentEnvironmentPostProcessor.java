@@ -21,6 +21,8 @@ import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnvironmentPostProcessor} to enable the Reactor Debug Agent if available.
@@ -35,22 +37,26 @@ import org.springframework.util.ClassUtils;
  */
 public class DebugAgentEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
+	private static final Logger logger = LoggerFactory.getLogger(DebugAgentEnvironmentPostProcessor.class);
+
 	private static final String REACTOR_DEBUGAGENT_CLASS = "reactor.tools.agent.ReactorDebugAgent";
 
 	private static final String DEBUGAGENT_ENABLED_CONFIG_KEY = "spring.reactor.debug-agent.enabled";
 
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		if (ClassUtils.isPresent(REACTOR_DEBUGAGENT_CLASS, null)) {
-			Boolean agentEnabled = environment.getProperty(DEBUGAGENT_ENABLED_CONFIG_KEY, Boolean.class);
-			if (agentEnabled != Boolean.FALSE) {
-				try {
-					Class<?> debugAgent = Class.forName(REACTOR_DEBUGAGENT_CLASS);
-					debugAgent.getMethod("init").invoke(null);
-				}
-				catch (Exception ex) {
-					throw new RuntimeException("Failed to init Reactor's debug agent");
-				}
+		if (!ClassUtils.isPresent(REACTOR_DEBUGAGENT_CLASS, null)) {
+			return;
+		}
+		Boolean agentEnabled = environment.getProperty(DEBUGAGENT_ENABLED_CONFIG_KEY, Boolean.class);
+		if (!agentEnabled.equals(Boolean.FALSE)) {
+			try {
+				Class<?> debugAgent = Class.forName(REACTOR_DEBUGAGENT_CLASS);
+				debugAgent.getMethod("init").invoke(null);
+			}
+			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
+				throw new RuntimeException("Failed to init Reactor's debug agent");
 			}
 		}
 	}

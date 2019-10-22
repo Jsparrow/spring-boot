@@ -30,6 +30,8 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ApplicationListener} to extract the remote URL for the
@@ -40,6 +42,7 @@ import org.springframework.util.StringUtils;
  */
 class RemoteUrlPropertyExtractor implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
 
+	private static final Logger logger = LoggerFactory.getLogger(RemoteUrlPropertyExtractor.class);
 	private static final String NON_OPTION_ARGS = CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME;
 
 	@Override
@@ -52,7 +55,8 @@ class RemoteUrlPropertyExtractor implements ApplicationListener<ApplicationEnvir
 			new URI(url);
 		}
 		catch (URISyntaxException ex) {
-			throw new IllegalStateException("Malformed URL '" + url + "'");
+			logger.error(ex.getMessage(), ex);
+			throw new IllegalStateException(new StringBuilder().append("Malformed URL '").append(url).append("'").toString());
 		}
 		Map<String, Object> source = Collections.singletonMap("remoteUrl", (Object) url);
 		PropertySource<?> propertySource = new MapPropertySource("remoteUrl", source);

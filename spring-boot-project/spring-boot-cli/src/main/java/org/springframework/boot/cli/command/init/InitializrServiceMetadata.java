@@ -174,12 +174,13 @@ class InitializrServiceMetadata {
 	}
 
 	private void parseGroup(JSONObject group, Map<String, Dependency> dependencies) throws JSONException {
-		if (group.has(VALUES_EL)) {
-			JSONArray content = group.getJSONArray(VALUES_EL);
-			for (int i = 0; i < content.length(); i++) {
-				Dependency dependency = parseDependency(content.getJSONObject(i));
-				dependencies.put(dependency.getId(), dependency);
-			}
+		if (!group.has(VALUES_EL)) {
+			return;
+		}
+		JSONArray content = group.getJSONArray(VALUES_EL);
+		for (int i = 0; i < content.length(); i++) {
+			Dependency dependency = parseDependency(content.getJSONObject(i));
+			dependencies.put(dependency.getId(), dependency);
 		}
 	}
 

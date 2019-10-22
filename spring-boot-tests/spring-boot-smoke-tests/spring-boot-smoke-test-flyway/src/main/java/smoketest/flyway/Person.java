@@ -51,7 +51,7 @@ public class Person {
 
 	@Override
 	public String toString() {
-		return "Person [firstName=" + this.firstName + ", lastName=" + this.lastName + "]";
+		return new StringBuilder().append("Person [firstName=").append(this.firstName).append(", lastName=").append(this.lastName).append("]").toString();
 	}
 
 }

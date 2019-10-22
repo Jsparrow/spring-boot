@@ -83,9 +83,7 @@ class HotelServiceImpl implements HotelService {
 
 		ReviewsSummaryImpl(List<RatingCount> ratingCounts) {
 			this.ratingCount = new HashMap<>();
-			for (RatingCount ratingCount : ratingCounts) {
-				this.ratingCount.put(ratingCount.getRating(), ratingCount.getCount());
-			}
+			ratingCounts.forEach(ratingCount -> this.ratingCount.put(ratingCount.getRating(), ratingCount.getCount()));
 		}
 
 		@Override

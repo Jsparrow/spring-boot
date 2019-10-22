@@ -22,9 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class Producer implements CommandLineRunner {
+
+	private static final Logger logger = LoggerFactory.getLogger(Producer.class);
 
 	@Autowired
 	private JmsMessagingTemplate jmsMessagingTemplate;
@@ -35,7 +39,7 @@ public class Producer implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		send("Sample message");
-		System.out.println("Message was sent to the Queue");
+		logger.info("Message was sent to the Queue");
 	}
 
 	public void send(String msg) {

@@ -75,7 +75,7 @@ public class BindException extends RuntimeException implements OriginProvider {
 	private static String buildMessage(ConfigurationPropertyName name, Bindable<?> target) {
 		StringBuilder message = new StringBuilder();
 		message.append("Failed to bind properties");
-		message.append((name != null) ? " under '" + name + "'" : "");
+		message.append((name != null) ? new StringBuilder().append(" under '").append(name).append("'").toString() : "");
 		message.append(" to ").append(target.getType());
 		return message.toString();
 	}

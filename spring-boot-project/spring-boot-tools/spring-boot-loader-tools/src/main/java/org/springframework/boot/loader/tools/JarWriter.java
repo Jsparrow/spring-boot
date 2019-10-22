@@ -45,6 +45,8 @@ import java.util.zip.ZipEntry;
 import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
 import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.UnixStat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Writes JAR content, ensuring valid directory entries are always created and duplicate
@@ -55,6 +57,8 @@ import org.apache.commons.compress.archivers.zip.UnixStat;
  * @since 1.0.0
  */
 public class JarWriter implements LoaderClassesWriter, AutoCloseable {
+
+	private static final Logger logger = LoggerFactory.getLogger(JarWriter.class);
 
 	private static final UnpackHandler NEVER_UNPACK = new NeverUnpackHandler();
 
@@ -72,7 +76,7 @@ public class JarWriter implements LoaderClassesWriter, AutoCloseable {
 	 * @throws IOException if the file cannot be opened
 	 * @throws FileNotFoundException if the file cannot be found
 	 */
-	public JarWriter(File file) throws FileNotFoundException, IOException {
+	public JarWriter(File file) throws IOException {
 		this(file, null);
 	}
 
@@ -83,7 +87,7 @@ public class JarWriter implements LoaderClassesWriter, AutoCloseable {
 	 * @throws IOException if the file cannot be opened
 	 * @throws FileNotFoundException if the file cannot be found
 	 */
-	public JarWriter(File file, LaunchScript launchScript) throws FileNotFoundException, IOException {
+	public JarWriter(File file, LaunchScript launchScript) throws IOException {
 		FileOutputStream fileOutputStream = new FileOutputStream(file);
 		if (launchScript != null) {
 			fileOutputStream.write(launchScript.toByteArray());
@@ -101,6 +105,7 @@ public class JarWriter implements LoaderClassesWriter, AutoCloseable {
 			Files.setPosixFilePermissions(path, permissions);
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore and continue creating the jar
 		}
 	}
@@ -201,6 +206,7 @@ public class JarWriter implements LoaderClassesWriter, AutoCloseable {
 			}
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore and just use the source file timestamp
 		}
 		return file.lastModified();
@@ -272,14 +278,15 @@ public class JarWriter implements LoaderClassesWriter, AutoCloseable {
 			}
 		}
 
-		if (this.writtenEntries.add(entry.getName())) {
-			entryWriter = addUnpackCommentIfNecessary(entry, entryWriter, unpackHandler);
-			this.jarOutput.putArchiveEntry(entry);
-			if (entryWriter != null) {
-				entryWriter.write(this.jarOutput);
-			}
-			this.jarOutput.closeArchiveEntry();
+		if (!this.writtenEntries.add(entry.getName())) {
+			return;
 		}
+		entryWriter = addUnpackCommentIfNecessary(entry, entryWriter, unpackHandler);
+		this.jarOutput.putArchiveEntry(entry);
+		if (entryWriter != null) {
+			entryWriter.write(this.jarOutput);
+		}
+		this.jarOutput.closeArchiveEntry();
 	}
 
 	private EntryWriter addUnpackCommentIfNecessary(JarArchiveEntry entry, EntryWriter entryWriter,
@@ -355,14 +362,14 @@ public class JarWriter implements LoaderClassesWriter, AutoCloseable {
 		@Override
 		public int read() throws IOException {
 			int read = (this.headerStream != null) ? this.headerStream.read() : -1;
-			if (read != -1) {
-				this.position++;
-				if (this.position >= this.headerLength) {
-					this.headerStream = null;
-				}
-				return read;
+			if (!(read != -1)) {
+				return super.read();
 			}
-			return super.read();
+			this.position++;
+			if (this.position >= this.headerLength) {
+				this.headerStream = null;
+			}
+			return read;
 		}
 
 		@Override

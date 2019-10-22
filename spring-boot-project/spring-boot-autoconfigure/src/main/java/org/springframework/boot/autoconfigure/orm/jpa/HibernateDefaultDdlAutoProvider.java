@@ -43,7 +43,7 @@ class HibernateDefaultDdlAutoProvider implements SchemaManagementProvider {
 			return "none";
 		}
 		SchemaManagement schemaManagement = getSchemaManagement(dataSource);
-		if (SchemaManagement.MANAGED.equals(schemaManagement)) {
+		if (SchemaManagement.MANAGED == schemaManagement) {
 			return "none";
 		}
 		return "create-drop";

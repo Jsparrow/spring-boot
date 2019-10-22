@@ -57,9 +57,7 @@ public class CommandCompleter extends StringsCompleter {
 			this.commands.add(command);
 			names.add(command.getName());
 			List<String> options = new ArrayList<>();
-			for (OptionHelp optionHelp : command.getOptionsHelp()) {
-				options.addAll(optionHelp.getOptions());
-			}
+			command.getOptionsHelp().forEach(optionHelp -> options.addAll(optionHelp.getOptions()));
 			AggregateCompleter argumentCompleters = new AggregateCompleter(new StringsCompleter(options),
 					new FileNameCompleter());
 			ArgumentCompleter argumentCompleter = new ArgumentCompleter(argumentDelimiter, argumentCompleters);
@@ -104,15 +102,15 @@ public class CommandCompleter extends StringsCompleter {
 
 			this.console.println();
 			this.console.println("Usage:");
-			this.console.println(command.getName() + " " + command.getUsageHelp());
+			this.console.println(new StringBuilder().append(command.getName()).append(" ").append(command.getUsageHelp()).toString());
 			for (OptionHelpLine optionHelpLine : optionHelpLines) {
-				this.console.println(String.format("\t%" + maxOptionsLength + "s: %s", optionHelpLine.getOptions(),
+				this.console.println(String.format(new StringBuilder().append("\t%").append(maxOptionsLength).append("s: %s").toString(), optionHelpLine.getOptions(),
 						optionHelpLine.getUsage()));
 			}
 			this.console.drawLine();
 		}
 		catch (IOException ex) {
-			Log.error(ex.getMessage() + " (" + ex.getClass().getName() + ")");
+			Log.error(new StringBuilder().append(ex.getMessage()).append(" (").append(ex.getClass().getName()).append(")").toString());
 		}
 	}
 

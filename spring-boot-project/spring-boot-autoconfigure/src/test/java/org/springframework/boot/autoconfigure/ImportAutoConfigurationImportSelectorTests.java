@@ -175,13 +175,52 @@ class ImportAutoConfigurationImportSelectorTests {
 				"org.springframework.boot.autoconfigure.AutoConfigurationPackages.PackageImport", null);
 		Set<Object> selectedImports = this.importSelector
 				.determineImports(getAnnotationMetadata(ImportMetaAutoConfigurationExcludeWithUnrelatedOne.class));
-		for (Object selectedImport : selectedImports) {
-			assertThat(selectedImport).isNotInstanceOf(packageImportClass);
-		}
+		selectedImports.forEach(selectedImport -> assertThat(selectedImport).isNotInstanceOf(packageImportClass));
 	}
 
 	private AnnotationMetadata getAnnotationMetadata(Class<?> source) throws IOException {
 		return new SimpleMetadataReaderFactory().getMetadataReader(source.getName()).getAnnotationMetadata();
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@ImportAutoConfiguration(FreeMarkerAutoConfiguration.class)
+	@interface ImportOne {
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@ImportAutoConfiguration(ThymeleafAutoConfiguration.class)
+	@interface ImportTwo {
+
+	}
+
+	@ImportAutoConfiguration
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface MetaImportAutoConfiguration {
+
+		@AliasFor(annotation = ImportAutoConfiguration.class)
+		Class<?>[] exclude() default {};
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface UnrelatedOne {
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface UnrelatedTwo {
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@ImportAutoConfiguration(ThymeleafAutoConfiguration.class)
+	@SelfAnnotating
+	@interface SelfAnnotating {
+
+		@AliasFor(annotation = ImportAutoConfiguration.class, attribute = "exclude")
+		Class<?>[] excludeAutoConfiguration() default {};
+
 	}
 
 	@ImportAutoConfiguration(FreeMarkerAutoConfiguration.class)
@@ -220,18 +259,6 @@ class ImportAutoConfigurationImportSelectorTests {
 
 	@SelfAnnotating(excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
 	static class ImportWithSelfAnnotatingAnnotationExclude {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@ImportAutoConfiguration(FreeMarkerAutoConfiguration.class)
-	@interface ImportOne {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@ImportAutoConfiguration(ThymeleafAutoConfiguration.class)
-	@interface ImportTwo {
 
 	}
 
@@ -280,35 +307,6 @@ class ImportAutoConfigurationImportSelectorTests {
 	@MetaImportAutoConfiguration(exclude = ThymeleafAutoConfiguration.class)
 	@UnrelatedTwo
 	static class ImportMetaAutoConfigurationExcludeWithUnrelatedTwo {
-
-	}
-
-	@ImportAutoConfiguration
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface MetaImportAutoConfiguration {
-
-		@AliasFor(annotation = ImportAutoConfiguration.class)
-		Class<?>[] exclude() default {};
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface UnrelatedOne {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface UnrelatedTwo {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@ImportAutoConfiguration(ThymeleafAutoConfiguration.class)
-	@SelfAnnotating
-	@interface SelfAnnotating {
-
-		@AliasFor(annotation = ImportAutoConfiguration.class, attribute = "exclude")
-		Class<?>[] excludeAutoConfiguration() default {};
 
 	}
 

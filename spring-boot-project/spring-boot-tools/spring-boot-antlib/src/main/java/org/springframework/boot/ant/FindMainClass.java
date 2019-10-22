@@ -48,7 +48,7 @@ public class FindMainClass extends Task {
 	}
 
 	@Override
-	public void execute() throws BuildException {
+	public void execute() {
 		String mainClass = this.mainClass;
 		if (!StringUtils.hasText(mainClass)) {
 			mainClass = findMainClass();
@@ -64,7 +64,7 @@ public class FindMainClass extends Task {
 			throw new BuildException("one of @mainClass or @classesRoot must be specified");
 		}
 		if (!this.classesRoot.exists()) {
-			throw new BuildException("@classesRoot " + this.classesRoot + " does not exist");
+			throw new BuildException(new StringBuilder().append("@classesRoot ").append(this.classesRoot).append(" does not exist").toString());
 		}
 		try {
 			if (this.classesRoot.isDirectory()) {

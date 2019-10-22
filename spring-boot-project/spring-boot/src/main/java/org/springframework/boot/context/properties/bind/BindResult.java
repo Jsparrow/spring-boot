@@ -51,7 +51,7 @@ public final class BindResult<T> {
 	 * @throws NoSuchElementException if no value was bound
 	 * @see #isBound()
 	 */
-	public T get() throws NoSuchElementException {
+	public T get() {
 		if (this.value == null) {
 			throw new NoSuchElementException("No value bound");
 		}

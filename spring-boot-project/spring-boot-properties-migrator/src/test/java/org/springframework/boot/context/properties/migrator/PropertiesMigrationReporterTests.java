@@ -161,10 +161,11 @@ class PropertiesMigrationReporterTests {
 	private void assertMappedProperty(PropertySource<?> propertySource, String name, Object value, Origin origin) {
 		assertThat(propertySource.containsProperty(name)).isTrue();
 		assertThat(propertySource.getProperty(name)).isEqualTo(value);
-		if (origin != null) {
-			assertThat(propertySource).isInstanceOf(OriginLookup.class);
-			assertThat(((OriginLookup<Object>) propertySource).getOrigin(name)).isEqualTo(origin);
+		if (origin == null) {
+			return;
 		}
+		assertThat(propertySource).isInstanceOf(OriginLookup.class);
+		assertThat(((OriginLookup<Object>) propertySource).getOrigin(name)).isEqualTo(origin);
 	}
 
 	private PropertySource<?> loadPropertySource(String name, String path) throws IOException {

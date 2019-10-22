@@ -41,6 +41,8 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for {@link MessageSource}.
@@ -88,6 +90,7 @@ public class MessageSourceAutoConfiguration {
 	protected static class ResourceBundleCondition extends SpringBootCondition {
 
 		private static ConcurrentReferenceHashMap<String, ConditionOutcome> cache = new ConcurrentReferenceHashMap<>();
+		private final Logger logger = LoggerFactory.getLogger(ResourceBundleCondition.class);
 
 		@Override
 		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -116,9 +119,10 @@ public class MessageSourceAutoConfiguration {
 			String target = name.replace('.', '/');
 			try {
 				return new PathMatchingResourcePatternResolver(classLoader)
-						.getResources("classpath*:" + target + ".properties");
+						.getResources(new StringBuilder().append("classpath*:").append(target).append(".properties").toString());
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				return NO_RESOURCES;
 			}
 		}

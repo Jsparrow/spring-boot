@@ -107,7 +107,7 @@ public abstract class InfoPropertiesInfoContributor<T extends InfoProperties> im
 	 * @return the property source
 	 */
 	protected PropertySource<?> toPropertySource() {
-		if (this.mode.equals(Mode.FULL)) {
+		if (this.mode == Mode.FULL) {
 			return this.properties.toPropertySource();
 		}
 		return toSimplePropertySource();

@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import java.util.Collections;
 
 /**
  * Tests for {@link CouchbaseReactiveHealthIndicator}.
@@ -46,7 +47,7 @@ class CouchbaseReactiveHealthIndicatorTests {
 	void couchbaseClusterIsUp() {
 		Cluster cluster = mock(Cluster.class);
 		CouchbaseReactiveHealthIndicator healthIndicator = new CouchbaseReactiveHealthIndicator(cluster);
-		List<EndpointHealth> endpoints = Arrays.asList(new EndpointHealth(ServiceType.BINARY, LifecycleState.CONNECTED,
+		List<EndpointHealth> endpoints = Collections.singletonList(new EndpointHealth(ServiceType.BINARY, LifecycleState.CONNECTED,
 				new InetSocketAddress(0), new InetSocketAddress(0), 1234, "endpoint-1"));
 		DiagnosticsReport diagnostics = new DiagnosticsReport(endpoints, "test-sdk", "test-id", null);
 		given(cluster.diagnostics()).willReturn(diagnostics);

@@ -73,7 +73,7 @@ public class HintCommand extends AbstractCommand {
 	private void showCommandHints(String starting) {
 		for (Command command : this.commandRunner) {
 			if (isHintMatch(command, starting)) {
-				Log.info(command.getName() + " " + command.getDescription());
+				Log.info(new StringBuilder().append(command.getName()).append(" ").append(command.getDescription()).toString());
 			}
 		}
 	}
@@ -89,25 +89,13 @@ public class HintCommand extends AbstractCommand {
 	private void showCommandOptionHints(String commandName, List<String> specifiedArguments, String starting) {
 		Command command = this.commandRunner.findCommand(commandName);
 		if (command != null) {
-			for (OptionHelp help : command.getOptionsHelp()) {
-				if (!alreadyUsed(help, specifiedArguments)) {
-					for (String option : help.getOptions()) {
-						if (option.startsWith(starting)) {
-							Log.info(option + " " + help.getUsageHelp());
-						}
-					}
-				}
-			}
+			command.getOptionsHelp().stream().filter(help -> !alreadyUsed(help, specifiedArguments)).forEach(help -> help.getOptions().stream().filter(option -> option.startsWith(starting))
+					.forEach(option -> Log.info(new StringBuilder().append(option).append(" ").append(help.getUsageHelp()).toString())));
 		}
 	}
 
 	private boolean alreadyUsed(OptionHelp help, List<String> specifiedArguments) {
-		for (String argument : specifiedArguments) {
-			if (help.getOptions().contains(argument)) {
-				return true;
-			}
-		}
-		return false;
+		return specifiedArguments.stream().anyMatch(argument -> help.getOptions().contains(argument));
 	}
 
 }

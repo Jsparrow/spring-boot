@@ -18,6 +18,8 @@ package smoketest.test;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple component that just prints a message. Used to show how different types of
@@ -28,9 +30,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class WelcomeCommandLineRunner implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(WelcomeCommandLineRunner.class);
+
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("***** WELCOME TO THE DEMO *****");
+		logger.info("***** WELCOME TO THE DEMO *****");
 	}
 
 }

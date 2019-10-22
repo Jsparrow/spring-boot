@@ -34,12 +34,12 @@ public class MustacheTemplateAvailabilityProvider implements TemplateAvailabilit
 	@Override
 	public boolean isTemplateAvailable(String view, Environment environment, ClassLoader classLoader,
 			ResourceLoader resourceLoader) {
-		if (ClassUtils.isPresent("com.samskivert.mustache.Template", classLoader)) {
-			String prefix = environment.getProperty("spring.mustache.prefix", MustacheProperties.DEFAULT_PREFIX);
-			String suffix = environment.getProperty("spring.mustache.suffix", MustacheProperties.DEFAULT_SUFFIX);
-			return resourceLoader.getResource(prefix + view + suffix).exists();
+		if (!ClassUtils.isPresent("com.samskivert.mustache.Template", classLoader)) {
+			return false;
 		}
-		return false;
+		String prefix = environment.getProperty("spring.mustache.prefix", MustacheProperties.DEFAULT_PREFIX);
+		String suffix = environment.getProperty("spring.mustache.suffix", MustacheProperties.DEFAULT_SUFFIX);
+		return resourceLoader.getResource(new StringBuilder().append(prefix).append(view).append(suffix).toString()).exists();
 	}
 
 }

@@ -30,6 +30,8 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sort {@link EnableAutoConfiguration auto-configuration} classes into priority order by
@@ -89,7 +91,7 @@ class AutoConfigurationSorter {
 		processing.add(current);
 		for (String after : classes.getClassesRequestedAfter(current)) {
 			Assert.state(!processing.contains(after),
-					"AutoConfigure cycle detected between " + current + " and " + after);
+					new StringBuilder().append("AutoConfigure cycle detected between ").append(current).append(" and ").append(after).toString());
 			if (!sorted.contains(after) && toSort.contains(after)) {
 				doSortByAfterAnnotation(classes, toSort, sorted, processing, after);
 			}
@@ -113,22 +115,20 @@ class AutoConfigurationSorter {
 
 		private void addToClasses(MetadataReaderFactory metadataReaderFactory,
 				AutoConfigurationMetadata autoConfigurationMetadata, Collection<String> classNames, boolean required) {
-			for (String className : classNames) {
-				if (!this.classes.containsKey(className)) {
-					AutoConfigurationClass autoConfigurationClass = new AutoConfigurationClass(className,
-							metadataReaderFactory, autoConfigurationMetadata);
-					boolean available = autoConfigurationClass.isAvailable();
-					if (required || available) {
-						this.classes.put(className, autoConfigurationClass);
-					}
-					if (available) {
-						addToClasses(metadataReaderFactory, autoConfigurationMetadata,
-								autoConfigurationClass.getBefore(), false);
-						addToClasses(metadataReaderFactory, autoConfigurationMetadata,
-								autoConfigurationClass.getAfter(), false);
-					}
+			classNames.stream().filter(className -> !this.classes.containsKey(className)).forEach(className -> {
+				AutoConfigurationClass autoConfigurationClass = new AutoConfigurationClass(className,
+						metadataReaderFactory, autoConfigurationMetadata);
+				boolean available = autoConfigurationClass.isAvailable();
+				if (required || available) {
+					this.classes.put(className, autoConfigurationClass);
 				}
-			}
+				if (available) {
+					addToClasses(metadataReaderFactory, autoConfigurationMetadata,
+							autoConfigurationClass.getBefore(), false);
+					addToClasses(metadataReaderFactory, autoConfigurationMetadata,
+							autoConfigurationClass.getAfter(), false);
+				}
+			});
 		}
 
 		AutoConfigurationClass get(String className) {
@@ -148,6 +148,8 @@ class AutoConfigurationSorter {
 	}
 
 	private static class AutoConfigurationClass {
+
+		private final Logger logger = LoggerFactory.getLogger(AutoConfigurationClass.class);
 
 		private final String className;
 
@@ -176,6 +178,7 @@ class AutoConfigurationSorter {
 				return true;
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				return false;
 			}
 		}

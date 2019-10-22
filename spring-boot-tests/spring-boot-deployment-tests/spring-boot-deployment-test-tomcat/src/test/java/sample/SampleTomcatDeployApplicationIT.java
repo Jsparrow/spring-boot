@@ -27,11 +27,15 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Integration Tests for {@link SampleTomcatDeployApplication}.
  */
 public class SampleTomcatDeployApplicationIT {
+
+	private static final Logger logger = LoggerFactory.getLogger(SampleTomcatDeployApplicationIT.class);
 
 	private final TestRestTemplate rest = new TestRestTemplate();
 
@@ -39,7 +43,7 @@ public class SampleTomcatDeployApplicationIT {
 
 	@Test
 	void testHome() throws Exception {
-		String url = "http://localhost:" + this.port + "/bootapp/";
+		String url = new StringBuilder().append("http://localhost:").append(this.port).append("/bootapp/").toString();
 		ResponseEntity<String> entity = this.rest.getForEntity(url, String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).isEqualTo("Hello World");
@@ -47,8 +51,8 @@ public class SampleTomcatDeployApplicationIT {
 
 	@Test
 	void testHealth() throws Exception {
-		String url = "http://localhost:" + this.port + "/bootapp/actuator/health";
-		System.out.println(url);
+		String url = new StringBuilder().append("http://localhost:").append(this.port).append("/bootapp/actuator/health").toString();
+		logger.info(url);
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(url, String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).isEqualTo("{\"status\":\"UP\"}");
@@ -87,7 +91,7 @@ public class SampleTomcatDeployApplicationIT {
 	}
 
 	private void assertThatPathProducesExpectedResponse(String path, MediaType accept, MediaType contentType) {
-		RequestEntity<Void> request = RequestEntity.get(URI.create("http://localhost:" + this.port + path))
+		RequestEntity<Void> request = RequestEntity.get(URI.create(new StringBuilder().append("http://localhost:").append(this.port).append(path).toString()))
 				.accept(accept).build();
 		ResponseEntity<String> response = this.rest.exchange(request, String.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);

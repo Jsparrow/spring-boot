@@ -39,6 +39,8 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility to handle any conversion needed during binding. This class is not thread-safe
@@ -99,14 +101,14 @@ final class BindConverter {
 
 	static BindConverter get(ConversionService conversionService,
 			Consumer<PropertyEditorRegistry> propertyEditorInitializer) {
-		if (conversionService == ApplicationConversionService.getSharedInstance()
-				&& propertyEditorInitializer == null) {
-			if (sharedInstance == null) {
-				sharedInstance = new BindConverter(conversionService, propertyEditorInitializer);
-			}
-			return sharedInstance;
+		if (!(conversionService == ApplicationConversionService.getSharedInstance()
+				&& propertyEditorInitializer == null)) {
+			return new BindConverter(conversionService, propertyEditorInitializer);
 		}
-		return new BindConverter(conversionService, propertyEditorInitializer);
+		if (sharedInstance == null) {
+			sharedInstance = new BindConverter(conversionService, propertyEditorInitializer);
+		}
+		return sharedInstance;
 	}
 
 	/**
@@ -125,6 +127,7 @@ final class BindConverter {
 	 */
 	static class CompositeConversionService implements ConversionService {
 
+		private final Logger logger = LoggerFactory.getLogger(CompositeConversionService.class);
 		private final List<ConversionService> delegates;
 
 		CompositeConversionService(List<ConversionService> delegates) {
@@ -140,12 +143,7 @@ final class BindConverter {
 
 		@Override
 		public boolean canConvert(TypeDescriptor sourceType, TypeDescriptor targetType) {
-			for (ConversionService service : this.delegates) {
-				if (service.canConvert(sourceType, targetType)) {
-					return true;
-				}
-			}
-			return false;
+			return this.delegates.stream().anyMatch(service -> service.canConvert(sourceType, targetType));
 		}
 
 		@Override
@@ -165,6 +163,7 @@ final class BindConverter {
 					}
 				}
 				catch (ConversionException ex) {
+					logger.error(ex.getMessage(), ex);
 				}
 			}
 			return this.delegates.get(this.delegates.size() - 1).convert(source, sourceType, targetType);

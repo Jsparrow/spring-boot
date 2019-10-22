@@ -109,15 +109,16 @@ class DataSourceInitializer {
 	 */
 	void initSchema() {
 		List<Resource> scripts = getScripts("spring.datasource.data", this.properties.getData(), "data");
-		if (!scripts.isEmpty()) {
-			if (!isEnabled()) {
-				logger.debug("Initialization disabled (not running data scripts)");
-				return;
-			}
-			String username = this.properties.getDataUsername();
-			String password = this.properties.getDataPassword();
-			runScripts(scripts, username, password);
+		if (scripts.isEmpty()) {
+			return;
 		}
+		if (!isEnabled()) {
+			logger.debug("Initialization disabled (not running data scripts)");
+			return;
+		}
+		String username = this.properties.getDataUsername();
+		String password = this.properties.getDataPassword();
+		runScripts(scripts, username, password);
 	}
 
 	private boolean isEnabled() {
@@ -147,8 +148,8 @@ class DataSourceInitializer {
 		}
 		String platform = this.properties.getPlatform();
 		List<String> fallbackResources = new ArrayList<>();
-		fallbackResources.add("classpath*:" + fallback + "-" + platform + ".sql");
-		fallbackResources.add("classpath*:" + fallback + ".sql");
+		fallbackResources.add(new StringBuilder().append("classpath*:").append(fallback).append("-").append(platform).append(".sql").toString());
+		fallbackResources.add(new StringBuilder().append("classpath*:").append(fallback).append(".sql").toString());
 		return getResources(propertyName, fallbackResources, false);
 	}
 
@@ -190,9 +191,7 @@ class DataSourceInitializer {
 		if (this.properties.getSqlScriptEncoding() != null) {
 			populator.setSqlScriptEncoding(this.properties.getSqlScriptEncoding().name());
 		}
-		for (Resource resource : resources) {
-			populator.addScript(resource);
-		}
+		resources.forEach(populator::addScript);
 		DataSource dataSource = this.dataSource;
 		if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
 			dataSource = DataSourceBuilder.create(this.properties.getClassLoader())

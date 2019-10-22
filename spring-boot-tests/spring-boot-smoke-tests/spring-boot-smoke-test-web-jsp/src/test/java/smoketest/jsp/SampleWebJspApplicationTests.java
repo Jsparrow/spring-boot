@@ -17,8 +17,6 @@
 package smoketest.jsp;
 
 import java.net.URI;
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 
 /**
  * Basic integration tests for JSP application.
@@ -55,7 +54,7 @@ class SampleWebJspApplicationTests {
 	@Test
 	void customErrorPage() throws Exception {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		RequestEntity<Void> request = new RequestEntity<>(headers, HttpMethod.GET, URI.create("/foo"));
 		ResponseEntity<String> entity = this.restTemplate.exchange(request, String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);

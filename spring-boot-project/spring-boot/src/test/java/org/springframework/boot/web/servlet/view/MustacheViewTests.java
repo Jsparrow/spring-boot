@@ -37,8 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class MustacheViewTests {
 
-	private final String templateUrl = "classpath:/" + getClass().getPackage().getName().replace(".", "/")
-			+ "/template.html";
+	private final String templateUrl = new StringBuilder().append("classpath:/").append(getClass().getPackage().getName().replace(".", "/")).append("/template.html").toString();
 
 	private MockHttpServletRequest request = new MockHttpServletRequest();
 

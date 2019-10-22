@@ -30,6 +30,8 @@ import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryA
 import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException.Reason;
 import org.springframework.boot.actuate.autoconfigure.cloudfoundry.Token;
 import org.springframework.util.Base64Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Validator used to ensure that a signed {@link Token} has not been tampered with.
@@ -37,6 +39,8 @@ import org.springframework.util.Base64Utils;
  * @author Madhura Bhave
  */
 class TokenValidator {
+
+	private static final Logger logger = LoggerFactory.getLogger(TokenValidator.class);
 
 	private final CloudFoundrySecurityService securityService;
 
@@ -59,9 +63,9 @@ class TokenValidator {
 		if (algorithm == null) {
 			throw new CloudFoundryAuthorizationException(Reason.INVALID_SIGNATURE, "Signing algorithm cannot be null");
 		}
-		if (!algorithm.equals("RS256")) {
+		if (!"RS256".equals(algorithm)) {
 			throw new CloudFoundryAuthorizationException(Reason.UNSUPPORTED_TOKEN_SIGNING_ALGORITHM,
-					"Signing algorithm " + algorithm + " not supported");
+					new StringBuilder().append("Signing algorithm ").append(algorithm).append(" not supported").toString());
 		}
 	}
 
@@ -94,6 +98,7 @@ class TokenValidator {
 			return signature.verify(token.getSignature());
 		}
 		catch (GeneralSecurityException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}
@@ -119,7 +124,7 @@ class TokenValidator {
 		String issuerUri = String.format("%s/oauth/token", uaaUrl);
 		if (!issuerUri.equals(token.getIssuer())) {
 			throw new CloudFoundryAuthorizationException(Reason.INVALID_ISSUER,
-					"Token issuer does not match " + uaaUrl + "/oauth/token");
+					new StringBuilder().append("Token issuer does not match ").append(uaaUrl).append("/oauth/token").toString());
 		}
 	}
 

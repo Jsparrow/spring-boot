@@ -23,6 +23,8 @@ import org.springframework.boot.autoconfigure.template.TemplateAvailabilityProvi
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link TemplateAvailabilityProvider} that provides availability information for JSP
@@ -34,6 +36,8 @@ import org.springframework.util.ClassUtils;
  * @since 2.0.0
  */
 public class JspTemplateAvailabilityProvider implements TemplateAvailabilityProvider {
+
+	private static final Logger logger = LoggerFactory.getLogger(JspTemplateAvailabilityProvider.class);
 
 	@Override
 	public boolean isTemplateAvailable(String view, Environment environment, ClassLoader classLoader,
@@ -47,6 +51,7 @@ public class JspTemplateAvailabilityProvider implements TemplateAvailabilityProv
 				return new File("src/main/webapp", resourceName).exists();
 			}
 			catch (AccessControlException ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 		return false;
@@ -55,7 +60,7 @@ public class JspTemplateAvailabilityProvider implements TemplateAvailabilityProv
 	private String getResourceName(String view, Environment environment) {
 		String prefix = environment.getProperty("spring.mvc.view.prefix", WebMvcAutoConfiguration.DEFAULT_PREFIX);
 		String suffix = environment.getProperty("spring.mvc.view.suffix", WebMvcAutoConfiguration.DEFAULT_SUFFIX);
-		return prefix + view + suffix;
+		return new StringBuilder().append(prefix).append(view).append(suffix).toString();
 	}
 
 }

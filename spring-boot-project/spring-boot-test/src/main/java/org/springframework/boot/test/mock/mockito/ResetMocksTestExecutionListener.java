@@ -32,6 +32,8 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link TestExecutionListener} to reset any mock beans that have been marked with a
@@ -42,6 +44,7 @@ import org.springframework.util.ClassUtils;
  */
 public class ResetMocksTestExecutionListener extends AbstractTestExecutionListener {
 
+	private static final Logger logger = LoggerFactory.getLogger(ResetMocksTestExecutionListener.class);
 	private static final boolean MOCKITO_IS_PRESENT = ClassUtils.isPresent("org.mockito.MockSettings",
 			ResetMocksTestExecutionListener.class.getClassLoader());
 
@@ -78,7 +81,7 @@ public class ResetMocksTestExecutionListener extends AbstractTestExecutionListen
 			BeanDefinition definition = beanFactory.getBeanDefinition(name);
 			if (definition.isSingleton() && instantiatedSingletons.contains(name)) {
 				Object bean = beanFactory.getSingleton(name);
-				if (reset.equals(MockReset.get(bean))) {
+				if (reset == MockReset.get(bean)) {
 					Mockito.reset(bean);
 				}
 			}
@@ -86,12 +89,13 @@ public class ResetMocksTestExecutionListener extends AbstractTestExecutionListen
 		try {
 			MockitoBeans mockedBeans = beanFactory.getBean(MockitoBeans.class);
 			for (Object mockedBean : mockedBeans) {
-				if (reset.equals(MockReset.get(mockedBean))) {
+				if (reset == MockReset.get(mockedBean)) {
 					Mockito.reset(mockedBean);
 				}
 			}
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Continue
 		}
 		if (applicationContext.getParent() != null) {

@@ -47,6 +47,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.NestedServletException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Servlet {@link Filter} that provides an {@link ErrorPageRegistry} for non-embedded
@@ -64,6 +66,8 @@ import org.springframework.web.util.NestedServletException;
  */
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class ErrorPageFilter implements Filter, ErrorPageRegistry {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(ErrorPageFilter.class);
 
 	private static final Log logger = LogFactory.getLog(ErrorPageFilter.class);
 
@@ -178,8 +182,7 @@ public class ErrorPageFilter implements Filter, ErrorPageRegistry {
 	private void forwardToErrorPage(String path, HttpServletRequest request, HttpServletResponse response, Throwable ex)
 			throws ServletException, IOException {
 		if (logger.isErrorEnabled()) {
-			String message = "Forwarding to error page from request " + getDescription(request) + " due to exception ["
-					+ ex.getMessage() + "]";
+			String message = new StringBuilder().append("Forwarding to error page from request ").append(getDescription(request)).append(" due to exception [").append(ex.getMessage()).append("]").toString();
 			logger.error(message, ex);
 		}
 		setErrorAttributes(request, 500, ex.getMessage());
@@ -201,19 +204,15 @@ public class ErrorPageFilter implements Filter, ErrorPageRegistry {
 	 */
 	protected String getDescription(HttpServletRequest request) {
 		String pathInfo = (request.getPathInfo() != null) ? request.getPathInfo() : "";
-		return "[" + request.getServletPath() + pathInfo + "]";
+		return new StringBuilder().append("[").append(request.getServletPath()).append(pathInfo).append("]").toString();
 	}
 
 	private void handleCommittedResponse(HttpServletRequest request, Throwable ex) {
 		if (isClientAbortException(ex)) {
 			return;
 		}
-		String message = "Cannot forward to error page for request " + getDescription(request)
-				+ " as the response has already been"
-				+ " committed. As a result, the response may have the wrong status"
-				+ " code. If your application is running on WebSphere Application"
-				+ " Server you may be able to resolve this problem by setting"
-				+ " com.ibm.ws.webcontainer.invokeFlushAfterService to false";
+		String message = new StringBuilder().append("Cannot forward to error page for request ").append(getDescription(request)).append(" as the response has already been").append(" committed. As a result, the response may have the wrong status").append(" code. If your application is running on WebSphere Application").append(" Server you may be able to resolve this problem by setting").append(" com.ibm.ws.webcontainer.invokeFlushAfterService to false")
+				.toString();
 		if (ex == null) {
 			logger.error(message);
 		}
@@ -300,6 +299,7 @@ public class ErrorPageFilter implements Filter, ErrorPageRegistry {
 			collection.add(ClassUtils.forName(className, null));
 		}
 		catch (Throwable ex) {
+			logger1.error(ex.getMessage(), ex);
 		}
 	}
 

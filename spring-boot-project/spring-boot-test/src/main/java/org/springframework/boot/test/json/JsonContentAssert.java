@@ -41,6 +41,8 @@ import org.skyscreamer.jsonassert.comparator.JSONComparator;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AssertJ {@link Assert} for {@link JsonContent}.
@@ -1054,6 +1056,8 @@ public class JsonContentAssert extends AbstractAssert<JsonContentAssert, CharSeq
 	 */
 	private class JsonPathValue {
 
+		private final Logger logger = LoggerFactory.getLogger(JsonPathValue.class);
+
 		private final String expression;
 
 		private final JsonPath jsonPath;
@@ -1085,6 +1089,7 @@ public class JsonContentAssert extends AbstractAssert<JsonContentAssert, CharSeq
 				read();
 			}
 			catch (PathNotFoundException ex) {
+				logger.error(ex.getMessage(), ex);
 				failWithMessage("No JSON path \"%s\" found", this.expression);
 			}
 		}
@@ -1095,6 +1100,7 @@ public class JsonContentAssert extends AbstractAssert<JsonContentAssert, CharSeq
 				failWithMessage("Expecting no JSON path \"%s\"", this.expression);
 			}
 			catch (PathNotFoundException ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 
@@ -1132,6 +1138,7 @@ public class JsonContentAssert extends AbstractAssert<JsonContentAssert, CharSeq
 				return read();
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				if (required) {
 					failWithNoValueMessage();
 				}

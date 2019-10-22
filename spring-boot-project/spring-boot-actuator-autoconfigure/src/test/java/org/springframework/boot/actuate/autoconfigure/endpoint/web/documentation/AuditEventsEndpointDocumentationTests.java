@@ -18,7 +18,6 @@ package org.springframework.boot.actuate.autoconfigure.endpoint.web.documentatio
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
@@ -56,7 +55,7 @@ class AuditEventsEndpointDocumentationTests extends MockMvcEndpointDocumentation
 	void allAuditEvents() throws Exception {
 		String queryTimestamp = "2017-11-07T09:37Z";
 		given(this.repository.find(any(), any(), any()))
-				.willReturn(Arrays.asList(new AuditEvent("alice", "logout", Collections.emptyMap())));
+				.willReturn(Collections.singletonList(new AuditEvent("alice", "logout", Collections.emptyMap())));
 		this.mockMvc.perform(get("/actuator/auditevents").param("after", queryTimestamp)).andExpect(status().isOk())
 				.andDo(document("auditevents/all", responseFields(
 						fieldWithPath("events").description("An array of audit events."),
@@ -70,7 +69,7 @@ class AuditEventsEndpointDocumentationTests extends MockMvcEndpointDocumentation
 		OffsetDateTime now = OffsetDateTime.now();
 		String queryTimestamp = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(now);
 		given(this.repository.find("alice", now.toInstant(), "logout"))
-				.willReturn(Arrays.asList(new AuditEvent("alice", "logout", Collections.emptyMap())));
+				.willReturn(Collections.singletonList(new AuditEvent("alice", "logout", Collections.emptyMap())));
 		this.mockMvc
 				.perform(get("/actuator/auditevents")
 						.param("principal", "alice").param("after", queryTimestamp).param("type", "logout"))

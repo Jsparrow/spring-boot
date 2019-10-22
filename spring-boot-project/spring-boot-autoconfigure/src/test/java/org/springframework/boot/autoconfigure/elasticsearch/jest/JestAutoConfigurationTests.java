@@ -43,6 +43,8 @@ import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link JestAutoConfiguration}.
@@ -53,6 +55,8 @@ import static org.mockito.Mockito.mock;
 @Deprecated
 @Testcontainers(disabledWithoutDocker = true)
 class JestAutoConfigurationTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(JestAutoConfigurationTests.class);
 
 	@Container
 	static final ElasticsearchContainer elasticsearch = new ElasticsearchContainer().withStartupAttempts(5)
@@ -122,6 +126,7 @@ class JestAutoConfigurationTests {
 				return client.execute(action);
 			}
 			catch (IOException ex) {
+				logger.error(ex.getMessage(), ex);
 				// Continue
 			}
 		}

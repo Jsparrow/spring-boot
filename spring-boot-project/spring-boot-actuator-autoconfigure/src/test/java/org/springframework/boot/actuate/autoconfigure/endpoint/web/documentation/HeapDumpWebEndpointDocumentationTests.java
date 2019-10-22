@@ -65,7 +65,7 @@ class HeapDumpWebEndpointDocumentationTests extends MockMvcEndpointDocumentation
 			return new HeapDumpWebEndpoint() {
 
 				@Override
-				protected HeapDumper createHeapDumper() throws HeapDumperUnavailableException {
+				protected HeapDumper createHeapDumper() {
 					return (file, live) -> FileCopyUtils.copy("<<binary content>>", new FileWriter(file));
 				}
 

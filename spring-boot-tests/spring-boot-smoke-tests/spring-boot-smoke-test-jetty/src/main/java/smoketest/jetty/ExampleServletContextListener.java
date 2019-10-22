@@ -20,6 +20,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple {@link ServletContextListener} to test gh-2058.
@@ -27,14 +29,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExampleServletContextListener implements ServletContextListener {
 
+	private static final Logger logger = LoggerFactory.getLogger(ExampleServletContextListener.class);
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		System.out.println("*** contextInitialized");
+		logger.info("*** contextInitialized");
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		System.out.println("*** contextDestroyed");
+		logger.info("*** contextDestroyed");
 	}
 
 }

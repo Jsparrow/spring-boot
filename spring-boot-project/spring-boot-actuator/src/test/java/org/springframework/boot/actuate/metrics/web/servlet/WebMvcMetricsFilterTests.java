@@ -89,6 +89,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link WebMvcMetricsFilter}.
@@ -98,6 +100,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 class WebMvcMetricsFilterTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(WebMvcMetricsFilterTests.class);
 
 	@Autowired
 	private SimpleMeterRegistry registry;
@@ -198,6 +202,7 @@ class WebMvcMetricsFilterTests {
 			this.mvc.perform(get("/api/c1/anonymousError/10"));
 		}
 		catch (Throwable ignore) {
+			logger.error(ignore.getMessage(), ignore);
 		}
 		assertThat(this.registry.get("http.server.requests").tag("uri", "/api/c1/anonymousError/{id}").timer().getId()
 				.getTag("exception")).endsWith("$1");
@@ -327,13 +332,9 @@ class WebMvcMetricsFilterTests {
 				@Override
 				@NonNull
 				public MeterFilterReply accept(@NonNull Meter.Id id) {
-					for (Tag tag : id.getTags()) {
-						if (tag.getKey().equals("uri")
-								&& (tag.getValue().contains("histogram") || tag.getValue().contains("percentiles"))) {
-							return MeterFilterReply.ACCEPT;
-						}
-					}
-					return MeterFilterReply.DENY;
+					return id.getTags().stream().filter(tag -> "uri".equals(tag.getKey())
+							&& (tag.getValue().contains("histogram") || tag.getValue().contains("percentiles"))).findFirst().map(tag -> MeterFilterReply.ACCEPT)
+							.orElse(MeterFilterReply.DENY);
 				}
 			});
 			return r;
@@ -428,7 +429,7 @@ class WebMvcMetricsFilterTests {
 		@Timed
 		@GetMapping("/error/{id}")
 		String alwaysThrowsException(@PathVariable Long id) {
-			throw new IllegalStateException("Boom on " + id + "!");
+			throw new IllegalStateException(new StringBuilder().append("Boom on ").append(id).append("!").toString());
 		}
 
 		@Timed
@@ -441,7 +442,7 @@ class WebMvcMetricsFilterTests {
 		@Timed
 		@GetMapping("/unhandledError/{id}")
 		String alwaysThrowsUnhandledException(@PathVariable Long id) {
-			throw new RuntimeException("Boom on " + id + "!");
+			throw new RuntimeException(new StringBuilder().append("Boom on ").append(id).append("!").toString());
 		}
 
 		@GetMapping("/streamingError")

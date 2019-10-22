@@ -101,7 +101,7 @@ class ConfigFileApplicationListenerTests {
 		this.application.setResourceLoader(new ResourceLoader() {
 			@Override
 			public Resource getResource(String location) {
-				if (location.equals("classpath:/custom.properties")) {
+				if ("classpath:/custom.properties".equals(location)) {
 					return new ByteArrayResource("the.property: fromcustom".getBytes(), location) {
 						@Override
 						public String getFilename() {
@@ -483,14 +483,14 @@ class ConfigFileApplicationListenerTests {
 		String log = output.toString();
 		// First make sure that each profile got processed only once
 		for (String profile : profiles) {
-			String reason = "Wrong number of occurrences for profile '" + profile + "' --> " + log;
+			String reason = new StringBuilder().append("Wrong number of occurrences for profile '").append(profile).append("' --> ").append(log).toString();
 			assertThat(StringUtils.countOccurrencesOf(log, createLogForProfile(profile))).as(reason).isEqualTo(1);
 		}
 		// Make sure the order of loading is the right one
 		for (String profile : profiles) {
 			String line = createLogForProfile(profile);
 			int index = log.indexOf(line);
-			assertThat(index).as("Loading profile '" + profile + "' not found in '" + log + "'").isNotEqualTo(-1);
+			assertThat(index).as(new StringBuilder().append("Loading profile '").append(profile).append("' not found in '").append(log).append("'").toString()).isNotEqualTo(-1);
 			log = log.substring(index + line.length());
 		}
 	}
@@ -511,10 +511,8 @@ class ConfigFileApplicationListenerTests {
 	private String createLogForProfile(String profile) {
 		String suffix = (profile != null) ? "-" + profile : "";
 		String string = ".properties)";
-		return "Loaded config file '"
-				+ new File(this.buildOutput.getTestResourcesLocation(), "application" + suffix + ".properties")
-						.getAbsoluteFile().toURI().toString()
-				+ "' (classpath:/application" + suffix + string;
+		return new StringBuilder().append("Loaded config file '").append(new File(this.buildOutput.getTestResourcesLocation(), "application" + suffix + ".properties")
+				.getAbsoluteFile().toURI().toString()).append("' (classpath:/application").append(suffix).append(string).toString();
 	}
 
 	@Test
@@ -675,7 +673,7 @@ class ConfigFileApplicationListenerTests {
 		TestPropertySourceUtils.addInlinedPropertiesToEnvironment(this.environment,
 				"spring.config.location=" + location);
 		this.initializer.postProcessEnvironment(this.environment, this.application);
-		assertThat(this.environment).has(matchingPropertySource("applicationConfig: [" + location + "]"));
+		assertThat(this.environment).has(matchingPropertySource(new StringBuilder().append("applicationConfig: [").append(location).append("]").toString()));
 	}
 
 	@Test
@@ -684,7 +682,7 @@ class ConfigFileApplicationListenerTests {
 		TestPropertySourceUtils.addInlinedPropertiesToEnvironment(this.environment,
 				"spring.config.location=" + location);
 		this.initializer.postProcessEnvironment(this.environment, this.application);
-		assertThat(this.environment).has(matchingPropertySource("applicationConfig: [file:" + location + "]"));
+		assertThat(this.environment).has(matchingPropertySource(new StringBuilder().append("applicationConfig: [file:").append(location).append("]").toString()));
 	}
 
 	@Test
@@ -695,7 +693,7 @@ class ConfigFileApplicationListenerTests {
 				"spring.config.location=" + location);
 		this.initializer.postProcessEnvironment(this.environment, this.application);
 		assertThat(this.environment).has(
-				matchingPropertySource("applicationConfig: [file:" + location.replace(File.separatorChar, '/') + "]"));
+				matchingPropertySource(new StringBuilder().append("applicationConfig: [file:").append(location.replace(File.separatorChar, '/')).append("]").toString()));
 	}
 
 	@Test

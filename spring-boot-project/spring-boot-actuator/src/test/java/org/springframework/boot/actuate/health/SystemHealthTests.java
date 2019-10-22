@@ -45,9 +45,7 @@ class SystemHealthTests {
 		CompositeHealth health = new SystemHealth(ApiVersion.V3, Status.UP, components, groups);
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(health);
-		assertThat(json).isEqualTo("{\"status\":\"UP\",\"components\":{" + "\"db1\":{\"status\":\"UP\"},"
-				+ "\"db2\":{\"status\":\"DOWN\",\"details\":{\"a\":\"b\"}}},"
-				+ "\"groups\":[\"liveness\",\"readiness\"]}");
+		assertThat(json).isEqualTo(new StringBuilder().append("{\"status\":\"UP\",\"components\":{").append("\"db1\":{\"status\":\"UP\"},").append("\"db2\":{\"status\":\"DOWN\",\"details\":{\"a\":\"b\"}}},").append("\"groups\":[\"liveness\",\"readiness\"]}").toString());
 	}
 
 }

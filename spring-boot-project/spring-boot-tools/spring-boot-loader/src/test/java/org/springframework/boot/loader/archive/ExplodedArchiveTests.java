@@ -81,7 +81,7 @@ class ExplodedArchiveTests {
 		Enumeration<JarEntry> entries = jarFile.entries();
 		while (entries.hasMoreElements()) {
 			JarEntry entry = entries.nextElement();
-			File destination = new File(this.rootFolder.getAbsolutePath() + File.separator + entry.getName());
+			File destination = new File(new StringBuilder().append(this.rootFolder.getAbsolutePath()).append(File.separator).append(entry.getName()).toString());
 			destination.getParentFile().mkdirs();
 			if (entry.isDirectory()) {
 				destination.mkdir();
@@ -130,7 +130,7 @@ class ExplodedArchiveTests {
 		Archive nested = this.archive.getNestedArchive(entry);
 		Map<String, Entry> nestedEntries = getEntriesMap(nested);
 		assertThat(nestedEntries.size()).isEqualTo(1);
-		assertThat(nested.getUrl().toString()).isEqualTo("file:" + this.rootFolder.toURI().getPath() + "d/");
+		assertThat(nested.getUrl().toString()).isEqualTo(new StringBuilder().append("file:").append(this.rootFolder.toURI().getPath()).append("d/").toString());
 	}
 
 	@Test

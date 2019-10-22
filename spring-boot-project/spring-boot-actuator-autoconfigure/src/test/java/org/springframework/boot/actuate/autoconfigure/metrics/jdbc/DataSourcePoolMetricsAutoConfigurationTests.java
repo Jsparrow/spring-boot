@@ -299,7 +299,7 @@ class DataSourcePoolMetricsAutoConfigurationTests {
 			}
 
 			@Override
-			public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+			public Object postProcessAfterInitialization(Object bean, String beanName) {
 				if (bean instanceof HikariDataSource) {
 					try {
 						((HikariDataSource) bean).getConnection().close();

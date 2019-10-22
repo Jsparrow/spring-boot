@@ -93,8 +93,7 @@ public class OutputCaptureExtension
 	}
 
 	@Override
-	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
-			throws ParameterResolutionException {
+	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
 		return CapturedOutput.class.equals(parameterContext.getParameter().getType());
 	}
 

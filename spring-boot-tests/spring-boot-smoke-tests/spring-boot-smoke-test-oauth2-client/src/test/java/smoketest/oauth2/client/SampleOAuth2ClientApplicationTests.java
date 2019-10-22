@@ -44,7 +44,7 @@ class SampleOAuth2ClientApplicationTests {
 	void everythingShouldRedirectToLogin() {
 		ResponseEntity<String> entity = this.restTemplate.getForEntity("/", String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-		assertThat(entity.getHeaders().getLocation()).isEqualTo(URI.create("http://localhost:" + this.port + "/login"));
+		assertThat(entity.getHeaders().getLocation()).isEqualTo(URI.create(new StringBuilder().append("http://localhost:").append(this.port).append("/login").toString()));
 	}
 
 	@Test

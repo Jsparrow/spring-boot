@@ -20,6 +20,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide git-related information such as commit id and time.
@@ -28,6 +30,8 @@ import java.util.Properties;
  * @since 1.4.0
  */
 public class GitProperties extends InfoProperties {
+
+	private static final Logger logger = LoggerFactory.getLogger(GitProperties.class);
 
 	public GitProperties(Properties entries) {
 		super(processEntries(entries));
@@ -113,6 +117,7 @@ public class GitProperties extends InfoProperties {
 			return String.valueOf(format.parse(s).getTime());
 		}
 		catch (ParseException ex) {
+			logger.error(ex.getMessage(), ex);
 			return s;
 		}
 	}
@@ -122,6 +127,7 @@ public class GitProperties extends InfoProperties {
 			return Long.parseLong(s) * 1000;
 		}
 		catch (NumberFormatException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

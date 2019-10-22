@@ -40,14 +40,14 @@ class SentenceExtractorTests {
 	@Test
 	void extractFirstSentenceNewLineBeforeDot() {
 		String sentence = this.extractor
-				.getFirstSentence("My short" + NEW_LINE + "description." + NEW_LINE + "More stuff.");
+				.getFirstSentence(new StringBuilder().append("My short").append(NEW_LINE).append("description.").append(NEW_LINE).append("More stuff.").toString());
 		assertThat(sentence).isEqualTo("My short description.");
 	}
 
 	@Test
 	void extractFirstSentenceNewLineBeforeDotWithSpaces() {
 		String sentence = this.extractor
-				.getFirstSentence("My short  " + NEW_LINE + " description.  " + NEW_LINE + "More stuff.");
+				.getFirstSentence(new StringBuilder().append("My short  ").append(NEW_LINE).append(" description.  ").append(NEW_LINE).append("More stuff.").toString());
 		assertThat(sentence).isEqualTo("My short description.");
 	}
 
@@ -59,7 +59,7 @@ class SentenceExtractorTests {
 
 	@Test
 	void extractFirstSentenceNoDotMultipleLines() {
-		String sentence = this.extractor.getFirstSentence("My short description " + NEW_LINE + " More stuff");
+		String sentence = this.extractor.getFirstSentence(new StringBuilder().append("My short description ").append(NEW_LINE).append(" More stuff").toString());
 		assertThat(sentence).isEqualTo("My short description");
 	}
 

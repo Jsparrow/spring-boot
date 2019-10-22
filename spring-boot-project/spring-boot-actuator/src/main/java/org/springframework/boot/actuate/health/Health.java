@@ -55,6 +55,11 @@ public final class Health extends HealthComponent {
 
 	private final Map<String, Object> details;
 
+	Health(Status status, Map<String, Object> details) {
+		this.status = status;
+		this.details = details;
+	}
+
 	/**
 	 * Create a new {@link Health} instance with the specified status and details.
 	 * @param builder the Builder to use
@@ -63,11 +68,6 @@ public final class Health extends HealthComponent {
 		Assert.notNull(builder, "Builder must not be null");
 		this.status = builder.status;
 		this.details = Collections.unmodifiableMap(builder.details);
-	}
-
-	Health(Status status, Map<String, Object> details) {
-		this.status = status;
-		this.details = details;
 	}
 
 	/**
@@ -106,11 +106,11 @@ public final class Health extends HealthComponent {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof Health) {
-			Health other = (Health) obj;
-			return this.status.equals(other.status) && this.details.equals(other.details);
+		if (!(obj instanceof Health)) {
+			return false;
 		}
-		return false;
+		Health other = (Health) obj;
+		return this.status.equals(other.status) && this.details.equals(other.details);
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public final class Health extends HealthComponent {
 
 	@Override
 	public String toString() {
-		return getStatus() + " " + getDetails();
+		return new StringBuilder().append(getStatus()).append(" ").append(getDetails()).toString();
 	}
 
 	/**
@@ -231,7 +231,7 @@ public final class Health extends HealthComponent {
 		 */
 		public Builder withException(Throwable ex) {
 			Assert.notNull(ex, "Exception must not be null");
-			return withDetail("error", ex.getClass().getName() + ": " + ex.getMessage());
+			return withDetail("error", new StringBuilder().append(ex.getClass().getName()).append(": ").append(ex.getMessage()).toString());
 		}
 
 		/**

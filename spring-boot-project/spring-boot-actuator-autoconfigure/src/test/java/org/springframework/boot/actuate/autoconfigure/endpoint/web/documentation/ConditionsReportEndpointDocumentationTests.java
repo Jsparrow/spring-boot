@@ -43,6 +43,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Collections;
 
 /**
  * Tests for generating documentation describing {@link ConditionsReportEndpoint}.
@@ -100,7 +101,7 @@ class ConditionsReportEndpointDocumentationTests extends MockMvcEndpointDocument
 			ConditionEvaluationReport conditionEvaluationReport = ConditionEvaluationReport
 					.get(context.getBeanFactory());
 			conditionEvaluationReport
-					.recordEvaluationCandidates(Arrays.asList(PropertyPlaceholderAutoConfiguration.class.getName()));
+					.recordEvaluationCandidates(Collections.singletonList(PropertyPlaceholderAutoConfiguration.class.getName()));
 			return new ConditionsReportEndpoint(context);
 		}
 

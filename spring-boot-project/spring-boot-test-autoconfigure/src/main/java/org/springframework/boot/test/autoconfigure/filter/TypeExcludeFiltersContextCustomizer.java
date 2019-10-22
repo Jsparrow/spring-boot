@@ -29,6 +29,8 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ContextCustomizer} to support {@link TypeExcludeFilters @TypeExcludeFilters}.
@@ -37,6 +39,8 @@ import org.springframework.util.ReflectionUtils;
  * @see TypeExcludeFilters
  */
 class TypeExcludeFiltersContextCustomizer implements ContextCustomizer {
+
+	private static final Logger logger = LoggerFactory.getLogger(TypeExcludeFiltersContextCustomizer.class);
 
 	private static final String EXCLUDE_FILTER_BEAN_NAME = TypeExcludeFilters.class.getName();
 
@@ -110,6 +114,7 @@ class TypeExcludeFiltersContextCustomizer implements ContextCustomizer {
 			return type.getDeclaredConstructor(Class.class);
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return type.getDeclaredConstructor();
 		}
 	}

@@ -157,28 +157,28 @@ public class Handler extends URLStreamHandler {
 	private String getFileFromSpec(String spec) {
 		int separatorIndex = spec.lastIndexOf("!/");
 		if (separatorIndex == -1) {
-			throw new IllegalArgumentException("No !/ in spec '" + spec + "'");
+			throw new IllegalArgumentException(new StringBuilder().append("No !/ in spec '").append(spec).append("'").toString());
 		}
 		try {
 			new URL(spec.substring(0, separatorIndex));
 			return spec;
 		}
 		catch (MalformedURLException ex) {
-			throw new IllegalArgumentException("Invalid spec URL '" + spec + "'", ex);
+			throw new IllegalArgumentException(new StringBuilder().append("Invalid spec URL '").append(spec).append("'").toString(), ex);
 		}
 	}
 
 	private String getFileFromContext(URL context, String spec) {
 		String file = context.getFile();
 		if (spec.startsWith("/")) {
-			return trimToJarRoot(file) + SEPARATOR + spec.substring(1);
+			return new StringBuilder().append(trimToJarRoot(file)).append(SEPARATOR).append(spec.substring(1)).toString();
 		}
 		if (file.endsWith("/")) {
 			return file + spec;
 		}
 		int lastSlashIndex = file.lastIndexOf('/');
 		if (lastSlashIndex == -1) {
-			throw new IllegalArgumentException("No / found in context URL's file '" + file + "'");
+			throw new IllegalArgumentException(new StringBuilder().append("No / found in context URL's file '").append(file).append("'").toString());
 		}
 		return file.substring(0, lastSlashIndex + 1) + spec;
 	}
@@ -186,7 +186,7 @@ public class Handler extends URLStreamHandler {
 	private String trimToJarRoot(String file) {
 		int lastSeparatorIndex = file.lastIndexOf(SEPARATOR);
 		if (lastSeparatorIndex == -1) {
-			throw new IllegalArgumentException("No !/ found in context URL's file '" + file + "'");
+			throw new IllegalArgumentException(new StringBuilder().append("No !/ found in context URL's file '").append(file).append("'").toString());
 		}
 		return file.substring(0, lastSeparatorIndex);
 	}
@@ -256,7 +256,7 @@ public class Handler extends URLStreamHandler {
 
 	@Override
 	protected boolean sameFile(URL u1, URL u2) {
-		if (!u1.getProtocol().equals("jar") || !u2.getProtocol().equals("jar")) {
+		if (!"jar".equals(u1.getProtocol()) || !"jar".equals(u2.getProtocol())) {
 			return false;
 		}
 		int separator1 = u1.getFile().indexOf(SEPARATOR);
@@ -313,7 +313,7 @@ public class Handler extends URLStreamHandler {
 			return result;
 		}
 		catch (Exception ex) {
-			throw new IOException("Unable to open root Jar file '" + name + "'", ex);
+			throw new IOException(new StringBuilder().append("Unable to open root Jar file '").append(name).append("'").toString(), ex);
 		}
 	}
 

@@ -55,6 +55,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Endpoint @Endpoint} to expose application properties from
@@ -74,6 +76,8 @@ import org.springframework.util.StringUtils;
 @Endpoint(id = "configprops")
 public class ConfigurationPropertiesReportEndpoint implements ApplicationContextAware {
 
+	private static final Logger logger1 = LoggerFactory.getLogger(ConfigurationPropertiesReportEndpoint.class);
+
 	private static final String CONFIGURATION_PROPERTIES_FILTER_ID = "configurationPropertiesFilter";
 
 	private final Sanitizer sanitizer = new Sanitizer();
@@ -83,7 +87,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 	private ObjectMapper objectMapper;
 
 	@Override
-	public void setApplicationContext(ApplicationContext context) throws BeansException {
+	public void setApplicationContext(ApplicationContext context) {
 		this.context = context;
 	}
 
@@ -133,7 +137,8 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 			return new HashMap<>(mapper.convertValue(bean, Map.class));
 		}
 		catch (Exception ex) {
-			return new HashMap<>(Collections.singletonMap("error", "Cannot serialize '" + prefix + "'"));
+			logger1.error(ex.getMessage(), ex);
+			return new HashMap<>(Collections.singletonMap("error", new StringBuilder().append("Cannot serialize '").append(prefix).append("'").toString()));
 		}
 	}
 
@@ -207,7 +212,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 	@SuppressWarnings("unchecked")
 	private List<Object> sanitize(String prefix, List<Object> list) {
 		List<Object> sanitized = new ArrayList<>();
-		for (Object item : list) {
+		list.forEach(item -> {
 			if (item instanceof Map) {
 				sanitized.add(sanitize(prefix, (Map<String, Object>) item));
 			}
@@ -217,7 +222,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 			else {
 				sanitized.add(this.sanitizer.sanitize(prefix, item));
 			}
-		}
+		});
 		return sanitized;
 	}
 
@@ -274,16 +279,16 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 				try {
 					if (pojo == ((BeanPropertyWriter) writer).get(pojo)) {
 						if (logger.isDebugEnabled()) {
-							logger.debug("Skipping '" + writer.getFullName() + "' on '" + pojo.getClass().getName()
-									+ "' as it is self-referential");
+							logger.debug(new StringBuilder().append("Skipping '").append(writer.getFullName()).append("' on '").append(pojo.getClass().getName()).append("' as it is self-referential")
+									.toString());
 						}
 						return;
 					}
 				}
 				catch (Exception ex) {
 					if (logger.isDebugEnabled()) {
-						logger.debug("Skipping '" + writer.getFullName() + "' on '" + pojo.getClass().getName()
-								+ "' as an exception was thrown when retrieving its value", ex);
+						logger.debug(new StringBuilder().append("Skipping '").append(writer.getFullName()).append("' on '").append(pojo.getClass().getName()).append("' as an exception was thrown when retrieving its value")
+								.toString(), ex);
 					}
 					return;
 				}
@@ -302,12 +307,12 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 		public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc,
 				List<BeanPropertyWriter> beanProperties) {
 			List<BeanPropertyWriter> result = new ArrayList<>();
-			for (BeanPropertyWriter writer : beanProperties) {
+			beanProperties.forEach(writer -> {
 				boolean readable = isReadable(beanDesc, writer);
 				if (readable) {
 					result.add(writer);
 				}
-			}
+			});
 			return result;
 		}
 

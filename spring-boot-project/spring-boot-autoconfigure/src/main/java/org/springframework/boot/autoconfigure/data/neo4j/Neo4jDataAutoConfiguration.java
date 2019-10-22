@@ -112,10 +112,7 @@ public class Neo4jDataAutoConfiguration {
 		@Bean
 		OpenSessionInViewInterceptor neo4jOpenSessionInViewInterceptor(Neo4jProperties properties) {
 			if (properties.getOpenInView() == null) {
-				logger.warn("spring.data.neo4j.open-in-view is enabled by default."
-						+ "Therefore, database queries may be performed during view "
-						+ "rendering. Explicitly configure "
-						+ "spring.data.neo4j.open-in-view to disable this warning");
+				logger.warn(new StringBuilder().append("spring.data.neo4j.open-in-view is enabled by default.").append("Therefore, database queries may be performed during view ").append("rendering. Explicitly configure ").append("spring.data.neo4j.open-in-view to disable this warning").toString());
 			}
 			return new OpenSessionInViewInterceptor();
 		}

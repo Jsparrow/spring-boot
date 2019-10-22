@@ -133,11 +133,11 @@ public class CachesEndpoint {
 		String cacheName = entry.getName();
 		String cacheManager = entry.getCacheManager();
 		Cache cache = this.cacheManagers.get(cacheManager).getCache(cacheName);
-		if (cache != null) {
-			cache.clear();
-			return true;
+		if (cache == null) {
+			return false;
 		}
-		return false;
+		cache.clear();
+		return true;
 	}
 
 	private Predicate<String> isNameMatch(String name) {

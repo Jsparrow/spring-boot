@@ -40,9 +40,9 @@ import org.springframework.util.FileCopyUtils;
  */
 class LogFileWebEndpointWebIntegrationTests {
 
-	private WebTestClient client;
-
 	private static File tempFile;
+
+	private WebTestClient client;
 
 	@BeforeEach
 	void setUp(WebTestClient client) {

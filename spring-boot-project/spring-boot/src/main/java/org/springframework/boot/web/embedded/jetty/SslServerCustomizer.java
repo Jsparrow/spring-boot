@@ -184,7 +184,7 @@ class SslServerCustomizer implements JettyServerCustomizer {
 			factory.setKeyStoreResource(Resource.newResource(url));
 		}
 		catch (Exception ex) {
-			throw new WebServerException("Could not load key store '" + ssl.getKeyStore() + "'", ex);
+			throw new WebServerException(new StringBuilder().append("Could not load key store '").append(ssl.getKeyStore()).append("'").toString(), ex);
 		}
 		if (ssl.getKeyStoreType() != null) {
 			factory.setKeyStoreType(ssl.getKeyStoreType());
@@ -204,7 +204,7 @@ class SslServerCustomizer implements JettyServerCustomizer {
 				factory.setTrustStoreResource(Resource.newResource(url));
 			}
 			catch (IOException ex) {
-				throw new WebServerException("Could not find trust store '" + ssl.getTrustStore() + "'", ex);
+				throw new WebServerException(new StringBuilder().append("Could not find trust store '").append(ssl.getTrustStore()).append("'").toString(), ex);
 			}
 		}
 		if (ssl.getTrustStoreType() != null) {

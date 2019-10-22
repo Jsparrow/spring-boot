@@ -60,18 +60,18 @@ class BindFailureAnalyzer extends AbstractFailureAnalyzer<BindException> {
 	}
 
 	private void buildDescription(StringBuilder description, ConfigurationProperty property) {
-		if (property != null) {
-			description.append(String.format("%n    Property: %s", property.getName()));
-			description.append(String.format("%n    Value: %s", property.getValue()));
-			description.append(String.format("%n    Origin: %s", property.getOrigin()));
+		if (property == null) {
+			return;
 		}
+		description.append(String.format("%n    Property: %s", property.getName()));
+		description.append(String.format("%n    Value: %s", property.getValue()));
+		description.append(String.format("%n    Origin: %s", property.getOrigin()));
 	}
 
 	private String getMessage(BindException cause) {
 		ConversionFailedException conversionFailure = findCause(cause, ConversionFailedException.class);
 		if (conversionFailure != null) {
-			return "failed to convert " + conversionFailure.getSourceType() + " to "
-					+ conversionFailure.getTargetType();
+			return new StringBuilder().append("failed to convert ").append(conversionFailure.getSourceType()).append(" to ").append(conversionFailure.getTargetType()).toString();
 		}
 		Throwable failure = cause;
 		while (failure.getCause() != null) {

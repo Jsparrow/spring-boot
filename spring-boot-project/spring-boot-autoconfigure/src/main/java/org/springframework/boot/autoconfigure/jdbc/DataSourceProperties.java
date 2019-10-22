@@ -35,6 +35,8 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for configuration of a data source.
@@ -48,6 +50,8 @@ import org.springframework.util.StringUtils;
  */
 @ConfigurationProperties(prefix = "spring.datasource")
 public class DataSourceProperties implements BeanClassLoaderAware, InitializingBean {
+
+	private static final Logger logger = LoggerFactory.getLogger(DataSourceProperties.class);
 
 	private ClassLoader classLoader;
 
@@ -246,6 +250,7 @@ public class DataSourceProperties implements BeanClassLoaderAware, InitializingB
 			throw ex;
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

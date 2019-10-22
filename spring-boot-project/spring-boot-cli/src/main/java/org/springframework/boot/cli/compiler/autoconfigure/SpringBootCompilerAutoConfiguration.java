@@ -68,16 +68,16 @@ public class SpringBootCompilerAutoConfiguration extends CompilerAutoConfigurati
 
 	@Override
 	public void applyToMainClass(GroovyClassLoader loader, GroovyCompilerConfiguration configuration,
-			GeneratorContext generatorContext, SourceUnit source, ClassNode classNode)
-			throws CompilationFailedException {
+			GeneratorContext generatorContext, SourceUnit source, ClassNode classNode) {
 		addEnableAutoConfigurationAnnotation(classNode);
 	}
 
 	private void addEnableAutoConfigurationAnnotation(ClassNode classNode) {
-		if (!hasEnableAutoConfigureAnnotation(classNode)) {
-			AnnotationNode annotationNode = new AnnotationNode(ClassHelper.make("EnableAutoConfiguration"));
-			classNode.addAnnotation(annotationNode);
+		if (hasEnableAutoConfigureAnnotation(classNode)) {
+			return;
 		}
+		AnnotationNode annotationNode = new AnnotationNode(ClassHelper.make("EnableAutoConfiguration"));
+		classNode.addAnnotation(annotationNode);
 	}
 
 	private boolean hasEnableAutoConfigureAnnotation(ClassNode classNode) {

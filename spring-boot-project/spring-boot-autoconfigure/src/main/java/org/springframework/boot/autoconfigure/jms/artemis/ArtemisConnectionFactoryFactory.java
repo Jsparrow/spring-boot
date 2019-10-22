@@ -32,6 +32,8 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory to create an Artemis {@link ActiveMQConnectionFactory} instance from properties
@@ -42,6 +44,8 @@ import org.springframework.util.StringUtils;
  * @author Stephane Nicoll
  */
 class ArtemisConnectionFactoryFactory {
+
+	private static final Logger logger = LoggerFactory.getLogger(ArtemisConnectionFactoryFactory.class);
 
 	static final String[] EMBEDDED_JMS_CLASSES = { "org.apache.activemq.artemis.jms.server.embedded.EmbeddedJMS",
 			"org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ" };
@@ -68,12 +72,13 @@ class ArtemisConnectionFactoryFactory {
 	}
 
 	private void startEmbeddedJms() {
-		for (int i = 0; i < EMBEDDED_JMS_CLASSES.length; i++) {
-			if (ClassUtils.isPresent(EMBEDDED_JMS_CLASSES[i], null)) {
+		for (String aEMBEDDED_JMS_CLASSES : EMBEDDED_JMS_CLASSES) {
+			if (ClassUtils.isPresent(aEMBEDDED_JMS_CLASSES, null)) {
 				try {
-					this.beanFactory.getBeansOfType(Class.forName(EMBEDDED_JMS_CLASSES[i]));
+					this.beanFactory.getBeansOfType(Class.forName(aEMBEDDED_JMS_CLASSES));
 				}
 				catch (Exception ex) {
+					logger.error(ex.getMessage(), ex);
 					// Ignore
 				}
 			}
@@ -103,8 +108,8 @@ class ArtemisConnectionFactoryFactory {
 	}
 
 	private boolean isEmbeddedJmsClassPresent() {
-		for (int i = 0; i < EMBEDDED_JMS_CLASSES.length; i++) {
-			if (ClassUtils.isPresent(EMBEDDED_JMS_CLASSES[i], null)) {
+		for (String aEMBEDDED_JMS_CLASSES : EMBEDDED_JMS_CLASSES) {
+			if (ClassUtils.isPresent(aEMBEDDED_JMS_CLASSES, null)) {
 				return true;
 			}
 		}

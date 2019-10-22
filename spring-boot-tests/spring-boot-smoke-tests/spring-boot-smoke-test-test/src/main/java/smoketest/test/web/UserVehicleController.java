@@ -45,7 +45,7 @@ public class UserVehicleController {
 	@GetMapping(path = "/{username}/vehicle", produces = MediaType.TEXT_PLAIN_VALUE)
 	public String getVehicleDetailsText(@PathVariable String username) {
 		VehicleDetails details = this.userVehicleService.getVehicleDetails(username);
-		return details.getMake() + " " + details.getModel();
+		return new StringBuilder().append(details.getMake()).append(" ").append(details.getModel()).toString();
 	}
 
 	@GetMapping(path = "/{username}/vehicle", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -56,13 +56,13 @@ public class UserVehicleController {
 	@GetMapping(path = "/{username}/vehicle.html", produces = MediaType.TEXT_HTML_VALUE)
 	public String VehicleDetailsHtml(@PathVariable String username) {
 		VehicleDetails details = this.userVehicleService.getVehicleDetails(username);
-		String makeAndModel = details.getMake() + " " + details.getModel();
-		return "<html><body><h1>" + makeAndModel + "</h1></body></html>";
+		String makeAndModel = new StringBuilder().append(details.getMake()).append(" ").append(details.getModel()).toString();
+		return new StringBuilder().append("<html><body><h1>").append(makeAndModel).append("</h1></body></html>").toString();
 	}
 
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	private void handleVinNotFound(VehicleIdentificationNumberNotFoundException ex) {
+	private void handleVinNotFound() {
 	}
 
 }

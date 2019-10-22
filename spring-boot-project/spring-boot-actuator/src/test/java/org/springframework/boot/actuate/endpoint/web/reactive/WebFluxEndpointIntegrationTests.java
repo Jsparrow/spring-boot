@@ -48,6 +48,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 
 /**
  * Integration tests for web endpoints exposed using WebFlux.
@@ -121,7 +122,7 @@ class WebFluxEndpointIntegrationTests
 		WebFluxEndpointHandlerMapping webEndpointHandlerMapping(Environment environment,
 				WebEndpointDiscoverer endpointDiscoverer, EndpointMediaTypes endpointMediaTypes) {
 			CorsConfiguration corsConfiguration = new CorsConfiguration();
-			corsConfiguration.setAllowedOrigins(Arrays.asList("https://example.com"));
+			corsConfiguration.setAllowedOrigins(Collections.singletonList("https://example.com"));
 			corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST"));
 			String endpointPath = environment.getProperty("endpointPath");
 			return new WebFluxEndpointHandlerMapping(new EndpointMapping(endpointPath),
@@ -143,7 +144,7 @@ class WebFluxEndpointIntegrationTests
 		WebFilter webFilter() {
 			return (exchange, chain) -> chain.filter(exchange).subscriberContext(
 					ReactiveSecurityContextHolder.withAuthentication(new UsernamePasswordAuthenticationToken("Alice",
-							"secret", Arrays.asList(new SimpleGrantedAuthority("ROLE_ACTUATOR")))));
+							"secret", Collections.singletonList(new SimpleGrantedAuthority("ROLE_ACTUATOR")))));
 		}
 
 	}

@@ -44,7 +44,7 @@ class StringToFileConverterTests {
 
 	@ConversionServiceTest
 	void convertWhenFilePrefixedReturnsFile(ConversionService conversionService) {
-		assertThat(convert(conversionService, "file:" + this.temp.getAbsolutePath() + "/test").getAbsoluteFile())
+		assertThat(convert(conversionService, new StringBuilder().append("file:").append(this.temp.getAbsolutePath()).append("/test").toString()).getAbsoluteFile())
 				.isEqualTo(new File(this.temp, "test").getAbsoluteFile());
 	}
 

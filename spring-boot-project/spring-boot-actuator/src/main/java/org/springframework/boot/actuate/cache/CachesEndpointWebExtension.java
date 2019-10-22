@@ -23,6 +23,8 @@ import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
 import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
 import org.springframework.lang.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EndpointWebExtension @EndpointWebExtension} for the {@link CachesEndpoint}.
@@ -33,6 +35,7 @@ import org.springframework.lang.Nullable;
 @EndpointWebExtension(endpoint = CachesEndpoint.class)
 public class CachesEndpointWebExtension {
 
+	private static final Logger logger = LoggerFactory.getLogger(CachesEndpointWebExtension.class);
 	private final CachesEndpoint delegate;
 
 	public CachesEndpointWebExtension(CachesEndpoint delegate) {
@@ -47,6 +50,7 @@ public class CachesEndpointWebExtension {
 			return new WebEndpointResponse<>(entry, status);
 		}
 		catch (NonUniqueCacheException ex) {
+			logger.error(ex.getMessage(), ex);
 			return new WebEndpointResponse<>(WebEndpointResponse.STATUS_BAD_REQUEST);
 		}
 	}
@@ -59,6 +63,7 @@ public class CachesEndpointWebExtension {
 			return new WebEndpointResponse<>(status);
 		}
 		catch (NonUniqueCacheException ex) {
+			logger.error(ex.getMessage(), ex);
 			return new WebEndpointResponse<>(WebEndpointResponse.STATUS_BAD_REQUEST);
 		}
 	}

@@ -56,11 +56,12 @@ public class MockitoTestExecutionListener extends AbstractTestExecutionListener 
 
 	@Override
 	public void beforeTestMethod(TestContext testContext) throws Exception {
-		if (Boolean.TRUE.equals(
+		if (!Boolean.TRUE.equals(
 				testContext.getAttribute(DependencyInjectionTestExecutionListener.REINJECT_DEPENDENCIES_ATTRIBUTE))) {
-			initMocks(testContext);
-			reinjectFields(testContext);
+			return;
 		}
+		initMocks(testContext);
+		reinjectFields(testContext);
 	}
 
 	private void initMocks(TestContext testContext) {
@@ -91,16 +92,17 @@ public class MockitoTestExecutionListener extends AbstractTestExecutionListener 
 	private void postProcessFields(TestContext testContext, BiConsumer<MockitoField, MockitoPostProcessor> consumer) {
 		DefinitionsParser parser = new DefinitionsParser();
 		parser.parse(testContext.getTestClass());
-		if (!parser.getDefinitions().isEmpty()) {
-			MockitoPostProcessor postProcessor = testContext.getApplicationContext()
-					.getBean(MockitoPostProcessor.class);
-			for (Definition definition : parser.getDefinitions()) {
-				Field field = parser.getField(definition);
-				if (field != null) {
-					consumer.accept(new MockitoField(field, testContext.getTestInstance(), definition), postProcessor);
-				}
-			}
+		if (parser.getDefinitions().isEmpty()) {
+			return;
 		}
+		MockitoPostProcessor postProcessor = testContext.getApplicationContext()
+				.getBean(MockitoPostProcessor.class);
+		parser.getDefinitions().forEach(definition -> {
+			Field field = parser.getField(definition);
+			if (field != null) {
+				consumer.accept(new MockitoField(field, testContext.getTestInstance(), definition), postProcessor);
+			}
+		});
 	}
 
 	/**
@@ -111,7 +113,7 @@ public class MockitoTestExecutionListener extends AbstractTestExecutionListener 
 		private final Set<Annotation> annotations = new LinkedHashSet<>();
 
 		@Override
-		public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+		public void doWith(Field field) throws IllegalAccessException {
 			for (Annotation annotation : field.getDeclaredAnnotations()) {
 				if (annotation.annotationType().getName().startsWith("org.mockito")) {
 					this.annotations.add(annotation);

@@ -43,11 +43,11 @@ class DiscoveredServletEndpoint extends AbstractDiscoveredEndpoint<Operation> im
 		super(discoverer, endpointBean, id, enabledByDefault, Collections.emptyList());
 		String beanType = endpointBean.getClass().getName();
 		Assert.state(endpointBean instanceof Supplier,
-				() -> "ServletEndpoint bean " + beanType + " must be a supplier");
+				() -> new StringBuilder().append("ServletEndpoint bean ").append(beanType).append(" must be a supplier").toString());
 		Object supplied = ((Supplier<?>) endpointBean).get();
-		Assert.state(supplied != null, () -> "ServletEndpoint bean " + beanType + " must not supply null");
+		Assert.state(supplied != null, () -> new StringBuilder().append("ServletEndpoint bean ").append(beanType).append(" must not supply null").toString());
 		Assert.state(supplied instanceof EndpointServlet,
-				() -> "ServletEndpoint bean " + beanType + " must supply an EndpointServlet");
+				() -> new StringBuilder().append("ServletEndpoint bean ").append(beanType).append(" must supply an EndpointServlet").toString());
 		this.endpointServlet = (EndpointServlet) supplied;
 		this.rootPath = rootPath;
 	}

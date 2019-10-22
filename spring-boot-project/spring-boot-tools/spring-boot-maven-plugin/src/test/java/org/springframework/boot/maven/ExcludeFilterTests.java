@@ -40,14 +40,14 @@ class ExcludeFilterTests {
 
 	@Test
 	void excludeSimple() throws ArtifactFilterException {
-		ExcludeFilter filter = new ExcludeFilter(Arrays.asList(createExclude("com.foo", "bar")));
+		ExcludeFilter filter = new ExcludeFilter(Collections.singletonList(createExclude("com.foo", "bar")));
 		Set result = filter.filter(Collections.singleton(createArtifact("com.foo", "bar")));
 		assertThat(result).isEmpty();
 	}
 
 	@Test
 	void excludeGroupIdNoMatch() throws ArtifactFilterException {
-		ExcludeFilter filter = new ExcludeFilter(Arrays.asList(createExclude("com.foo", "bar")));
+		ExcludeFilter filter = new ExcludeFilter(Collections.singletonList(createExclude("com.foo", "bar")));
 		Artifact artifact = createArtifact("com.baz", "bar");
 		Set result = filter.filter(Collections.singleton(artifact));
 		assertThat(result).hasSize(1);
@@ -56,7 +56,7 @@ class ExcludeFilterTests {
 
 	@Test
 	void excludeArtifactIdNoMatch() throws ArtifactFilterException {
-		ExcludeFilter filter = new ExcludeFilter(Arrays.asList(createExclude("com.foo", "bar")));
+		ExcludeFilter filter = new ExcludeFilter(Collections.singletonList(createExclude("com.foo", "bar")));
 		Artifact artifact = createArtifact("com.foo", "biz");
 		Set result = filter.filter(Collections.singleton(artifact));
 		assertThat(result).hasSize(1);
@@ -65,14 +65,14 @@ class ExcludeFilterTests {
 
 	@Test
 	void excludeClassifier() throws ArtifactFilterException {
-		ExcludeFilter filter = new ExcludeFilter(Arrays.asList(createExclude("com.foo", "bar", "jdk5")));
+		ExcludeFilter filter = new ExcludeFilter(Collections.singletonList(createExclude("com.foo", "bar", "jdk5")));
 		Set result = filter.filter(Collections.singleton(createArtifact("com.foo", "bar", "jdk5")));
 		assertThat(result).isEmpty();
 	}
 
 	@Test
 	void excludeClassifierNoTargetClassifier() throws ArtifactFilterException {
-		ExcludeFilter filter = new ExcludeFilter(Arrays.asList(createExclude("com.foo", "bar", "jdk5")));
+		ExcludeFilter filter = new ExcludeFilter(Collections.singletonList(createExclude("com.foo", "bar", "jdk5")));
 		Artifact artifact = createArtifact("com.foo", "bar");
 		Set result = filter.filter(Collections.singleton(artifact));
 		assertThat(result).hasSize(1);
@@ -81,7 +81,7 @@ class ExcludeFilterTests {
 
 	@Test
 	void excludeClassifierNoMatch() throws ArtifactFilterException {
-		ExcludeFilter filter = new ExcludeFilter(Arrays.asList(createExclude("com.foo", "bar", "jdk5")));
+		ExcludeFilter filter = new ExcludeFilter(Collections.singletonList(createExclude("com.foo", "bar", "jdk5")));
 		Artifact artifact = createArtifact("com.foo", "bar", "jdk6");
 		Set result = filter.filter(Collections.singleton(artifact));
 		assertThat(result).hasSize(1);

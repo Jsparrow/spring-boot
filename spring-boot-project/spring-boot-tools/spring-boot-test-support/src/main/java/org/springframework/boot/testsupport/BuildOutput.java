@@ -43,7 +43,7 @@ public class BuildOutput {
 			if (location.getPath().endsWith(path("target", "test-classes"))) {
 				return location;
 			}
-			throw new IllegalStateException("Unexpected test classes location '" + location + "'");
+			throw new IllegalStateException(new StringBuilder().append("Unexpected test classes location '").append(location).append("'").toString());
 		}
 		catch (URISyntaxException ex) {
 			throw new IllegalStateException("Invalid test class code source location", ex);
@@ -60,7 +60,7 @@ public class BuildOutput {
 			return testClassesLocation;
 		}
 		throw new IllegalStateException(
-				"Cannot determine test resources location from classes location '" + testClassesLocation + "'");
+				new StringBuilder().append("Cannot determine test resources location from classes location '").append(testClassesLocation).append("'").toString());
 	}
 
 	/**

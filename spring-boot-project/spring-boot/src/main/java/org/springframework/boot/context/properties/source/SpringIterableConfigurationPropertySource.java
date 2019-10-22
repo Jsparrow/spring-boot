@@ -32,6 +32,8 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ConfigurationPropertySource} backed by an {@link EnumerablePropertySource}.
@@ -47,6 +49,7 @@ import org.springframework.util.ObjectUtils;
 class SpringIterableConfigurationPropertySource extends SpringConfigurationPropertySource
 		implements IterableConfigurationPropertySource {
 
+	private static final Logger logger = LoggerFactory.getLogger(SpringIterableConfigurationPropertySource.class);
 	private volatile Cache cache;
 
 	SpringIterableConfigurationPropertySource(EnumerablePropertySource<?> propertySource, PropertyMapper mapper) {
@@ -60,6 +63,7 @@ class SpringIterableConfigurationPropertySource extends SpringConfigurationPrope
 				((MapPropertySource) getPropertySource()).getSource().size();
 			}
 			catch (UnsupportedOperationException ex) {
+				logger.error(ex.getMessage(), ex);
 				throw new IllegalArgumentException("PropertySource must be fully enumerable");
 			}
 		}
@@ -139,6 +143,7 @@ class SpringIterableConfigurationPropertySource extends SpringConfigurationPrope
 			return cache;
 		}
 		catch (ConcurrentModificationException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Not fatal at this point, we can continue without a cache
 			return null;
 		}
@@ -228,11 +233,11 @@ class SpringIterableConfigurationPropertySource extends SpringConfigurationPrope
 			if (isImmutable(source)) {
 				return IMMUTABLE_PROPERTY_SOURCE;
 			}
-			if (source instanceof MapPropertySource) {
-				MapPropertySource mapPropertySource = (MapPropertySource) source;
-				return new CacheKey(mapPropertySource.getSource().keySet());
+			if (!(source instanceof MapPropertySource)) {
+				return new CacheKey(source.getPropertyNames());
 			}
-			return new CacheKey(source.getPropertyNames());
+			MapPropertySource mapPropertySource = (MapPropertySource) source;
+			return new CacheKey(mapPropertySource.getSource().keySet());
 		}
 
 		private static boolean isImmutable(EnumerablePropertySource<?> source) {

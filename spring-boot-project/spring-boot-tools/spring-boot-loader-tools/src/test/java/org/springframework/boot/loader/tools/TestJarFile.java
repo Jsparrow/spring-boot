@@ -59,7 +59,7 @@ public class TestJarFile {
 		File file = getFilePath(filename);
 		file.getParentFile().mkdirs();
 		InputStream inputStream = getClass()
-				.getResourceAsStream("/" + classToCopy.getName().replace('.', '/') + ".class");
+				.getResourceAsStream(new StringBuilder().append("/").append(classToCopy.getName().replace('.', '/')).append(".class").toString());
 		copyToFile(inputStream, file);
 		if (time != null) {
 			file.setLastModified(time);
@@ -120,7 +120,7 @@ public class TestJarFile {
 	}
 
 	public File getFile(String extension) throws IOException {
-		File file = new File(this.temporaryFolder, UUID.randomUUID() + "." + extension);
+		File file = new File(this.temporaryFolder, new StringBuilder().append(UUID.randomUUID()).append(".").append(extension).toString());
 		ZipUtil.pack(this.entries.toArray(new ZipEntrySource[0]), file);
 		return file;
 	}

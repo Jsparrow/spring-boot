@@ -211,7 +211,7 @@ class RedisAutoConfigurationTests {
 							.getClusterConfiguration();
 					assertThat(clusterConfiguration.getClusterNodes()).hasSize(2);
 					assertThat(clusterConfiguration.getClusterNodes())
-							.extracting((node) -> node.getHost() + ":" + node.getPort())
+							.extracting((node) -> new StringBuilder().append(node.getHost()).append(":").append(node.getPort()).toString())
 							.containsExactlyInAnyOrder("127.0.0.1:27379", "127.0.0.1:27380");
 				});
 

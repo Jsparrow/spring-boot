@@ -36,6 +36,8 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for storing {@link EntityScan @EntityScan} specified packages for reference later
@@ -47,6 +49,8 @@ import org.springframework.util.StringUtils;
  * @see EntityScanner
  */
 public class EntityScanPackages {
+
+	private static final Logger logger = LoggerFactory.getLogger(EntityScanPackages.class);
 
 	private static final String BEAN = EntityScanPackages.class.getName();
 
@@ -85,6 +89,7 @@ public class EntityScanPackages {
 			return beanFactory.getBean(BEAN, EntityScanPackages.class);
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			return NONE;
 		}
 	}
@@ -152,12 +157,12 @@ public class EntityScanPackages {
 			for (Class<?> basePackageClass : basePackageClasses) {
 				packagesToScan.add(ClassUtils.getPackageName(basePackageClass));
 			}
-			if (packagesToScan.isEmpty()) {
-				String packageName = ClassUtils.getPackageName(metadata.getClassName());
-				Assert.state(!StringUtils.isEmpty(packageName), "@EntityScan cannot be used with the default package");
-				return Collections.singleton(packageName);
+			if (!packagesToScan.isEmpty()) {
+				return packagesToScan;
 			}
-			return packagesToScan;
+			String packageName = ClassUtils.getPackageName(metadata.getClassName());
+			Assert.state(!StringUtils.isEmpty(packageName), "@EntityScan cannot be used with the default package");
+			return Collections.singleton(packageName);
 		}
 
 	}

@@ -65,7 +65,7 @@ class DiscoveredJmxOperation extends AbstractDiscoveredOperation implements JmxO
 		Method method = operationMethod.getMethod();
 		this.name = method.getName();
 		this.outputType = JmxType.get(method.getReturnType());
-		this.description = getDescription(method, () -> "Invoke " + this.name + " for endpoint " + endpointId);
+		this.description = getDescription(method, () -> new StringBuilder().append("Invoke ").append(this.name).append(" for endpoint ").append(endpointId).toString());
 		this.parameters = getParameters(operationMethod);
 	}
 

@@ -40,6 +40,8 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.server.WebServerException;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link WebServer} that can be used to control an embedded Undertow server. Typically
@@ -55,6 +57,8 @@ import org.springframework.util.StringUtils;
  * @see UndertowServletWebServerFactory
  */
 public class UndertowServletWebServer implements WebServer {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(UndertowServletWebServer.class);
 
 	private static final Log logger = LogFactory.getLog(UndertowServletWebServer.class);
 
@@ -127,7 +131,7 @@ public class UndertowServletWebServer implements WebServer {
 	}
 
 	@Override
-	public void start() throws WebServerException {
+	public void start() {
 		synchronized (this.monitor) {
 			if (this.started) {
 				return;
@@ -141,8 +145,8 @@ public class UndertowServletWebServer implements WebServer {
 				}
 				this.undertow.start();
 				this.started = true;
-				UndertowServletWebServer.logger.info("Undertow started on port(s) " + getPortsDescription()
-						+ " with context path '" + this.contextPath + "'");
+				UndertowServletWebServer.logger.info(new StringBuilder().append("Undertow started on port(s) ").append(getPortsDescription()).append(" with context path '").append(this.contextPath).append("'")
+						.toString());
 			}
 			catch (Exception ex) {
 				try {
@@ -176,6 +180,7 @@ public class UndertowServletWebServer implements WebServer {
 			}
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}
@@ -227,12 +232,11 @@ public class UndertowServletWebServer implements WebServer {
 				ports.add(new Port(-1, "unknown"));
 			}
 			else {
-				for (BoundChannel channel : extractChannels()) {
-					ports.add(getPortFromChannel(channel));
-				}
+				extractChannels().forEach(channel -> ports.add(getPortFromChannel(channel)));
 			}
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Continue
 		}
 		return ports;
@@ -247,16 +251,16 @@ public class UndertowServletWebServer implements WebServer {
 
 	private Port getPortFromChannel(BoundChannel channel) {
 		SocketAddress socketAddress = channel.getLocalAddress();
-		if (socketAddress instanceof InetSocketAddress) {
-			String protocol = (ReflectionUtils.findField(channel.getClass(), "ssl") != null) ? "https" : "http";
-			return new Port(((InetSocketAddress) socketAddress).getPort(), protocol);
+		if (!(socketAddress instanceof InetSocketAddress)) {
+			return null;
 		}
-		return null;
+		String protocol = (ReflectionUtils.findField(channel.getClass(), "ssl") != null) ? "https" : "http";
+		return new Port(((InetSocketAddress) socketAddress).getPort(), protocol);
 	}
 
 	private List<Port> getConfiguredPorts() {
 		List<Port> ports = new ArrayList<>();
-		for (Object listener : extractListeners()) {
+		extractListeners().forEach(listener -> {
 			try {
 				Port port = getPortFromListener(listener);
 				if (port.getNumber() != 0) {
@@ -264,9 +268,10 @@ public class UndertowServletWebServer implements WebServer {
 				}
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				// Continue
 			}
-		}
+		});
 		return ports;
 	}
 
@@ -288,7 +293,7 @@ public class UndertowServletWebServer implements WebServer {
 	}
 
 	@Override
-	public void stop() throws WebServerException {
+	public void stop() {
 		synchronized (this.monitor) {
 			if (!this.started) {
 				return;
@@ -354,7 +359,7 @@ public class UndertowServletWebServer implements WebServer {
 
 		@Override
 		public String toString() {
-			return this.number + " (" + this.protocol + ")";
+			return new StringBuilder().append(this.number).append(" (").append(this.protocol).append(")").toString();
 		}
 
 	}

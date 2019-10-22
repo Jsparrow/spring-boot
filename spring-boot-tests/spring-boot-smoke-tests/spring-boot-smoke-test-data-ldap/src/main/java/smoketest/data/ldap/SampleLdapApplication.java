@@ -19,10 +19,13 @@ package smoketest.data.ldap;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SampleLdapApplication implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleLdapApplication.class);
 	private final PersonRepository repository;
 
 	public SampleLdapApplication(PersonRepository repository) {
@@ -33,17 +36,17 @@ public class SampleLdapApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		// fetch all people
-		System.out.println("People found with findAll():");
-		System.out.println("-------------------------------");
+		logger.info("People found with findAll():");
+		logger.info("-------------------------------");
 		for (Person person : this.repository.findAll()) {
-			System.out.println(person);
+			logger.info(String.valueOf(person));
 		}
 		System.out.println();
 
 		// fetch an individual person
-		System.out.println("Person found with findByPhone('+46 555-123456'):");
-		System.out.println("--------------------------------");
-		System.out.println(this.repository.findByPhone("+46 555-123456"));
+		logger.info("Person found with findByPhone('+46 555-123456'):");
+		logger.info("--------------------------------");
+		logger.info(String.valueOf(this.repository.findByPhone("+46 555-123456")));
 	}
 
 	public static void main(String[] args) {

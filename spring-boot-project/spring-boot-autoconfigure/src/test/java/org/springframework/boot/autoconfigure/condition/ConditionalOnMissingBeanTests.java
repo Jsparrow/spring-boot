@@ -335,6 +335,13 @@ public class ConditionalOnMissingBeanTests {
 		};
 	}
 
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@interface TestAnnotation {
+
+	}
+
 	@Configuration(proxyBeanMethods = false)
 	static class OnBeanInAncestorsConfiguration {
 
@@ -754,13 +761,6 @@ public class ConditionalOnMissingBeanTests {
 		OtherExampleBean() {
 			super("other subclass");
 		}
-
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@interface TestAnnotation {
 
 	}
 

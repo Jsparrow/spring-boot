@@ -56,12 +56,8 @@ class TypeElementMembers {
 	}
 
 	private void process(TypeElement element) {
-		for (ExecutableElement method : ElementFilter.methodsIn(element.getEnclosedElements())) {
-			processMethod(method);
-		}
-		for (VariableElement field : ElementFilter.fieldsIn(element.getEnclosedElements())) {
-			processField(field);
-		}
+		ElementFilter.methodsIn(element.getEnclosedElements()).forEach(this::processMethod);
+		ElementFilter.fieldsIn(element.getEnclosedElements()).forEach(this::processField);
 		Element superType = this.env.getTypeUtils().asElement(element.getSuperclass());
 		if (superType instanceof TypeElement && !OBJECT_CLASS_NAME.equals(superType.toString())) {
 			process((TypeElement) superType);
@@ -69,19 +65,20 @@ class TypeElementMembers {
 	}
 
 	private void processMethod(ExecutableElement method) {
-		if (isPublic(method)) {
-			String name = method.getSimpleName().toString();
-			if (isGetter(method) && !this.publicGetters.containsKey(name)) {
-				this.publicGetters.put(getAccessorName(name), method);
-			}
-			else if (isSetter(method)) {
-				String propertyName = getAccessorName(name);
-				List<ExecutableElement> matchingSetters = this.publicSetters.computeIfAbsent(propertyName,
-						(k) -> new ArrayList<>());
-				TypeMirror paramType = method.getParameters().get(0).asType();
-				if (getMatchingSetter(matchingSetters, paramType) == null) {
-					matchingSetters.add(method);
-				}
+		if (!isPublic(method)) {
+			return;
+		}
+		String name = method.getSimpleName().toString();
+		if (isGetter(method) && !this.publicGetters.containsKey(name)) {
+			this.publicGetters.put(getAccessorName(name), method);
+		}
+		else if (isSetter(method)) {
+			String propertyName = getAccessorName(name);
+			List<ExecutableElement> matchingSetters = this.publicSetters.computeIfAbsent(propertyName,
+					(k) -> new ArrayList<>());
+			TypeMirror paramType = method.getParameters().get(0).asType();
+			if (getMatchingSetter(matchingSetters, paramType) == null) {
+				matchingSetters.add(method);
 			}
 		}
 	}
@@ -128,9 +125,7 @@ class TypeElementMembers {
 
 	private void processField(VariableElement field) {
 		String name = field.getSimpleName().toString();
-		if (!this.fields.containsKey(name)) {
-			this.fields.put(name, field);
-		}
+		this.fields.putIfAbsent(name, field);
 	}
 
 	Map<String, VariableElement> getFields() {

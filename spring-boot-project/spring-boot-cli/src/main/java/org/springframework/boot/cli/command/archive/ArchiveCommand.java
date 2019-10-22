@@ -82,7 +82,7 @@ abstract class ArchiveCommand extends OptionParsingCommand {
 
 	@Override
 	public String getUsageHelp() {
-		return "[options] <" + getName() + "-name> <files>";
+		return new StringBuilder().append("[options] <").append(getName()).append("-name> <files>").toString();
 	}
 
 	/**
@@ -112,8 +112,7 @@ abstract class ArchiveCommand extends OptionParsingCommand {
 			this.includeOption = option("include",
 					"Pattern applied to directories on the classpath to find files to include in the resulting ")
 							.withRequiredArg().withValuesSeparatedBy(",").defaultsTo("");
-			this.excludeOption = option("exclude", "Pattern applied to directories on the classpath to find files to "
-					+ "exclude from the resulting " + this.type).withRequiredArg().withValuesSeparatedBy(",")
+			this.excludeOption = option("exclude", new StringBuilder().append("Pattern applied to directories on the classpath to find files to ").append("exclude from the resulting ").append(this.type).toString()).withRequiredArg().withValuesSeparatedBy(",")
 							.defaultsTo("");
 		}
 
@@ -121,11 +120,11 @@ abstract class ArchiveCommand extends OptionParsingCommand {
 		protected ExitStatus run(OptionSet options) throws Exception {
 			List<?> nonOptionArguments = new ArrayList<Object>(options.nonOptionArguments());
 			Assert.isTrue(nonOptionArguments.size() >= 2,
-					() -> "The name of the resulting " + this.type + " and at least one source file must be specified");
+					() -> new StringBuilder().append("The name of the resulting ").append(this.type).append(" and at least one source file must be specified").toString());
 
 			File output = new File((String) nonOptionArguments.remove(0));
 			Assert.isTrue(output.getName().toLowerCase(Locale.ENGLISH).endsWith("." + this.type),
-					() -> "The output '" + output + "' is not a " + this.type.toUpperCase(Locale.ENGLISH) + " file.");
+					() -> new StringBuilder().append("The output '").append(output).append("' is not a ").append(this.type.toUpperCase(Locale.ENGLISH)).append(" file.").toString());
 			deleteIfExists(output);
 
 			GroovyCompiler compiler = createCompiler(options);
@@ -168,14 +167,12 @@ abstract class ArchiveCommand extends OptionParsingCommand {
 			ResourceMatcher matcher = new ResourceMatcher(options.valuesOf(this.includeOption),
 					options.valuesOf(this.excludeOption));
 			List<File> roots = new ArrayList<>();
-			for (URL classpathEntry : classpath) {
-				roots.add(new File(URI.create(classpathEntry.toString())));
-			}
+			classpath.forEach(classpathEntry -> roots.add(new File(URI.create(classpathEntry.toString()))));
 			return matcher.find(roots);
 		}
 
 		private void writeJar(File file, Class<?>[] compiledClasses, List<MatchedResource> classpathEntries,
-				List<URL> dependencies) throws FileNotFoundException, IOException, URISyntaxException {
+				List<URL> dependencies) throws IOException, URISyntaxException {
 			final List<Library> libraries;
 			try (JarWriter writer = new JarWriter(file)) {
 				addManifest(writer, compiledClasses);
@@ -303,14 +300,7 @@ abstract class ArchiveCommand extends OptionParsingCommand {
 		}
 
 		private void disableGrabResolvers(List<? extends AnnotatedNode> nodes) {
-			for (AnnotatedNode classNode : nodes) {
-				List<AnnotationNode> annotations = classNode.getAnnotations();
-				for (AnnotationNode node : new ArrayList<>(annotations)) {
-					if (node.getClassNode().getNameWithoutPackage().equals("GrabResolver")) {
-						node.setMember("initClass", new ConstantExpression(false));
-					}
-				}
-			}
+			nodes.stream().map(AnnotatedNode::getAnnotations).forEach(annotations -> new ArrayList<>(annotations).stream().filter(node -> "GrabResolver".equals(node.getClassNode().getNameWithoutPackage())).forEach(node -> node.setMember("initClass", new ConstantExpression(false))));
 		}
 
 	}

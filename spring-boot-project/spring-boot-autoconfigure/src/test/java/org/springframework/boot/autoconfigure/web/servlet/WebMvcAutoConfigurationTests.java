@@ -521,12 +521,8 @@ class WebMvcAutoConfigurationTests {
 			assertThat(resolver).isInstanceOf(HandlerExceptionResolverComposite.class);
 			List<HandlerExceptionResolver> delegates = ((HandlerExceptionResolverComposite) resolver)
 					.getExceptionResolvers();
-			for (HandlerExceptionResolver delegate : delegates) {
-				if (delegate instanceof AbstractHandlerExceptionResolver
-						&& !(delegate instanceof DefaultHandlerExceptionResolver)) {
-					consumer.accept(ReflectionTestUtils.getField(delegate, "warnLogger"));
-				}
-			}
+			delegates.stream().filter(delegate -> delegate instanceof AbstractHandlerExceptionResolver
+					&& !(delegate instanceof DefaultHandlerExceptionResolver)).forEach(delegate -> consumer.accept(ReflectionTestUtils.getField(delegate, "warnLogger")));
 		};
 	}
 
@@ -646,13 +642,12 @@ class WebMvcAutoConfigurationTests {
 	private void assertCachePeriod(AssertableWebApplicationContext context) {
 		Map<String, Object> handlerMap = getHandlerMap(context.getBean("resourceHandlerMapping", HandlerMapping.class));
 		assertThat(handlerMap).hasSize(2);
-		for (Entry<String, Object> entry : handlerMap.entrySet()) {
-			Object handler = entry.getValue();
+		handlerMap.entrySet().stream().map(Map.Entry::getValue).forEach(handler -> {
 			if (handler instanceof ResourceHttpRequestHandler) {
 				assertThat(((ResourceHttpRequestHandler) handler).getCacheSeconds()).isEqualTo(5);
 				assertThat(((ResourceHttpRequestHandler) handler).getCacheControl()).isNull();
 			}
-		}
+		});
 	}
 
 	@Test
@@ -768,13 +763,11 @@ class WebMvcAutoConfigurationTests {
 	private void assertCacheControl(AssertableWebApplicationContext context) {
 		Map<String, Object> handlerMap = getHandlerMap(context.getBean("resourceHandlerMapping", HandlerMapping.class));
 		assertThat(handlerMap).hasSize(2);
-		for (Object handler : handlerMap.keySet()) {
-			if (handler instanceof ResourceHttpRequestHandler) {
-				assertThat(((ResourceHttpRequestHandler) handler).getCacheSeconds()).isEqualTo(-1);
-				assertThat(((ResourceHttpRequestHandler) handler).getCacheControl())
-						.isEqualToComparingFieldByField(CacheControl.maxAge(5, TimeUnit.SECONDS).proxyRevalidate());
-			}
-		}
+		handlerMap.keySet().stream().filter(handler -> handler instanceof ResourceHttpRequestHandler).forEach(handler -> {
+			assertThat(((ResourceHttpRequestHandler) handler).getCacheSeconds()).isEqualTo(-1);
+			assertThat(((ResourceHttpRequestHandler) handler).getCacheControl())
+					.isEqualToComparingFieldByField(CacheControl.maxAge(5, TimeUnit.SECONDS).proxyRevalidate());
+		});
 	}
 
 	protected Map<String, List<Resource>> getResourceMappingLocations(ApplicationContext context) {

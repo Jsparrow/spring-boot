@@ -55,14 +55,14 @@ class RemappedErrorViewIntegrationTests {
 
 	@Test
 	void directAccessToErrorPage() {
-		String content = this.template.getForObject("http://localhost:" + this.port + "/spring/error", String.class);
+		String content = this.template.getForObject(new StringBuilder().append("http://localhost:").append(this.port).append("/spring/error").toString(), String.class);
 		assertThat(content).contains("error");
 		assertThat(content).contains("999");
 	}
 
 	@Test
 	void forwardToErrorPage() {
-		String content = this.template.getForObject("http://localhost:" + this.port + "/spring/", String.class);
+		String content = this.template.getForObject(new StringBuilder().append("http://localhost:").append(this.port).append("/spring/").toString(), String.class);
 		assertThat(content).contains("error");
 		assertThat(content).contains("500");
 	}

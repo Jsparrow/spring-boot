@@ -54,10 +54,10 @@ public class HealthIndicatorRegistryFactory {
 
 	protected <T extends HealthIndicatorRegistry> T initialize(T registry,
 			Map<String, HealthIndicator> healthIndicators) {
-		for (Map.Entry<String, HealthIndicator> entry : healthIndicators.entrySet()) {
+		healthIndicators.entrySet().forEach(entry -> {
 			String name = this.healthIndicatorNameFactory.apply(entry.getKey());
 			registry.register(name, entry.getValue());
-		}
+		});
 		return registry;
 	}
 

@@ -29,6 +29,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.net.URLStreamHandler;
 import java.security.Permission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link java.net.JarURLConnection} used to support {@link JarFile#getUrl()}.
@@ -38,6 +40,8 @@ import java.security.Permission;
  * @author Rostyslav Dudka
  */
 final class JarURLConnection extends java.net.JarURLConnection {
+
+	private static final Logger logger = LoggerFactory.getLogger(JarURLConnection.class);
 
 	private static ThreadLocal<Boolean> useFastExceptions = new ThreadLocal<>();
 
@@ -190,7 +194,7 @@ final class JarURLConnection extends java.net.JarURLConnection {
 		if (Boolean.TRUE.equals(useFastExceptions.get())) {
 			throw FILE_NOT_FOUND_EXCEPTION;
 		}
-		throw new FileNotFoundException("JAR entry " + entry + " not found in " + jarFile.getName());
+		throw new FileNotFoundException(new StringBuilder().append("JAR entry ").append(entry).append(" not found in ").append(jarFile.getName()).toString());
 	}
 
 	@Override
@@ -215,6 +219,7 @@ final class JarURLConnection extends java.net.JarURLConnection {
 			return (entry != null) ? (int) entry.getSize() : -1;
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			return -1;
 		}
 	}
@@ -251,6 +256,7 @@ final class JarURLConnection extends java.net.JarURLConnection {
 			return (entry != null) ? entry.getTime() : 0;
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			return 0;
 		}
 	}
@@ -279,15 +285,15 @@ final class JarURLConnection extends java.net.JarURLConnection {
 			index = separator + SEPARATOR.length();
 		}
 		JarEntryName jarEntryName = JarEntryName.get(spec, index);
-		if (Boolean.TRUE.equals(useFastExceptions.get()) && !jarEntryName.isEmpty()
-				&& !connectionJarFile.containsEntry(jarEntryName.toString())) {
-			if (connectionJarFile != jarFile) {
-				connectionJarFile.close();
-			}
-			return NOT_FOUND_CONNECTION;
+		if (!(Boolean.TRUE.equals(useFastExceptions.get()) && !jarEntryName.isEmpty()
+				&& !connectionJarFile.containsEntry(jarEntryName.toString()))) {
+			return new JarURLConnection(url, connectionJarFile, jarEntryName,
+					(connectionJarFile != jarFile) ? connectionJarFile::close : null);
 		}
-		return new JarURLConnection(url, connectionJarFile, jarEntryName,
-				(connectionJarFile != jarFile) ? connectionJarFile::close : null);
+		if (connectionJarFile != jarFile) {
+			connectionJarFile.close();
+		}
+		return NOT_FOUND_CONNECTION;
 	}
 
 	private static int indexOfRootSpec(StringSequence file, String pathFromRoot) {
@@ -309,13 +315,13 @@ final class JarURLConnection extends java.net.JarURLConnection {
 
 	private static JarURLConnection notFound(JarFile jarFile, JarEntryName jarEntryName, CloseAction closeAction)
 			throws IOException {
-		if (Boolean.TRUE.equals(useFastExceptions.get())) {
-			if (closeAction != null) {
-				closeAction.perform();
-			}
-			return NOT_FOUND_CONNECTION;
+		if (!Boolean.TRUE.equals(useFastExceptions.get())) {
+			return new JarURLConnection(null, jarFile, jarEntryName, closeAction);
 		}
-		return new JarURLConnection(null, jarFile, jarEntryName, closeAction);
+		if (closeAction != null) {
+			closeAction.perform();
+		}
+		return NOT_FOUND_CONNECTION;
 	}
 
 	/**
@@ -358,7 +364,7 @@ final class JarURLConnection extends java.net.JarURLConnection {
 					if (c == '%') {
 						if ((i + 2) >= length) {
 							throw new IllegalArgumentException(
-									"Invalid encoded sequence \"" + source.substring(i) + "\"");
+									new StringBuilder().append("Invalid encoded sequence \"").append(source.substring(i)).append("\"").toString());
 						}
 						c = decodeEscapeSequence(source, i);
 						i += 2;
@@ -372,7 +378,7 @@ final class JarURLConnection extends java.net.JarURLConnection {
 			int hi = Character.digit(source.charAt(i + 1), 16);
 			int lo = Character.digit(source.charAt(i + 2), 16);
 			if (hi == -1 || lo == -1) {
-				throw new IllegalArgumentException("Invalid encoded sequence \"" + source.substring(i) + "\"");
+				throw new IllegalArgumentException(new StringBuilder().append("Invalid encoded sequence \"").append(source.substring(i)).append("\"").toString());
 			}
 			return ((char) ((hi << 4) + lo));
 		}
