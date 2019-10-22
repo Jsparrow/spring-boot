@@ -264,39 +264,34 @@ class ArtemisAutoConfigurationTests {
 	@Test
 	void severalEmbeddedBrokers() {
 		this.contextRunner.withUserConfiguration(EmptyConfiguration.class)
-				.withPropertyValues("spring.artemis.embedded.queues=Queue1").run((first) -> {
-					this.contextRunner.withPropertyValues("spring.artemis.embedded.queues=Queue2").run((second) -> {
-						ArtemisProperties firstProperties = first.getBean(ArtemisProperties.class);
-						ArtemisProperties secondProperties = second.getBean(ArtemisProperties.class);
-						assertThat(firstProperties.getEmbedded().getServerId())
-								.isLessThan(secondProperties.getEmbedded().getServerId());
-						DestinationChecker firstChecker = new DestinationChecker(first);
-						firstChecker.checkQueue("Queue1", true);
-						firstChecker.checkQueue("Queue2", false);
-						DestinationChecker secondChecker = new DestinationChecker(second);
-						secondChecker.checkQueue("Queue1", false);
-						secondChecker.checkQueue("Queue2", true);
-					});
-				});
+				.withPropertyValues("spring.artemis.embedded.queues=Queue1").run((first) -> this.contextRunner.withPropertyValues("spring.artemis.embedded.queues=Queue2").run((second) -> {
+					ArtemisProperties firstProperties = first.getBean(ArtemisProperties.class);
+					ArtemisProperties secondProperties = second.getBean(ArtemisProperties.class);
+					assertThat(firstProperties.getEmbedded().getServerId())
+							.isLessThan(secondProperties.getEmbedded().getServerId());
+					DestinationChecker firstChecker = new DestinationChecker(first);
+					firstChecker.checkQueue("Queue1", true);
+					firstChecker.checkQueue("Queue2", false);
+					DestinationChecker secondChecker = new DestinationChecker(second);
+					secondChecker.checkQueue("Queue1", false);
+					secondChecker.checkQueue("Queue2", true);
+				}));
 	}
 
 	@Test
 	void connectToASpecificEmbeddedBroker() {
+		// Connect to the "main" broker
+		// Do not start a specific one
 		this.contextRunner.withUserConfiguration(EmptyConfiguration.class)
 				.withPropertyValues("spring.artemis.embedded.serverId=93", "spring.artemis.embedded.queues=Queue1")
-				.run((first) -> {
-					this.contextRunner.withUserConfiguration(EmptyConfiguration.class)
-							.withPropertyValues("spring.artemis.mode=embedded",
-									// Connect to the "main" broker
-									"spring.artemis.embedded.serverId=93",
-									// Do not start a specific one
-									"spring.artemis.embedded.enabled=false")
-							.run((secondContext) -> {
-								first.getBean(JmsTemplate.class).convertAndSend("Queue1", "test");
-								assertThat(secondContext.getBean(JmsTemplate.class).receiveAndConvert("Queue1"))
-										.isEqualTo("test");
-							});
-				});
+				.run((first) -> this.contextRunner.withUserConfiguration(EmptyConfiguration.class)
+						.withPropertyValues("spring.artemis.mode=embedded", "spring.artemis.embedded.serverId=93",
+								"spring.artemis.embedded.enabled=false")
+						.run((secondContext) -> {
+							first.getBean(JmsTemplate.class).convertAndSend("Queue1", "test");
+							assertThat(secondContext.getBean(JmsTemplate.class).receiveAndConvert("Queue1"))
+									.isEqualTo("test");
+						}));
 	}
 
 	@Test

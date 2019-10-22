@@ -144,13 +144,14 @@ public class SpringApplicationBuilder {
 	}
 
 	private void configureAsChildIfNecessary(String... args) {
-		if (this.parent != null && !this.configuredAsChild) {
-			this.configuredAsChild = true;
-			if (!this.registerShutdownHookApplied) {
-				this.application.setRegisterShutdownHook(false);
-			}
-			initializers(new ParentContextApplicationContextInitializer(this.parent.run(args)));
+		if (!(this.parent != null && !this.configuredAsChild)) {
+			return;
 		}
+		this.configuredAsChild = true;
+		if (!this.registerShutdownHookApplied) {
+			this.application.setRegisterShutdownHook(false);
+		}
+		initializers(new ParentContextApplicationContextInitializer(this.parent.run(args)));
 	}
 
 	/**
@@ -436,9 +437,7 @@ public class SpringApplicationBuilder {
 
 	private Map<String, Object> getMapFromProperties(Properties properties) {
 		Map<String, Object> map = new HashMap<>();
-		for (Object key : Collections.list(properties.propertyNames())) {
-			map.put((String) key, properties.get(key));
-		}
+		Collections.list(properties.propertyNames()).forEach(key -> map.put((String) key, properties.get(key)));
 		return map;
 	}
 

@@ -174,7 +174,7 @@ public class GroovyCompiler {
 	 * @throws IOException in case of I/O errors
 	 * @throws CompilationFailedException in case of compilation errors
 	 */
-	public Class<?>[] compile(String... sources) throws CompilationFailedException, IOException {
+	public Class<?>[] compile(String... sources) throws IOException {
 
 		this.loader.clearCache();
 		List<Class<?>> classes = new ArrayList<>();
@@ -237,11 +237,9 @@ public class GroovyCompiler {
 		int index = getIndexOfASTTransformationVisitor(conversionOperations);
 		conversionOperations.add(index, new CompilationUnit.SourceUnitOperation() {
 			@Override
-			public void call(SourceUnit source) throws CompilationFailedException {
+			public void call(SourceUnit source) {
 				ASTNode[] nodes = new ASTNode[] { source.getAST() };
-				for (ASTTransformation transformation : GroovyCompiler.this.transformations) {
-					transformation.visit(nodes, source);
-				}
+				GroovyCompiler.this.transformations.forEach(transformation -> transformation.visit(nodes, source));
 			}
 		});
 	}
@@ -266,8 +264,7 @@ public class GroovyCompiler {
 		}
 
 		@Override
-		public void call(SourceUnit source, GeneratorContext context, ClassNode classNode)
-				throws CompilationFailedException {
+		public void call(SourceUnit source, GeneratorContext context, ClassNode classNode) {
 
 			ImportCustomizer importCustomizer = new SmartImportCustomizer(source);
 			ClassNode mainClassNode = MainClass.get(source.getAST().getClasses());

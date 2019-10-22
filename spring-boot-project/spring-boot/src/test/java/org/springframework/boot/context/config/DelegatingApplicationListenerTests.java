@@ -52,7 +52,7 @@ class DelegatingApplicationListenerTests {
 	@Test
 	void orderedInitialize() {
 		TestPropertySourceUtils.addInlinedPropertiesToEnvironment(this.context,
-				"context.listener.classes=" + MockInitB.class.getName() + "," + MockInitA.class.getName());
+				new StringBuilder().append("context.listener.classes=").append(MockInitB.class.getName()).append(",").append(MockInitA.class.getName()).toString());
 		this.listener.onApplicationEvent(new ApplicationEnvironmentPreparedEvent(new SpringApplication(), new String[0],
 				this.context.getEnvironment()));
 		this.context.getBeanFactory().registerSingleton("testListener", this.listener);

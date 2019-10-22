@@ -40,8 +40,7 @@ public class RoundEnvironmentTester {
 	public TypeElement getRootElement(Class<?> type) {
 		return (TypeElement) this.roundEnvironment.getRootElements().stream()
 				.filter((element) -> element.toString().equals(type.getName())).findFirst()
-				.orElseThrow(() -> new IllegalStateException("No element found for " + type
-						+ " make sure it is included in the list of classes to compile"));
+				.orElseThrow(() -> new IllegalStateException(new StringBuilder().append("No element found for ").append(type).append(" make sure it is included in the list of classes to compile").toString()));
 	}
 
 }

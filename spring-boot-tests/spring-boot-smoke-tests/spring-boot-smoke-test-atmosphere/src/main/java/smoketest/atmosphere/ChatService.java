@@ -41,14 +41,14 @@ public class ChatService {
 
 	@Disconnect
 	public void onDisconnect(AtmosphereResourceEvent event) {
-		this.logger.info("Client " + event.getResource().uuid() + " disconnected ["
-				+ (event.isCancelled() ? "cancelled" : "closed") + "]");
+		this.logger.info(new StringBuilder().append("Client ").append(event.getResource().uuid()).append(" disconnected [").append(event.isCancelled() ? "cancelled" : "closed").append("]")
+				.toString());
 	}
 
 	@org.atmosphere.config.service.Message(encoders = JacksonEncoderDecoder.class,
 			decoders = JacksonEncoderDecoder.class)
 	public Message onMessage(Message message) throws IOException {
-		this.logger.info("Author " + message.getAuthor() + " sent message " + message.getMessage());
+		this.logger.info(new StringBuilder().append("Author ").append(message.getAuthor()).append(" sent message ").append(message.getMessage()).toString());
 		return message;
 	}
 

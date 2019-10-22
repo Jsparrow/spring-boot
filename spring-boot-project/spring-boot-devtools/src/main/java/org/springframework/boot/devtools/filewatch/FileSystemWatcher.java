@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Watches specific folders for file changes.
@@ -41,6 +43,8 @@ import org.springframework.util.Assert;
  * @see FileChangeListener
  */
 public class FileSystemWatcher {
+
+	private static final Logger logger = LoggerFactory.getLogger(FileSystemWatcher.class);
 
 	private static final Duration DEFAULT_POLL_INTERVAL = Duration.ofMillis(1000);
 
@@ -124,7 +128,7 @@ public class FileSystemWatcher {
 	 */
 	public void addSourceFolder(File folder) {
 		Assert.notNull(folder, "Folder must not be null");
-		Assert.isTrue(!folder.isFile(), "Folder '" + folder + "' must not be a file");
+		Assert.isTrue(!folder.isFile(), new StringBuilder().append("Folder '").append(folder).append("' must not be a file").toString());
 		synchronized (this.monitor) {
 			checkNotStarted();
 			this.folders.put(folder, null);
@@ -196,12 +200,15 @@ public class FileSystemWatcher {
 				thread.join();
 			}
 			catch (InterruptedException ex) {
+				logger.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 		}
 	}
 
 	private static final class Watcher implements Runnable {
+
+		private final Logger logger1 = LoggerFactory.getLogger(Watcher.class);
 
 		private final AtomicInteger remainingScans;
 
@@ -236,6 +243,7 @@ public class FileSystemWatcher {
 					scan();
 				}
 				catch (InterruptedException ex) {
+					logger1.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 				}
 				remainingScans = this.remainingScans.get();
@@ -273,23 +281,21 @@ public class FileSystemWatcher {
 
 		private Map<File, FolderSnapshot> getCurrentSnapshots() {
 			Map<File, FolderSnapshot> snapshots = new LinkedHashMap<>();
-			for (File folder : this.folders.keySet()) {
-				snapshots.put(folder, new FolderSnapshot(folder));
-			}
+			this.folders.keySet().forEach(folder -> snapshots.put(folder, new FolderSnapshot(folder)));
 			return snapshots;
 		}
 
 		private void updateSnapshots(Collection<FolderSnapshot> snapshots) {
 			Map<File, FolderSnapshot> updated = new LinkedHashMap<>();
 			Set<ChangedFiles> changeSet = new LinkedHashSet<>();
-			for (FolderSnapshot snapshot : snapshots) {
+			snapshots.forEach(snapshot -> {
 				FolderSnapshot previous = this.folders.get(snapshot.getFolder());
 				updated.put(snapshot.getFolder(), snapshot);
 				ChangedFiles changedFiles = previous.getChangedFiles(snapshot, this.triggerFilter);
 				if (!changedFiles.getFiles().isEmpty()) {
 					changeSet.add(changedFiles);
 				}
-			}
+			});
 			if (!changeSet.isEmpty()) {
 				fireListeners(Collections.unmodifiableSet(changeSet));
 			}
@@ -297,9 +303,7 @@ public class FileSystemWatcher {
 		}
 
 		private void fireListeners(Set<ChangedFiles> changeSet) {
-			for (FileChangeListener listener : this.listeners) {
-				listener.onChange(changeSet);
-			}
+			this.listeners.forEach(listener -> listener.onChange(changeSet));
 		}
 
 	}

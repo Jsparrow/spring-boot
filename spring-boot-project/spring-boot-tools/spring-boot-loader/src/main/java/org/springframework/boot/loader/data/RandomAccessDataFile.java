@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link RandomAccessData} implementation backed by a {@link RandomAccessFile}.
@@ -204,6 +206,8 @@ public class RandomAccessDataFile implements RandomAccessData {
 
 	private static final class FileAccess {
 
+		private final Logger logger = LoggerFactory.getLogger(FileAccess.class);
+
 		private final Object monitor = new Object();
 
 		private final File file;
@@ -229,6 +233,7 @@ public class RandomAccessDataFile implements RandomAccessData {
 					this.randomAccessFile = new RandomAccessFile(this.file, "r");
 				}
 				catch (FileNotFoundException ex) {
+					logger.error(ex.getMessage(), ex);
 					throw new IllegalArgumentException(
 							String.format("File %s must exist", this.file.getAbsolutePath()));
 				}

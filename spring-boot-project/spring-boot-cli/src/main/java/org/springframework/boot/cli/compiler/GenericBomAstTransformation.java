@@ -17,7 +17,6 @@
 package org.springframework.boot.cli.compiler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -77,12 +76,13 @@ public abstract class GenericBomAstTransformation implements SpringBootAstTransf
 
 	private void addDependencyManagementBom(ModuleNode node, String module) {
 		AnnotatedNode annotated = getAnnotatedNode(node);
-		if (annotated != null) {
-			AnnotationNode bom = getAnnotation(annotated);
-			List<Expression> expressions = new ArrayList<>(getConstantExpressions(bom.getMember("value")));
-			expressions.add(new ConstantExpression(module));
-			bom.setMember("value", new ListExpression(expressions));
+		if (annotated == null) {
+			return;
 		}
+		AnnotationNode bom = getAnnotation(annotated);
+		List<Expression> expressions = new ArrayList<>(getConstantExpressions(bom.getMember("value")));
+		expressions.add(new ConstantExpression(module));
+		bom.setMember("value", new ListExpression(expressions));
 	}
 
 	private AnnotationNode getAnnotation(AnnotatedNode annotated) {
@@ -112,19 +112,15 @@ public abstract class GenericBomAstTransformation implements SpringBootAstTransf
 		}
 		if (valueExpression instanceof ConstantExpression
 				&& ((ConstantExpression) valueExpression).getValue() instanceof String) {
-			return Arrays.asList((ConstantExpression) valueExpression);
+			return Collections.singletonList((ConstantExpression) valueExpression);
 		}
 		return Collections.emptyList();
 	}
 
 	private List<ConstantExpression> getConstantExpressions(ListExpression valueExpression) {
 		List<ConstantExpression> expressions = new ArrayList<>();
-		for (Expression expression : valueExpression.getExpressions()) {
-			if (expression instanceof ConstantExpression
-					&& ((ConstantExpression) expression).getValue() instanceof String) {
-				expressions.add((ConstantExpression) expression);
-			}
-		}
+		valueExpression.getExpressions().stream().filter(expression -> expression instanceof ConstantExpression
+				&& ((ConstantExpression) expression).getValue() instanceof String).forEach(expression -> expressions.add((ConstantExpression) expression));
 		return expressions;
 	}
 

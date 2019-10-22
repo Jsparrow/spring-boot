@@ -78,9 +78,7 @@ public abstract class AbstractNestedCondition extends SpringBootCondition implem
 			this.all = Collections.unmodifiableList(memberConditions.getMatchOutcomes());
 			List<ConditionOutcome> matches = new ArrayList<>();
 			List<ConditionOutcome> nonMatches = new ArrayList<>();
-			for (ConditionOutcome outcome : this.all) {
-				(outcome.isMatch() ? matches : nonMatches).add(outcome);
-			}
+			this.all.forEach(outcome -> (outcome.isMatch() ? matches : nonMatches).add(outcome));
 			this.matches = Collections.unmodifiableList(matches);
 			this.nonMatches = Collections.unmodifiableList(nonMatches);
 		}
@@ -119,25 +117,25 @@ public abstract class AbstractNestedCondition extends SpringBootCondition implem
 			MultiValueMap<AnnotationMetadata, Condition> memberConditions = new LinkedMultiValueMap<>();
 			for (String member : members) {
 				AnnotationMetadata metadata = getMetadata(member);
-				for (String[] conditionClasses : getConditionClasses(metadata)) {
+				getConditionClasses(metadata).forEach(conditionClasses -> {
 					for (String conditionClass : conditionClasses) {
 						Condition condition = getCondition(conditionClass);
 						validateMemberCondition(condition, phase, className);
 						memberConditions.add(metadata, condition);
 					}
-				}
+				});
 			}
 			return Collections.unmodifiableMap(memberConditions);
 		}
 
 		private void validateMemberCondition(Condition condition, ConfigurationPhase nestedPhase,
 				String nestedClassName) {
-			if (nestedPhase == ConfigurationPhase.PARSE_CONFIGURATION && condition instanceof ConfigurationCondition) {
-				ConfigurationPhase memberPhase = ((ConfigurationCondition) condition).getConfigurationPhase();
-				if (memberPhase == ConfigurationPhase.REGISTER_BEAN) {
-					throw new IllegalStateException("Nested condition " + nestedClassName + " uses a configuration "
-							+ "phase that is inappropriate for " + condition.getClass());
-				}
+			if (!(nestedPhase == ConfigurationPhase.PARSE_CONFIGURATION && condition instanceof ConfigurationCondition)) {
+				return;
+			}
+			ConfigurationPhase memberPhase = ((ConfigurationCondition) condition).getConfigurationPhase();
+			if (memberPhase == ConfigurationPhase.REGISTER_BEAN) {
+				throw new IllegalStateException(new StringBuilder().append("Nested condition ").append(nestedClassName).append(" uses a configuration ").append("phase that is inappropriate for ").append(condition.getClass()).toString());
 			}
 		}
 
@@ -184,9 +182,7 @@ public abstract class AbstractNestedCondition extends SpringBootCondition implem
 			this.context = context;
 			this.metadata = metadata;
 			this.outcomes = new ArrayList<>(conditions.size());
-			for (Condition condition : conditions) {
-				this.outcomes.add(getConditionOutcome(metadata, condition));
-			}
+			conditions.forEach(condition -> this.outcomes.add(getConditionOutcome(metadata, condition)));
 		}
 
 		private ConditionOutcome getConditionOutcome(AnnotationMetadata metadata, Condition condition) {
@@ -205,9 +201,7 @@ public abstract class AbstractNestedCondition extends SpringBootCondition implem
 			}
 			List<ConditionOutcome> match = new ArrayList<>();
 			List<ConditionOutcome> nonMatch = new ArrayList<>();
-			for (ConditionOutcome outcome : this.outcomes) {
-				(outcome.isMatch() ? match : nonMatch).add(outcome);
-			}
+			this.outcomes.forEach(outcome -> (outcome.isMatch() ? match : nonMatch).add(outcome));
 			if (nonMatch.isEmpty()) {
 				return ConditionOutcome.match(message.found("matching nested conditions").items(match));
 			}

@@ -39,7 +39,8 @@ public final class ParameterMappingException extends InvalidEndpointRequestExcep
 	 * @param cause the cause of the mapping failure
 	 */
 	public ParameterMappingException(OperationParameter parameter, Object value, Throwable cause) {
-		super("Failed to map " + value + " of type " + value.getClass() + " to " + parameter,
+		super(new StringBuilder().append("Failed to map ").append(value).append(" of type ").append(value.getClass()).append(" to ").append(parameter)
+				.toString(),
 				"Parameter mapping failure", cause);
 		this.parameter = parameter;
 		this.value = value;

@@ -48,12 +48,13 @@ public class DefaultRepositorySystemSessionAutoConfiguration implements Reposito
 		}
 
 		ProxySelector existing = session.getProxySelector();
-		if (existing == null || !(existing instanceof CompositeProxySelector)) {
-			JreProxySelector fallback = new JreProxySelector();
-			ProxySelector selector = (existing != null) ? new CompositeProxySelector(Arrays.asList(existing, fallback))
-					: fallback;
-			session.setProxySelector(selector);
+		if (existing instanceof CompositeProxySelector) {
+			return;
 		}
+		JreProxySelector fallback = new JreProxySelector();
+		ProxySelector selector = (existing != null) ? new CompositeProxySelector(Arrays.asList(existing, fallback))
+				: fallback;
+		session.setProxySelector(selector);
 	}
 
 	private File getM2RepoDirectory() {

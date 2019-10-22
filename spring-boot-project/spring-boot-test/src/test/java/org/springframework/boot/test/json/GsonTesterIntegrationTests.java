@@ -34,6 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class GsonTesterIntegrationTests {
 
+	private static final String JSON = "{\"name\":\"Spring\",\"age\":123}";
+
 	private GsonTester<ExampleObject> simpleJson;
 
 	private GsonTester<List<ExampleObject>> listJson;
@@ -43,8 +45,6 @@ class GsonTesterIntegrationTests {
 	private GsonTester<String> stringJson;
 
 	private Gson gson;
-
-	private static final String JSON = "{\"name\":\"Spring\",\"age\":123}";
 
 	@BeforeEach
 	void setup() {
@@ -60,7 +60,7 @@ class GsonTesterIntegrationTests {
 
 	@Test
 	void typicalListTest() throws Exception {
-		String example = "[" + JSON + "]";
+		String example = new StringBuilder().append("[").append(JSON).append("]").toString();
 		assertThat(this.listJson.parse(example)).asList().hasSize(1);
 		assertThat(this.listJson.parse(example).getObject().get(0).getName()).isEqualTo("Spring");
 	}

@@ -91,12 +91,10 @@ class BindFailureAnalyzerTests {
 	}
 
 	private BeanCreationException createFailure(Class<?> configuration, String... environment) {
-		try {
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
 			addEnvironment(context, environment);
 			context.register(configuration);
 			context.refresh();
-			context.close();
 			return null;
 		}
 		catch (BeanCreationException ex) {
@@ -114,6 +112,12 @@ class BindFailureAnalyzerTests {
 			map.put(key.trim(), value.trim());
 		}
 		sources.addFirst(new MapPropertySource("test", map));
+	}
+
+	enum Fruit {
+
+		APPLE, BANANA, ORANGE
+
 	}
 
 	@EnableConfigurationProperties(BindValidationFailureAnalyzerTests.FieldValidationFailureProperties.class)
@@ -215,12 +219,6 @@ class BindFailureAnalyzerTests {
 		void setValue(String value) {
 			throw new RuntimeException("This is a failure");
 		}
-
-	}
-
-	enum Fruit {
-
-		APPLE, BANANA, ORANGE
 
 	}
 

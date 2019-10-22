@@ -44,15 +44,14 @@ public class RemoteVehicleDetailsService implements VehicleDetailsService {
 	}
 
 	@Override
-	public VehicleDetails getVehicleDetails(VehicleIdentificationNumber vin)
-			throws VehicleIdentificationNumberNotFoundException {
+	public VehicleDetails getVehicleDetails(VehicleIdentificationNumber vin) {
 		Assert.notNull(vin, "VIN must not be null");
 		logger.debug("Retrieving vehicle data for: " + vin);
 		try {
 			return this.restTemplate.getForObject("/vehicle/{vin}/details", VehicleDetails.class, vin);
 		}
 		catch (HttpStatusCodeException ex) {
-			if (HttpStatus.NOT_FOUND.equals(ex.getStatusCode())) {
+			if (HttpStatus.NOT_FOUND == ex.getStatusCode()) {
 				throw new VehicleIdentificationNumberNotFoundException(vin, ex);
 			}
 			throw ex;

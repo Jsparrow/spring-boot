@@ -64,7 +64,7 @@ public class ExampleJsonObjectWithView {
 
 	@Override
 	public String toString() {
-		return this.value + " " + this.id;
+		return new StringBuilder().append(this.value).append(" ").append(this.id).toString();
 	}
 
 	public static class TestView {

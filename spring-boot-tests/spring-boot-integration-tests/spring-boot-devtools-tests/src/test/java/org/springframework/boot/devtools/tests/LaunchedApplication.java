@@ -49,10 +49,11 @@ class LaunchedApplication {
 	}
 
 	void restartRemote(int port) throws InterruptedException {
-		if (this.remoteProcessRestarter != null) {
-			stop(this.remoteProcess);
-			this.remoteProcess = this.remoteProcessRestarter.apply(port, this.classesDirectory);
+		if (this.remoteProcessRestarter == null) {
+			return;
 		}
+		stop(this.remoteProcess);
+		this.remoteProcess = this.remoteProcessRestarter.apply(port, this.classesDirectory);
 	}
 
 	void stop() throws InterruptedException {
@@ -61,10 +62,11 @@ class LaunchedApplication {
 	}
 
 	private void stop(Process process) throws InterruptedException {
-		if (process != null) {
-			process.destroy();
-			process.waitFor();
+		if (process == null) {
+			return;
 		}
+		process.destroy();
+		process.waitFor();
 	}
 
 	File getStandardOut() {

@@ -147,9 +147,7 @@ public class LocalDevToolsAutoConfiguration {
 				watcher.setTriggerFilter(new TriggerFileFilter(triggerFile));
 			}
 			List<File> additionalPaths = restartProperties.getAdditionalPaths();
-			for (File path : additionalPaths) {
-				watcher.addSourceFolder(path.getAbsoluteFile());
-			}
+			additionalPaths.forEach(path -> watcher.addSourceFolder(path.getAbsoluteFile()));
 			return watcher;
 		}
 

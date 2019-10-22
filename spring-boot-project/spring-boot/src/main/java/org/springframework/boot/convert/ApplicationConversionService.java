@@ -158,7 +158,7 @@ public class ApplicationConversionService extends FormattingConversionService {
 		beans.addAll(beanFactory.getBeansOfType(Converter.class).values());
 		beans.addAll(beanFactory.getBeansOfType(Printer.class).values());
 		beans.addAll(beanFactory.getBeansOfType(Parser.class).values());
-		for (Object bean : beans) {
+		beans.forEach(bean -> {
 			if (bean instanceof GenericConverter) {
 				registry.addConverter((GenericConverter) bean);
 			}
@@ -174,7 +174,7 @@ public class ApplicationConversionService extends FormattingConversionService {
 			else if (bean instanceof Parser) {
 				registry.addParser((Parser<?>) bean);
 			}
-		}
+		});
 	}
 
 }

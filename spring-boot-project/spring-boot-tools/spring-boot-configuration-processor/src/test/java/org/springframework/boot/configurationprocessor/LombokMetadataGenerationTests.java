@@ -143,7 +143,7 @@ class LombokMetadataGenerationTests extends AbstractMetadataGenerationTests {
 			int countNameFields) {
 		assertThat(metadata).has(Metadata.withGroup(prefix).fromSource(source));
 		for (int i = 0; i < countNameFields; i++) {
-			assertThat(metadata).has(Metadata.withProperty(prefix + ".name" + i, String.class));
+			assertThat(metadata).has(Metadata.withProperty(new StringBuilder().append(prefix).append(".name").append(i).toString(), String.class));
 		}
 		assertThat(metadata.getItems()).hasSize(1 + countNameFields);
 	}

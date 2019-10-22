@@ -87,9 +87,7 @@ public class DependencyManagementBomTransformation extends AnnotatedNodeASTTrans
 	protected void processAnnotationNodes(List<AnnotationNode> annotationNodes) {
 		if (!annotationNodes.isEmpty()) {
 			if (annotationNodes.size() > 1) {
-				for (AnnotationNode annotationNode : annotationNodes) {
-					handleDuplicateDependencyManagementBomAnnotation(annotationNode);
-				}
+				annotationNodes.forEach(this::handleDuplicateDependencyManagementBomAnnotation);
 			}
 			else {
 				processDependencyManagementBomAnnotation(annotationNodes.get(0));
@@ -133,7 +131,7 @@ public class DependencyManagementBomTransformation extends AnnotatedNodeASTTrans
 		}
 		if (valueExpression instanceof ConstantExpression
 				&& ((ConstantExpression) valueExpression).getValue() instanceof String) {
-			return Arrays.asList((ConstantExpression) valueExpression);
+			return Collections.singletonList((ConstantExpression) valueExpression);
 		}
 		reportError("@DependencyManagementBom requires an inline constant that is a string or a string array",
 				valueExpression);
@@ -142,7 +140,7 @@ public class DependencyManagementBomTransformation extends AnnotatedNodeASTTrans
 
 	private List<ConstantExpression> getConstantExpressions(ListExpression valueExpression) {
 		List<ConstantExpression> expressions = new ArrayList<>();
-		for (Expression expression : valueExpression.getExpressions()) {
+		valueExpression.getExpressions().forEach(expression -> {
 			if (expression instanceof ConstantExpression
 					&& ((ConstantExpression) expression).getValue() instanceof String) {
 				expressions.add((ConstantExpression) expression);
@@ -150,7 +148,7 @@ public class DependencyManagementBomTransformation extends AnnotatedNodeASTTrans
 			else {
 				reportError("Each entry in the array must be an inline string constant", expression);
 			}
-		}
+		});
 		return expressions;
 	}
 
@@ -173,7 +171,7 @@ public class DependencyManagementBomTransformation extends AnnotatedNodeASTTrans
 				this.resolutionContext.addDependencyManagement(new MavenModelDependencyManagement(model));
 			}
 			catch (Exception ex) {
-				throw new IllegalStateException("Failed to build model for '" + uri + "'. Is it a valid Maven bom?",
+				throw new IllegalStateException(new StringBuilder().append("Failed to build model for '").append(uri).append("'. Is it a valid Maven bom?").toString(),
 						ex);
 			}
 		}

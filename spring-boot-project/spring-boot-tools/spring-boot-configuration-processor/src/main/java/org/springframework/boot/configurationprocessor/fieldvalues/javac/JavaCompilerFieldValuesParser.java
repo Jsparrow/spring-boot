@@ -46,12 +46,12 @@ public class JavaCompilerFieldValuesParser implements FieldValuesParser {
 	@Override
 	public Map<String, Object> getFieldValues(TypeElement element) throws Exception {
 		Tree tree = this.trees.getTree(element);
-		if (tree != null) {
-			FieldCollector fieldCollector = new FieldCollector();
-			tree.accept(fieldCollector);
-			return fieldCollector.getFieldValues();
+		if (tree == null) {
+			return Collections.emptyMap();
 		}
-		return Collections.emptyMap();
+		FieldCollector fieldCollector = new FieldCollector();
+		tree.accept(fieldCollector);
+		return fieldCollector.getFieldValues();
 	}
 
 	/**
@@ -176,10 +176,10 @@ public class JavaCompilerFieldValuesParser implements FieldValuesParser {
 				}
 				return result;
 			}
-			if (expression.getKind().equals("IDENTIFIER")) {
+			if ("IDENTIFIER".equals(expression.getKind())) {
 				return this.staticFinals.get(expression.toString());
 			}
-			if (expression.getKind().equals("MEMBER_SELECT")) {
+			if ("MEMBER_SELECT".equals(expression.getKind())) {
 				return WELL_KNOWN_STATIC_FINALS.get(expression.toString());
 			}
 			return defaultValue;
@@ -200,13 +200,13 @@ public class JavaCompilerFieldValuesParser implements FieldValuesParser {
 		private Object getFactoryValue(ExpressionTree expression, Object factoryValue, String prefix,
 				Map<String, String> suffixMapping) {
 			Object instance = expression.getInstance();
-			if (instance != null && instance.toString().startsWith(prefix)) {
-				String type = instance.toString();
-				type = type.substring(prefix.length(), type.indexOf('('));
-				String suffix = suffixMapping.get(type);
-				return (suffix != null) ? factoryValue + suffix : null;
+			if (!(instance != null && instance.toString().startsWith(prefix))) {
+				return null;
 			}
-			return null;
+			String type = instance.toString();
+			type = type.substring(prefix.length(), type.indexOf('('));
+			String suffix = suffixMapping.get(type);
+			return (suffix != null) ? factoryValue + suffix : null;
 		}
 
 		Map<String, Object> getFieldValues() {

@@ -65,13 +65,8 @@ public class PathMappedEndpoints implements Iterable<PathMappedEndpoint> {
 
 	private Map<EndpointId, PathMappedEndpoint> getEndpoints(Collection<EndpointsSupplier<?>> suppliers) {
 		Map<EndpointId, PathMappedEndpoint> endpoints = new LinkedHashMap<>();
-		suppliers.forEach((supplier) -> {
-			supplier.getEndpoints().forEach((endpoint) -> {
-				if (endpoint instanceof PathMappedEndpoint) {
-					endpoints.put(endpoint.getEndpointId(), (PathMappedEndpoint) endpoint);
-				}
-			});
-		});
+		suppliers.forEach((supplier) -> supplier.getEndpoints().stream().filter(endpoint -> endpoint instanceof PathMappedEndpoint)
+				.forEach(endpoint -> endpoints.put(endpoint.getEndpointId(), (PathMappedEndpoint) endpoint)));
 		return Collections.unmodifiableMap(endpoints);
 	}
 
@@ -144,7 +139,7 @@ public class PathMappedEndpoints implements Iterable<PathMappedEndpoint> {
 	}
 
 	private String getPath(PathMappedEndpoint endpoint) {
-		return (endpoint != null) ? this.basePath + "/" + endpoint.getRootPath() : null;
+		return (endpoint != null) ? new StringBuilder().append(this.basePath).append("/").append(endpoint.getRootPath()).toString() : null;
 	}
 
 	private <T> List<T> asList(Stream<T> stream) {

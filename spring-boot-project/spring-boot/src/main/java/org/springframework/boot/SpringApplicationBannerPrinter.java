@@ -136,9 +136,7 @@ class SpringApplicationBannerPrinter {
 
 		@Override
 		public void printBanner(Environment environment, Class<?> sourceClass, PrintStream out) {
-			for (Banner banner : this.banners) {
-				banner.printBanner(environment, sourceClass, out);
-			}
+			this.banners.forEach(banner -> banner.printBanner(environment, sourceClass, out));
 		}
 
 	}

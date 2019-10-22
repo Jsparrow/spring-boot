@@ -31,8 +31,7 @@ public class FlywayMigrationScriptMissingException extends RuntimeException {
 	private final List<String> locations;
 
 	FlywayMigrationScriptMissingException(List<String> locations) {
-		super(locations.isEmpty() ? "Migration script locations not configured" : "Cannot find migration scripts in: "
-				+ locations + " (please add migration scripts or check your Flyway configuration)");
+		super(locations.isEmpty() ? "Migration script locations not configured" : new StringBuilder().append("Cannot find migration scripts in: ").append(locations).append(" (please add migration scripts or check your Flyway configuration)").toString());
 		this.locations = new ArrayList<>(locations);
 	}
 

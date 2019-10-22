@@ -36,15 +36,16 @@ class ConditionEvaluationReportAutoConfigurationImportListener
 
 	@Override
 	public void onAutoConfigurationImportEvent(AutoConfigurationImportEvent event) {
-		if (this.beanFactory != null) {
-			ConditionEvaluationReport report = ConditionEvaluationReport.get(this.beanFactory);
-			report.recordEvaluationCandidates(event.getCandidateConfigurations());
-			report.recordExclusions(event.getExclusions());
+		if (this.beanFactory == null) {
+			return;
 		}
+		ConditionEvaluationReport report = ConditionEvaluationReport.get(this.beanFactory);
+		report.recordEvaluationCandidates(event.getCandidateConfigurations());
+		report.recordExclusions(event.getExclusions());
 	}
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = (beanFactory instanceof ConfigurableListableBeanFactory)
 				? (ConfigurableListableBeanFactory) beanFactory : null;
 	}

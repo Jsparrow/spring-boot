@@ -35,6 +35,8 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ImportBeanDefinitionRegistrar} for registering
@@ -44,6 +46,8 @@ import org.springframework.util.StringUtils;
  * @author Phillip Webb
  */
 class ConfigurationPropertiesScanRegistrar implements ImportBeanDefinitionRegistrar {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConfigurationPropertiesScanRegistrar.class);
 
 	private final Environment environment;
 
@@ -79,11 +83,8 @@ class ConfigurationPropertiesScanRegistrar implements ImportBeanDefinitionRegist
 	private void scan(BeanDefinitionRegistry registry, Set<String> packages) {
 		ConfigurationPropertiesBeanRegistrar registrar = new ConfigurationPropertiesBeanRegistrar(registry);
 		ClassPathScanningCandidateComponentProvider scanner = getScanner(registry);
-		for (String basePackage : packages) {
-			for (BeanDefinition candidate : scanner.findCandidateComponents(basePackage)) {
-				register(registrar, candidate.getBeanClassName());
-			}
-		}
+		packages.forEach(basePackage -> scanner.findCandidateComponents(basePackage)
+				.forEach(candidate -> register(registrar, candidate.getBeanClassName())));
 	}
 
 	private ClassPathScanningCandidateComponentProvider getScanner(BeanDefinitionRegistry registry) {
@@ -102,6 +103,7 @@ class ConfigurationPropertiesScanRegistrar implements ImportBeanDefinitionRegist
 			register(registrar, ClassUtils.forName(className, null));
 		}
 		catch (ClassNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}

@@ -16,7 +16,6 @@
 
 package smoketest.actuator;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import java.util.Collections;
 
 /**
  * Basic integration tests for service demo application.
@@ -132,7 +132,7 @@ class SampleActuatorApplicationTests {
 	@Test
 	void testHtmlErrorPage() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		HttpEntity<?> request = new HttpEntity<Void>(headers);
 		ResponseEntity<String> entity = this.restTemplate.withBasicAuth("user", "password").exchange("/foo",
 				HttpMethod.GET, request, String.class);

@@ -75,17 +75,17 @@ abstract class RedisConnectionConfiguration {
 			return this.sentinelConfiguration;
 		}
 		RedisProperties.Sentinel sentinelProperties = this.properties.getSentinel();
-		if (sentinelProperties != null) {
-			RedisSentinelConfiguration config = new RedisSentinelConfiguration();
-			config.master(sentinelProperties.getMaster());
-			config.setSentinels(createSentinels(sentinelProperties));
-			if (this.properties.getPassword() != null) {
-				config.setPassword(RedisPassword.of(this.properties.getPassword()));
-			}
-			config.setDatabase(this.properties.getDatabase());
-			return config;
+		if (sentinelProperties == null) {
+			return null;
 		}
-		return null;
+		RedisSentinelConfiguration config = new RedisSentinelConfiguration();
+		config.master(sentinelProperties.getMaster());
+		config.setSentinels(createSentinels(sentinelProperties));
+		if (this.properties.getPassword() != null) {
+			config.setPassword(RedisPassword.of(this.properties.getPassword()));
+		}
+		config.setDatabase(this.properties.getDatabase());
+		return config;
 	}
 
 	/**
@@ -123,7 +123,7 @@ abstract class RedisConnectionConfiguration {
 				nodes.add(new RedisNode(parts[0], Integer.valueOf(parts[1])));
 			}
 			catch (RuntimeException ex) {
-				throw new IllegalStateException("Invalid redis sentinel property '" + node + "'", ex);
+				throw new IllegalStateException(new StringBuilder().append("Invalid redis sentinel property '").append(node).append("'").toString(), ex);
 			}
 		}
 		return nodes;
@@ -144,7 +144,7 @@ abstract class RedisConnectionConfiguration {
 			return new ConnectionInfo(uri, useSsl, password);
 		}
 		catch (URISyntaxException ex) {
-			throw new IllegalArgumentException("Malformed url '" + url + "'", ex);
+			throw new IllegalArgumentException(new StringBuilder().append("Malformed url '").append(url).append("'").toString(), ex);
 		}
 	}
 

@@ -95,11 +95,11 @@ public class HelpCommand extends AbstractCommand {
 		String commandName = args[0];
 		for (Command command : this.commandRunner) {
 			if (command.getName().equals(commandName)) {
-				Log.info(this.commandRunner.getName() + command.getName() + " - " + command.getDescription());
+				Log.info(new StringBuilder().append(this.commandRunner.getName()).append(command.getName()).append(" - ").append(command.getDescription()).toString());
 				Log.info("");
 				if (command.getUsageHelp() != null) {
-					Log.info("usage: " + this.commandRunner.getName() + command.getName() + " "
-							+ command.getUsageHelp());
+					Log.info(new StringBuilder().append("usage: ").append(this.commandRunner.getName()).append(command.getName()).append(" ").append(command.getUsageHelp())
+							.toString());
 					Log.info("");
 				}
 				if (command.getHelp() != null) {
@@ -109,11 +109,11 @@ public class HelpCommand extends AbstractCommand {
 				if (examples != null) {
 					Log.info((examples.size() != 1) ? "examples:" : "example:");
 					Log.info("");
-					for (HelpExample example : examples) {
-						Log.info("    " + example.getDescription() + ":");
+					examples.forEach(example -> {
+						Log.info(new StringBuilder().append("    ").append(example.getDescription()).append(":").toString());
 						Log.info("        $ " + example.getExample());
 						Log.info("");
-					}
+					});
 					Log.info("");
 				}
 				return ExitStatus.OK;

@@ -58,9 +58,7 @@ public class ResolveDependencyCoordinatesTransformation extends AnnotatedNodeAST
 
 	@Override
 	protected void processAnnotationNodes(List<AnnotationNode> annotationNodes) {
-		for (AnnotationNode annotationNode : annotationNodes) {
-			transformGrabAnnotation(annotationNode);
-		}
+		annotationNodes.forEach(this::transformGrabAnnotation);
 	}
 
 	private void transformGrabAnnotation(AnnotationNode grabAnnotation) {
@@ -73,11 +71,11 @@ public class ResolveDependencyCoordinatesTransformation extends AnnotatedNodeAST
 
 	private String getValue(AnnotationNode annotation) {
 		Expression expression = annotation.getMember("value");
-		if (expression instanceof ConstantExpression) {
-			Object value = ((ConstantExpression) expression).getValue();
-			return (value instanceof String) ? (String) value : null;
+		if (!(expression instanceof ConstantExpression)) {
+			return null;
 		}
-		return null;
+		Object value = ((ConstantExpression) expression).getValue();
+		return (value instanceof String) ? (String) value : null;
 	}
 
 	private boolean isConvenienceForm(String value) {

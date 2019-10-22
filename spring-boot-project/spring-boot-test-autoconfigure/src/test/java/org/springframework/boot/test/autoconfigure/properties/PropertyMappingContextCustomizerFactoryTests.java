@@ -92,18 +92,32 @@ class PropertyMappingContextCustomizerFactoryTests {
 		context.register(ConfigMapping.class);
 		customizer.customizeContext(context, null);
 		assertThatExceptionOfType(BeanCreationException.class).isThrownBy(context::refresh)
-				.withMessageContaining("The @PropertyMapping annotation "
-						+ "@PropertyMappingContextCustomizerFactoryTests.TypeMappingAnnotation "
-						+ "cannot be used in combination with the @Component annotation @Configuration");
-	}
-
-	@NoMappingAnnotation
-	static class NoMapping {
-
+				.withMessageContaining(new StringBuilder().append("The @PropertyMapping annotation ").append("@PropertyMappingContextCustomizerFactoryTests.TypeMappingAnnotation ").append("cannot be used in combination with the @Component annotation @Configuration").toString());
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface NoMappingAnnotation {
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@PropertyMapping
+	@interface TypeMappingAnnotation {
+
+		String mapped() default "Mapped";
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface AttributeMappingAnnotation {
+
+		@PropertyMapping("mapped")
+		String value() default "Mapped";
+
+	}
+
+	@NoMappingAnnotation
+	static class NoMapping {
 
 	}
 
@@ -118,14 +132,6 @@ class PropertyMappingContextCustomizerFactoryTests {
 
 	}
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@PropertyMapping
-	@interface TypeMappingAnnotation {
-
-		String mapped() default "Mapped";
-
-	}
-
 	@AttributeMappingAnnotation
 	static class AttributeMapping {
 
@@ -133,14 +139,6 @@ class PropertyMappingContextCustomizerFactoryTests {
 
 	@AttributeMappingAnnotation("Other")
 	static class OtherMapping {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface AttributeMappingAnnotation {
-
-		@PropertyMapping("mapped")
-		String value() default "Mapped";
 
 	}
 

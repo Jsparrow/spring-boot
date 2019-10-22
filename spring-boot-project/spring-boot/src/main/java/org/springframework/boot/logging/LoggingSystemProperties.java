@@ -136,13 +136,13 @@ public class LoggingSystemProperties {
 	}
 
 	private PropertyResolver getPropertyResolver() {
-		if (this.environment instanceof ConfigurableEnvironment) {
-			PropertySourcesPropertyResolver resolver = new PropertySourcesPropertyResolver(
-					((ConfigurableEnvironment) this.environment).getPropertySources());
-			resolver.setIgnoreUnresolvableNestedPlaceholders(true);
-			return resolver;
+		if (!(this.environment instanceof ConfigurableEnvironment)) {
+			return this.environment;
 		}
-		return this.environment;
+		PropertySourcesPropertyResolver resolver = new PropertySourcesPropertyResolver(
+				((ConfigurableEnvironment) this.environment).getPropertySources());
+		resolver.setIgnoreUnresolvableNestedPlaceholders(true);
+		return resolver;
 	}
 
 	private void setSystemProperty(PropertyResolver resolver, String systemPropertyName, String propertyName) {

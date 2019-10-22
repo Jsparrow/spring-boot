@@ -54,7 +54,7 @@ public final class Layouts {
 		if (file.isDirectory() || lowerCaseFileName.endsWith(".zip")) {
 			return new Expanded();
 		}
-		throw new IllegalStateException("Unable to deduce layout for '" + file + "'");
+		throw new IllegalStateException(new StringBuilder().append("Unable to deduce layout for '").append(file).append("'").toString());
 	}
 
 	/**

@@ -51,13 +51,13 @@ class ManagementPortCustomServletPathSampleActuatorTests extends AbstractSampleA
 	@Test
 	void actuatorPathOnMainPortShouldNotMatch() {
 		ResponseEntity<String> entity = new TestRestTemplate()
-				.getForEntity("http://localhost:" + this.port + "/example/actuator/health", String.class);
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.port).append("/example/actuator/health").toString(), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 	}
 
 	@Override
 	String getPath() {
-		return "http://localhost:" + this.port + "/example";
+		return new StringBuilder().append("http://localhost:").append(this.port).append("/example").toString();
 	}
 
 	@Override

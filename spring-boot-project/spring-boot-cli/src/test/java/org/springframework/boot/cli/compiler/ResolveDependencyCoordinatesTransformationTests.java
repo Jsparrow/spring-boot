@@ -16,8 +16,6 @@
 
 package org.springframework.boot.cli.compiler;
 
-import java.util.Arrays;
-
 import groovy.lang.Grab;
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.AnnotationNode;
@@ -48,6 +46,7 @@ import org.springframework.boot.cli.compiler.grape.DependencyResolutionContext;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import java.util.Collections;
 
 /**
  * Tests for {@link ResolveDependencyCoordinatesTransformation}
@@ -87,27 +86,27 @@ final class ResolveDependencyCoordinatesTransformationTests {
 
 	@Test
 	void transformationOfAnnotationOnImport() {
-		this.moduleNode.addImport(null, null, Arrays.asList(this.grabAnnotation));
+		this.moduleNode.addImport(null, null, Collections.singletonList(this.grabAnnotation));
 		assertGrabAnnotationHasBeenTransformed();
 	}
 
 	@Test
 	void transformationOfAnnotationOnStarImport() {
-		this.moduleNode.addStarImport("org.springframework.util", Arrays.asList(this.grabAnnotation));
+		this.moduleNode.addStarImport("org.springframework.util", Collections.singletonList(this.grabAnnotation));
 
 		assertGrabAnnotationHasBeenTransformed();
 	}
 
 	@Test
 	void transformationOfAnnotationOnStaticImport() {
-		this.moduleNode.addStaticImport(null, null, null, Arrays.asList(this.grabAnnotation));
+		this.moduleNode.addStaticImport(null, null, null, Collections.singletonList(this.grabAnnotation));
 
 		assertGrabAnnotationHasBeenTransformed();
 	}
 
 	@Test
 	void transformationOfAnnotationOnStaticStarImport() {
-		this.moduleNode.addStaticStarImport(null, null, Arrays.asList(this.grabAnnotation));
+		this.moduleNode.addStaticStarImport(null, null, Collections.singletonList(this.grabAnnotation));
 
 		assertGrabAnnotationHasBeenTransformed();
 	}
@@ -196,7 +195,7 @@ final class ResolveDependencyCoordinatesTransformationTests {
 				new ConstantExpression("test"));
 		declarationExpression.addAnnotation(this.grabAnnotation);
 
-		BlockStatement code = new BlockStatement(Arrays.asList(new ExpressionStatement(declarationExpression)),
+		BlockStatement code = new BlockStatement(Collections.singletonList(new ExpressionStatement(declarationExpression)),
 				new VariableScope());
 
 		MethodNode methodNode = new MethodNode("test", 0, new ClassNode(Void.class), new Parameter[0], new ClassNode[0],
@@ -229,7 +228,7 @@ final class ResolveDependencyCoordinatesTransformationTests {
 			return null;
 		}
 		else {
-			throw new IllegalStateException("Member '" + memberName + "' is not a ConstantExpression");
+			throw new IllegalStateException(new StringBuilder().append("Member '").append(memberName).append("' is not a ConstantExpression").toString());
 		}
 	}
 

@@ -146,9 +146,7 @@ public class JettyServletWebServerFactory extends AbstractServletWebServerFactor
 		if (getSsl() != null && getSsl().isEnabled()) {
 			customizeSsl(server, address);
 		}
-		for (JettyServerCustomizer customizer : getServerCustomizers()) {
-			customizer.customize(server);
-		}
+		getServerCustomizers().forEach(customizer -> customizer.customize(server));
 		if (this.useForwardHeaders) {
 			new ForwardHeadersCustomizer().customize(server);
 		}
@@ -165,12 +163,7 @@ public class JettyServletWebServerFactory extends AbstractServletWebServerFactor
 		ServerConnector connector = new ServerConnector(server, this.acceptors, this.selectors);
 		connector.setHost(address.getHostString());
 		connector.setPort(address.getPort());
-		for (ConnectionFactory connectionFactory : connector.getConnectionFactories()) {
-			if (connectionFactory instanceof HttpConfiguration.ConnectionFactory) {
-				((HttpConfiguration.ConnectionFactory) connectionFactory).getHttpConfiguration()
-						.setSendServerVersion(false);
-			}
-		}
+		connector.getConnectionFactories().stream().filter(connectionFactory -> connectionFactory instanceof HttpConfiguration.ConnectionFactory).forEach(connectionFactory -> ((HttpConfiguration.ConnectionFactory) connectionFactory).getHttpConfiguration().setSendServerVersion(false));
 		return connector;
 	}
 
@@ -229,13 +222,14 @@ public class JettyServletWebServerFactory extends AbstractServletWebServerFactor
 		SessionHandler handler = context.getSessionHandler();
 		Duration sessionTimeout = getSession().getTimeout();
 		handler.setMaxInactiveInterval(isNegative(sessionTimeout) ? -1 : (int) sessionTimeout.getSeconds());
-		if (getSession().isPersistent()) {
-			DefaultSessionCache cache = new DefaultSessionCache(handler);
-			FileSessionDataStore store = new FileSessionDataStore();
-			store.setStoreDir(getValidSessionStoreDir());
-			cache.setSessionDataStore(store);
-			handler.setSessionCache(cache);
+		if (!getSession().isPersistent()) {
+			return;
 		}
+		DefaultSessionCache cache = new DefaultSessionCache(handler);
+		FileSessionDataStore store = new FileSessionDataStore();
+		store.setStoreDir(getValidSessionStoreDir());
+		cache.setSessionDataStore(store);
+		handler.setSessionCache(cache);
 	}
 
 	private boolean isNegative(Duration sessionTimeout) {
@@ -277,7 +271,7 @@ public class JettyServletWebServerFactory extends AbstractServletWebServerFactor
 		if ("file".equals(url.getProtocol())) {
 			File file = new File(url.toURI());
 			if (file.isFile()) {
-				return Resource.newResource("jar:" + url + "!/META-INF/resources");
+				return Resource.newResource(new StringBuilder().append("jar:").append(url).append("!/META-INF/resources").toString());
 			}
 		}
 		return Resource.newResource(url + "META-INF/resources");
@@ -494,22 +488,23 @@ public class JettyServletWebServerFactory extends AbstractServletWebServerFactor
 	}
 
 	private void addJettyErrorPages(ErrorHandler errorHandler, Collection<ErrorPage> errorPages) {
-		if (errorHandler instanceof ErrorPageErrorHandler) {
-			ErrorPageErrorHandler handler = (ErrorPageErrorHandler) errorHandler;
-			for (ErrorPage errorPage : errorPages) {
-				if (errorPage.isGlobal()) {
-					handler.addErrorPage(ErrorPageErrorHandler.GLOBAL_ERROR_PAGE, errorPage.getPath());
+		if (!(errorHandler instanceof ErrorPageErrorHandler)) {
+			return;
+		}
+		ErrorPageErrorHandler handler = (ErrorPageErrorHandler) errorHandler;
+		errorPages.forEach(errorPage -> {
+			if (errorPage.isGlobal()) {
+				handler.addErrorPage(ErrorPageErrorHandler.GLOBAL_ERROR_PAGE, errorPage.getPath());
+			}
+			else {
+				if (errorPage.getExceptionName() != null) {
+					handler.addErrorPage(errorPage.getExceptionName(), errorPage.getPath());
 				}
 				else {
-					if (errorPage.getExceptionName() != null) {
-						handler.addErrorPage(errorPage.getExceptionName(), errorPage.getPath());
-					}
-					else {
-						handler.addErrorPage(errorPage.getStatusCode(), errorPage.getPath());
-					}
+					handler.addErrorPage(errorPage.getStatusCode(), errorPage.getPath());
 				}
 			}
-		}
+		});
 	}
 
 	private static final class LoaderHidingResource extends Resource {
@@ -521,7 +516,7 @@ public class JettyServletWebServerFactory extends AbstractServletWebServerFactor
 		}
 
 		@Override
-		public Resource addPath(String path) throws IOException, MalformedURLException {
+		public Resource addPath(String path) throws IOException {
 			if (path.startsWith("/org/springframework/boot")) {
 				return null;
 			}
@@ -585,12 +580,12 @@ public class JettyServletWebServerFactory extends AbstractServletWebServerFactor
 		}
 
 		@Override
-		public boolean delete() throws SecurityException {
+		public boolean delete() {
 			return this.delegate.delete();
 		}
 
 		@Override
-		public boolean renameTo(Resource dest) throws SecurityException {
+		public boolean renameTo(Resource dest) {
 			return this.delegate.renameTo(dest);
 		}
 

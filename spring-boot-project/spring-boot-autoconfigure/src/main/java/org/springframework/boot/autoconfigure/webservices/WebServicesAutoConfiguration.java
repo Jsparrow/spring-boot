@@ -50,6 +50,8 @@ import org.springframework.ws.config.annotation.WsConfigurationSupport;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 import org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition;
 import org.springframework.xml.xsd.SimpleXsdSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for Spring Web Services.
@@ -96,6 +98,7 @@ public class WebServicesAutoConfiguration {
 	private static class WsdlDefinitionBeanFactoryPostProcessor
 			implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
+		private final Logger logger = LoggerFactory.getLogger(WsdlDefinitionBeanFactoryPostProcessor.class);
 		private ApplicationContext applicationContext;
 
 		@Override
@@ -104,19 +107,19 @@ public class WebServicesAutoConfiguration {
 		}
 
 		@Override
-		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 			Binder binder = Binder.get(this.applicationContext.getEnvironment());
 			List<String> wsdlLocations = binder.bind("spring.webservices.wsdl-locations", Bindable.listOf(String.class))
 					.orElse(Collections.emptyList());
-			for (String wsdlLocation : wsdlLocations) {
+			wsdlLocations.forEach(wsdlLocation -> {
 				registerBeans(wsdlLocation, "*.wsdl", SimpleWsdl11Definition.class, SimpleWsdl11Definition::new,
 						registry);
 				registerBeans(wsdlLocation, "*.xsd", SimpleXsdSchema.class, SimpleXsdSchema::new, registry);
-			}
+			});
 		}
 
 		@Override
-		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		}
 
 		private <T> void registerBeans(String location, String pattern, Class<T> type,
@@ -134,6 +137,7 @@ public class WebServicesAutoConfiguration {
 				return this.applicationContext.getResources(ensureTrailingSlash(location) + pattern);
 			}
 			catch (IOException ex) {
+				logger.error(ex.getMessage(), ex);
 				return new Resource[0];
 			}
 		}

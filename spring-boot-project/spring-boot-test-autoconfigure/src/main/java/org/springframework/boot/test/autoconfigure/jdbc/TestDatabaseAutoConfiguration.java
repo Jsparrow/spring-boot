@@ -77,26 +77,27 @@ public class TestDatabaseAutoConfiguration {
 		private static final Log logger = LogFactory.getLog(EmbeddedDataSourceBeanFactoryPostProcessor.class);
 
 		@Override
-		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 			Assert.isInstanceOf(ConfigurableListableBeanFactory.class, registry,
 					"Test Database Auto-configuration can only be used with a ConfigurableListableBeanFactory");
 			process(registry, (ConfigurableListableBeanFactory) registry);
 		}
 
 		@Override
-		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		}
 
 		private void process(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {
 			BeanDefinitionHolder holder = getDataSourceBeanDefinition(beanFactory);
-			if (holder != null) {
-				String beanName = holder.getBeanName();
-				boolean primary = holder.getBeanDefinition().isPrimary();
-				logger.info("Replacing '" + beanName + "' DataSource bean with " + (primary ? "primary " : "")
-						+ "embedded version");
-				registry.removeBeanDefinition(beanName);
-				registry.registerBeanDefinition(beanName, createEmbeddedBeanDefinition(primary));
+			if (holder == null) {
+				return;
 			}
+			String beanName = holder.getBeanName();
+			boolean primary = holder.getBeanDefinition().isPrimary();
+			logger.info(new StringBuilder().append("Replacing '").append(beanName).append("' DataSource bean with ").append(primary ? "primary " : "").append("embedded version")
+					.toString());
+			registry.removeBeanDefinition(beanName);
+			registry.registerBeanDefinition(beanName, createEmbeddedBeanDefinition(primary));
 		}
 
 		private BeanDefinition createEmbeddedBeanDefinition(boolean primary) {
@@ -173,13 +174,11 @@ public class TestDatabaseAutoConfiguration {
 		EmbeddedDatabase getEmbeddedDatabase() {
 			EmbeddedDatabaseConnection connection = this.environment.getProperty("spring.test.database.connection",
 					EmbeddedDatabaseConnection.class, EmbeddedDatabaseConnection.NONE);
-			if (EmbeddedDatabaseConnection.NONE.equals(connection)) {
+			if (EmbeddedDatabaseConnection.NONE == connection) {
 				connection = EmbeddedDatabaseConnection.get(getClass().getClassLoader());
 			}
 			Assert.state(connection != EmbeddedDatabaseConnection.NONE,
-					"Failed to replace DataSource with an embedded database for tests. If "
-							+ "you want an embedded database please put a supported one "
-							+ "on the classpath or tune the replace attribute of @AutoConfigureTestDatabase.");
+					new StringBuilder().append("Failed to replace DataSource with an embedded database for tests. If ").append("you want an embedded database please put a supported one ").append("on the classpath or tune the replace attribute of @AutoConfigureTestDatabase.").toString());
 			return new EmbeddedDatabaseBuilder().generateUniqueName(true).setType(connection.getType()).build();
 		}
 

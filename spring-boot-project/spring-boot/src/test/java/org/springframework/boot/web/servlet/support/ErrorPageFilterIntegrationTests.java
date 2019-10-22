@@ -95,7 +95,7 @@ class ErrorPageFilterIntegrationTests {
 			HttpStatus status) throws Exception {
 		int port = context.getWebServer().getPort();
 		RestTemplate template = new RestTemplate();
-		ResponseEntity<String> entity = template.getForEntity(new URI("http://localhost:" + port + resourcePath),
+		ResponseEntity<String> entity = template.getForEntity(new URI(new StringBuilder().append("http://localhost:").append(port).append(resourcePath).toString()),
 				String.class);
 		assertThat(entity.getBody()).isEqualTo("Hello World");
 		assertThat(entity.getStatusCode()).isEqualTo(status);

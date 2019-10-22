@@ -16,8 +16,6 @@
 
 package smoketest.mustache;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 
 /**
  * Basic integration tests for Mustache application.
@@ -55,7 +54,7 @@ class SampleWebMustacheApplicationTests {
 	@Test
 	void testMustacheErrorTemplate() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 		ResponseEntity<String> responseEntity = this.restTemplate.exchange("/does-not-exist", HttpMethod.GET,
 				requestEntity, String.class);
@@ -66,7 +65,7 @@ class SampleWebMustacheApplicationTests {
 	@Test
 	void test503HtmlResource() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 		ResponseEntity<String> entity = this.restTemplate.exchange("/serviceUnavailable", HttpMethod.GET, requestEntity,
 				String.class);
@@ -77,7 +76,7 @@ class SampleWebMustacheApplicationTests {
 	@Test
 	void test5xxHtmlResource() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 		ResponseEntity<String> entity = this.restTemplate.exchange("/bang", HttpMethod.GET, requestEntity,
 				String.class);
@@ -88,7 +87,7 @@ class SampleWebMustacheApplicationTests {
 	@Test
 	void test507Template() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 		ResponseEntity<String> entity = this.restTemplate.exchange("/insufficientStorage", HttpMethod.GET,
 				requestEntity, String.class);

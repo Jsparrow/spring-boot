@@ -37,6 +37,8 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for AssertJ based JSON marshal testers. Exposes specific Asserts following a
@@ -68,15 +70,11 @@ import org.springframework.util.ReflectionUtils;
  */
 public abstract class AbstractJsonMarshalTester<T> {
 
+	private static final Logger logger = LoggerFactory.getLogger(AbstractJsonMarshalTester.class);
+
 	private Class<?> resourceLoadClass;
 
 	private ResolvableType type;
-
-	/**
-	 * Create a new uninitialized {@link AbstractJsonMarshalTester} instance.
-	 */
-	protected AbstractJsonMarshalTester() {
-	}
 
 	/**
 	 * Create a new {@link AbstractJsonMarshalTester} instance.
@@ -91,16 +89,23 @@ public abstract class AbstractJsonMarshalTester<T> {
 	}
 
 	/**
+	 * Create a new uninitialized {@link AbstractJsonMarshalTester} instance.
+	 */
+	protected AbstractJsonMarshalTester() {
+	}
+
+	/**
 	 * Initialize the marshal tester for use.
 	 * @param resourceLoadClass the source class used when loading relative classpath
 	 * resources
 	 * @param type the type under test
 	 */
 	protected final void initialize(Class<?> resourceLoadClass, ResolvableType type) {
-		if (this.resourceLoadClass == null && this.type == null) {
-			this.resourceLoadClass = resourceLoadClass;
-			this.type = type;
+		if (!(this.resourceLoadClass == null && this.type == null)) {
+			return;
 		}
+		this.resourceLoadClass = resourceLoadClass;
+		this.type = type;
 	}
 
 	/**
@@ -316,6 +321,7 @@ public abstract class AbstractJsonMarshalTester<T> {
 			closeable.close();
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -385,12 +391,13 @@ public abstract class AbstractJsonMarshalTester<T> {
 		}
 
 		protected void doWithField(Field field, Object test, ObjectFactory<M> marshaller) {
-			if (this.testerClass.isAssignableFrom(field.getType())) {
-				ReflectionUtils.makeAccessible(field);
-				Object existingValue = ReflectionUtils.getField(field, test);
-				if (existingValue == null) {
-					setupField(field, test, marshaller);
-				}
+			if (!this.testerClass.isAssignableFrom(field.getType())) {
+				return;
+			}
+			ReflectionUtils.makeAccessible(field);
+			Object existingValue = ReflectionUtils.getField(field, test);
+			if (existingValue == null) {
+				setupField(field, test, marshaller);
 			}
 		}
 

@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Really basic JSON parser for when you have nothing else available. Comes with some
@@ -37,6 +39,8 @@ import org.springframework.util.StringUtils;
  */
 public class BasicJsonParser extends AbstractJsonParser {
 
+	private static final Logger logger = LoggerFactory.getLogger(BasicJsonParser.class);
+
 	@Override
 	public Map<String, Object> parseMap(String json) {
 		return parseMap(json, this::parseMapInternal);
@@ -50,9 +54,7 @@ public class BasicJsonParser extends AbstractJsonParser {
 	private List<Object> parseListInternal(String json) {
 		List<Object> list = new ArrayList<>();
 		json = trimLeadingCharacter(trimTrailingCharacter(json, ']'), '[');
-		for (String value : tokenize(json)) {
-			list.add(parseInternal(value));
-		}
+		tokenize(json).forEach(value -> list.add(parseInternal(value)));
 		return list;
 	}
 
@@ -70,12 +72,14 @@ public class BasicJsonParser extends AbstractJsonParser {
 			return Long.valueOf(json);
 		}
 		catch (NumberFormatException ex) {
+			logger.error(ex.getMessage(), ex);
 			// ignore
 		}
 		try {
 			return Double.valueOf(json);
 		}
 		catch (NumberFormatException ex) {
+			logger.error(ex.getMessage(), ex);
 			// ignore
 		}
 		return json;
@@ -98,12 +102,12 @@ public class BasicJsonParser extends AbstractJsonParser {
 	private Map<String, Object> parseMapInternal(String json) {
 		Map<String, Object> map = new LinkedHashMap<>();
 		json = trimLeadingCharacter(trimTrailingCharacter(json, '}'), '{');
-		for (String pair : tokenize(json)) {
+		tokenize(json).forEach(pair -> {
 			String[] values = StringUtils.trimArrayElements(StringUtils.split(pair, ":"));
 			String key = trimLeadingCharacter(trimTrailingCharacter(values[0], '"'), '"');
 			Object value = parseInternal(values[1]);
 			map.put(key, value);
-		}
+		});
 		return map;
 	}
 

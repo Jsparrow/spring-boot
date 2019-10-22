@@ -44,6 +44,8 @@ import org.springframework.boot.loader.archive.ExplodedArchive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 import org.springframework.boot.loader.util.SystemPropertyUtils;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Launcher} for archives with user-configured classpath and main class via a
@@ -75,6 +77,8 @@ import org.springframework.util.Assert;
  * @since 1.0.0
  */
 public class PropertiesLauncher extends Launcher {
+
+	private static final Logger logger = LoggerFactory.getLogger(PropertiesLauncher.class);
 
 	private static final Class<?>[] PARENT_ONLY_PARAMS = new Class<?>[] { ClassLoader.class };
 
@@ -166,7 +170,7 @@ public class PropertiesLauncher extends Launcher {
 		}
 	}
 
-	private void initializeProperties() throws Exception, IOException {
+	private void initializeProperties() throws Exception {
 		List<String> configs = new ArrayList<>();
 		if (getProperty(CONFIG_LOCATION) != null) {
 			configs.add(getProperty(CONFIG_LOCATION));
@@ -174,9 +178,9 @@ public class PropertiesLauncher extends Launcher {
 		else {
 			String[] names = getPropertyWithDefault(CONFIG_NAME, "loader").split(",");
 			for (String name : names) {
-				configs.add("file:" + getHomeDirectory() + "/" + name + ".properties");
-				configs.add("classpath:" + name + ".properties");
-				configs.add("classpath:BOOT-INF/classes/" + name + ".properties");
+				configs.add(new StringBuilder().append("file:").append(getHomeDirectory()).append("/").append(name).append(".properties").toString());
+				configs.add(new StringBuilder().append("classpath:").append(name).append(".properties").toString());
+				configs.add(new StringBuilder().append("classpath:BOOT-INF/classes/").append(name).append(".properties").toString());
 			}
 		}
 		for (String config : configs) {
@@ -194,22 +198,23 @@ public class PropertiesLauncher extends Launcher {
 		}
 	}
 
-	private void loadResource(InputStream resource) throws IOException, Exception {
+	private void loadResource(InputStream resource) throws Exception {
 		this.properties.load(resource);
-		for (Object key : Collections.list(this.properties.propertyNames())) {
+		Collections.list(this.properties.propertyNames()).forEach(key -> {
 			String text = this.properties.getProperty((String) key);
 			String value = SystemPropertyUtils.resolvePlaceholders(this.properties, text);
 			if (value != null) {
 				this.properties.put(key, value);
 			}
+		});
+		if (!"true".equals(getProperty(SET_SYSTEM_PROPERTIES))) {
+			return;
 		}
-		if ("true".equals(getProperty(SET_SYSTEM_PROPERTIES))) {
-			debug("Adding resolved properties to System properties");
-			for (Object key : Collections.list(this.properties.propertyNames())) {
-				String value = this.properties.getProperty((String) key);
-				System.setProperty((String) key, value);
-			}
-		}
+		debug("Adding resolved properties to System properties");
+		Collections.list(this.properties.propertyNames()).forEach(key -> {
+			String value = this.properties.getProperty((String) key);
+			System.setProperty((String) key, value);
+		});
 	}
 
 	private InputStream getResource(String config) throws Exception {
@@ -339,7 +344,7 @@ public class PropertiesLauncher extends Launcher {
 	protected String getMainClass() throws Exception {
 		String mainClass = getProperty(MAIN, "Start-Class");
 		if (mainClass == null) {
-			throw new IllegalStateException("No '" + MAIN + "' or 'Start-Class' specified");
+			throw new IllegalStateException(new StringBuilder().append("No '").append(MAIN).append("' or 'Start-Class' specified").toString());
 		}
 		return mainClass;
 	}
@@ -382,6 +387,7 @@ public class PropertiesLauncher extends Launcher {
 			return constructor.newInstance(initargs);
 		}
 		catch (NoSuchMethodException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -406,13 +412,13 @@ public class PropertiesLauncher extends Launcher {
 		String property = SystemPropertyUtils.getProperty(propertyKey);
 		if (property != null) {
 			String value = SystemPropertyUtils.resolvePlaceholders(this.properties, property);
-			debug("Property '" + propertyKey + "' from environment: " + value);
+			debug(new StringBuilder().append("Property '").append(propertyKey).append("' from environment: ").append(value).toString());
 			return value;
 		}
 		if (this.properties.containsKey(propertyKey)) {
 			String value = SystemPropertyUtils.resolvePlaceholders(this.properties,
 					this.properties.getProperty(propertyKey));
-			debug("Property '" + propertyKey + "' from properties: " + value);
+			debug(new StringBuilder().append("Property '").append(propertyKey).append("' from properties: ").append(value).toString());
 			return value;
 		}
 		try {
@@ -423,7 +429,7 @@ public class PropertiesLauncher extends Launcher {
 					if (manifest != null) {
 						String value = manifest.getMainAttributes().getValue(manifestKey);
 						if (value != null) {
-							debug("Property '" + manifestKey + "' from home directory manifest: " + value);
+							debug(new StringBuilder().append("Property '").append(manifestKey).append("' from home directory manifest: ").append(value).toString());
 							return SystemPropertyUtils.resolvePlaceholders(this.properties, value);
 						}
 					}
@@ -431,6 +437,7 @@ public class PropertiesLauncher extends Launcher {
 			}
 		}
 		catch (IllegalStateException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 		// Otherwise try the parent archive
@@ -438,7 +445,7 @@ public class PropertiesLauncher extends Launcher {
 		if (manifest != null) {
 			String value = manifest.getMainAttributes().getValue(manifestKey);
 			if (value != null) {
-				debug("Property '" + manifestKey + "' from archive manifest: " + value);
+				debug(new StringBuilder().append("Property '").append(manifestKey).append("' from archive manifest: ").append(value).toString());
 				return SystemPropertyUtils.resolvePlaceholders(this.properties, value);
 			}
 		}
@@ -481,7 +488,7 @@ public class PropertiesLauncher extends Launcher {
 		}
 		Archive archive = getArchive(file);
 		if (archive != null) {
-			debug("Adding classpath entries from archive " + archive.getUrl() + root);
+			debug(new StringBuilder().append("Adding classpath entries from archive ").append(archive.getUrl()).append(root).toString());
 			lib.add(archive);
 		}
 		List<Archive> nestedArchives = getNestedArchives(root);
@@ -515,7 +522,7 @@ public class PropertiesLauncher extends Launcher {
 	private List<Archive> getNestedArchives(String path) throws Exception {
 		Archive parent = this.parent;
 		String root = path;
-		if (!root.equals("/") && root.startsWith("/") || parent.getUrl().equals(this.home.toURI().toURL())) {
+		if (!"/".equals(root) && root.startsWith("/") || parent.getUrl().equals(this.home.toURI().toURL())) {
 			// If home dir is same as parent archive, no need to add it twice.
 			return null;
 		}
@@ -538,7 +545,7 @@ public class PropertiesLauncher extends Launcher {
 				root = "";
 			}
 		}
-		if (root.equals("/") || root.equals("./") || root.equals(".")) {
+		if ("/".equals(root) || "./".equals(root) || ".".equals(root)) {
 			// The prefix for nested jars is actually empty if it's at the root
 			root = "";
 		}
@@ -565,6 +572,7 @@ public class PropertiesLauncher extends Launcher {
 			}));
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}
@@ -584,7 +592,7 @@ public class PropertiesLauncher extends Launcher {
 		}
 		else {
 			// It's a directory
-			if (!path.endsWith("/") && !path.equals(".")) {
+			if (!path.endsWith("/") && !".".equals(path)) {
 				path = path + "/";
 			}
 		}
@@ -618,7 +626,7 @@ public class PropertiesLauncher extends Launcher {
 
 	private void debug(String message) {
 		if (Boolean.getBoolean(DEBUG)) {
-			System.out.println(message);
+			logger.info(message);
 		}
 	}
 

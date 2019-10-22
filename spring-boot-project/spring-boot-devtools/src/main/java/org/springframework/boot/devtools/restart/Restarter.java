@@ -55,6 +55,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Allows a running application to be restarted with an updated classpath. The restarter
@@ -82,6 +84,8 @@ import org.springframework.util.ReflectionUtils;
  * @see #restart()
  */
 public class Restarter {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(Restarter.class);
 
 	private static final Object INSTANCE_MONITOR = new Object();
 
@@ -151,18 +155,20 @@ public class Restarter {
 			return new MainMethod(thread).getDeclaringClassName();
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
 
 	protected void initialize(boolean restartOnInitialize) {
 		preInitializeLeakyClasses();
-		if (this.initialUrls != null) {
-			this.urls.addAll(Arrays.asList(this.initialUrls));
-			if (restartOnInitialize) {
-				this.logger.debug("Immediately restarting application");
-				immediateRestart();
-			}
+		if (this.initialUrls == null) {
+			return;
+		}
+		this.urls.addAll(Arrays.asList(this.initialUrls));
+		if (restartOnInitialize) {
+			this.logger.debug("Immediately restarting application");
+			immediateRestart();
 		}
 	}
 
@@ -278,7 +284,7 @@ public class Restarter {
 		ClassLoaderFiles updatedFiles = new ClassLoaderFiles(this.classLoaderFiles);
 		ClassLoader classLoader = new RestartClassLoader(this.applicationClassLoader, urls, updatedFiles, this.logger);
 		if (this.logger.isDebugEnabled()) {
-			this.logger.debug("Starting application " + this.mainClassName + " with URLs " + Arrays.asList(urls));
+			this.logger.debug(new StringBuilder().append("Starting application ").append(this.mainClassName).append(" with URLs ").append(Arrays.asList(urls)).toString());
 		}
 		return relaunch(classLoader);
 	}
@@ -305,10 +311,10 @@ public class Restarter {
 		this.logger.debug("Stopping application");
 		this.stopLock.lock();
 		try {
-			for (ConfigurableApplicationContext context : this.rootContexts) {
+			this.rootContexts.forEach(context -> {
 				context.close();
 				this.rootContexts.remove(context);
-			}
+			});
 			cleanupCaches();
 			if (this.forceReferenceCleanup) {
 				forceReferenceCleanup();
@@ -349,6 +355,7 @@ public class Restarter {
 			AnnotationUtils.clearCache();
 		}
 		catch (Throwable ex) {
+			logger1.error(ex.getMessage(), ex);
 			clear(AnnotationUtils.class, "findAnnotationCache");
 			clear(AnnotationUtils.class, "annotatedInterfaceCache");
 		}
@@ -360,7 +367,7 @@ public class Restarter {
 		}
 		catch (Exception ex) {
 			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("Unable to clear field " + className + " " + fieldName, ex);
+				this.logger.debug(new StringBuilder().append("Unable to clear field ").append(className).append(" ").append(fieldName).toString(), ex);
 			}
 		}
 	}
@@ -379,7 +386,7 @@ public class Restarter {
 		}
 		catch (Exception ex) {
 			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("Unable to clear field " + type + " " + fieldName, ex);
+				this.logger.debug(new StringBuilder().append("Unable to clear field ").append(type).append(" ").append(fieldName).toString(), ex);
 			}
 		}
 	}
@@ -399,6 +406,7 @@ public class Restarter {
 			}
 		}
 		catch (OutOfMemoryError ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Expected
 		}
 	}
@@ -456,9 +464,7 @@ public class Restarter {
 
 	public Object getOrAddAttribute(String name, final ObjectFactory<?> objectFactory) {
 		synchronized (this.attributes) {
-			if (!this.attributes.containsKey(name)) {
-				this.attributes.put(name, objectFactory.getObject());
-			}
+			this.attributes.putIfAbsent(name, objectFactory.getObject());
 			return this.attributes.get(name);
 		}
 	}
@@ -592,6 +598,8 @@ public class Restarter {
 	 */
 	private class LeakSafeThread extends Thread {
 
+		private final Logger logger2 = LoggerFactory.getLogger(LeakSafeThread.class);
+
 		private Callable<?> callable;
 
 		private Object result;
@@ -629,7 +637,7 @@ public class Restarter {
 				this.result = this.callable.call();
 			}
 			catch (Exception ex) {
-				ex.printStackTrace();
+				logger2.error(ex.getMessage(), ex);
 				System.exit(1);
 			}
 		}

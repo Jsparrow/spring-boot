@@ -43,13 +43,13 @@ class CloudFoundrySecurityInterceptor {
 
 	private static final Log logger = LogFactory.getLog(CloudFoundrySecurityInterceptor.class);
 
+	private static final SecurityResponse SUCCESS = SecurityResponse.success();
+
 	private final TokenValidator tokenValidator;
 
 	private final CloudFoundrySecurityService cloudFoundrySecurityService;
 
 	private final String applicationId;
-
-	private static final SecurityResponse SUCCESS = SecurityResponse.success();
 
 	CloudFoundrySecurityInterceptor(TokenValidator tokenValidator,
 			CloudFoundrySecurityService cloudFoundrySecurityService, String applicationId) {
@@ -81,7 +81,7 @@ class CloudFoundrySecurityInterceptor {
 			if (ex instanceof CloudFoundryAuthorizationException) {
 				CloudFoundryAuthorizationException cfException = (CloudFoundryAuthorizationException) ex;
 				return new SecurityResponse(cfException.getStatusCode(),
-						"{\"security_error\":\"" + cfException.getMessage() + "\"}");
+						new StringBuilder().append("{\"security_error\":\"").append(cfException.getMessage()).append("\"}").toString());
 			}
 			return new SecurityResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}

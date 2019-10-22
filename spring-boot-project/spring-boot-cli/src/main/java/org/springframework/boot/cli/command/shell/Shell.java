@@ -90,9 +90,7 @@ public class Shell {
 		List<Command> commands = new ArrayList<>();
 		ServiceLoader<CommandFactory> factories = ServiceLoader.load(CommandFactory.class, getClass().getClassLoader());
 		for (CommandFactory factory : factories) {
-			for (Command command : factory.getCommands()) {
-				commands.add(convertToForkCommand(command));
-			}
+			factory.getCommands().forEach(command -> commands.add(convertToForkCommand(command)));
 		}
 		commands.add(new PromptCommand(this.prompts));
 		commands.add(new ClearCommand(this.consoleReader));
@@ -140,7 +138,7 @@ public class Shell {
 
 	private void printBanner() {
 		String version = getClass().getPackage().getImplementationVersion();
-		version = (version != null) ? " (v" + version + ")" : "";
+		version = (version != null) ? new StringBuilder().append(" (v").append(version).append(")").toString() : "";
 		System.out.println(ansi("Spring Boot", Code.BOLD).append(version, Code.FAINT));
 		System.out.println(ansi("Hit TAB to complete. Type 'help' and hit RETURN for help, and 'exit' to quit."));
 	}
@@ -221,7 +219,7 @@ public class Shell {
 
 		boolean handleSigInt() {
 			Command command = this.lastCommand;
-			if (command != null && command instanceof RunProcessCommand) {
+			if (command instanceof RunProcessCommand) {
 				return ((RunProcessCommand) command).handleSigInt();
 			}
 			return false;

@@ -72,6 +72,8 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for Flyway database migrations.
@@ -117,6 +119,8 @@ public class FlywayAutoConfiguration {
 			FlywayMigrationInitializerNamedParameterJdbcOperationsDependsOnPostProcessor.class })
 	public static class FlywayConfiguration {
 
+		private final Logger logger = LoggerFactory.getLogger(FlywayConfiguration.class);
+
 		@Bean
 		public Flyway flyway(FlywayProperties properties, DataSourceProperties dataSourceProperties,
 				ResourceLoader resourceLoader, ObjectProvider<DataSource> dataSource,
@@ -160,11 +164,12 @@ public class FlywayAutoConfiguration {
 
 		private void checkLocationExists(DataSource dataSource, FlywayProperties properties,
 				ResourceLoader resourceLoader) {
-			if (properties.isCheckLocation()) {
-				List<String> locations = new LocationResolver(dataSource).resolveLocations(properties.getLocations());
-				if (!hasAtLeastOneLocation(resourceLoader, locations)) {
-					throw new FlywayMigrationScriptMissingException(locations);
-				}
+			if (!properties.isCheckLocation()) {
+				return;
+			}
+			List<String> locations = new LocationResolver(dataSource).resolveLocations(properties.getLocations());
+			if (!hasAtLeastOneLocation(resourceLoader, locations)) {
+				throw new FlywayMigrationScriptMissingException(locations);
 			}
 		}
 
@@ -178,7 +183,7 @@ public class FlywayAutoConfiguration {
 			map.from(properties.getSchemas()).as(StringUtils::toStringArray).to(configuration::schemas);
 			map.from(properties.getTable()).to(configuration::table);
 			// No method reference for compatibility with Flyway 5.x
-			map.from(properties.getTablespace()).whenNonNull().to((tablespace) -> configuration.tablespace(tablespace));
+			map.from(properties.getTablespace()).whenNonNull().to(configuration::tablespace);
 			map.from(properties.getBaselineDescription()).to(configuration::baselineDescription);
 			map.from(properties.getBaselineVersion()).to(configuration::baselineVersion);
 			map.from(properties.getInstalledBy()).to(configuration::installedBy);
@@ -213,7 +218,7 @@ public class FlywayAutoConfiguration {
 			map.from(properties.getOracleSqlplus()).whenNonNull().to(configuration::oracleSqlplus);
 			// No method reference for compatibility with Flyway 5.x
 			map.from(properties.getOracleSqlplusWarn()).whenNonNull()
-					.to((oracleSqlplusWarn) -> configuration.oracleSqlplusWarn(oracleSqlplusWarn));
+					.to(configuration::oracleSqlplusWarn);
 			map.from(properties.getStream()).whenNonNull().to(configuration::stream);
 			map.from(properties.getUndoSqlMigrationPrefix()).whenNonNull().to(configuration::undoSqlMigrationPrefix);
 		}
@@ -236,6 +241,7 @@ public class FlywayAutoConfiguration {
 					flyway.javaMigrations(migrations.toArray(new JavaMigration[0]));
 				}
 				catch (NoSuchMethodError ex) {
+					logger.error(ex.getMessage(), ex);
 					// Flyway 5.x
 				}
 			}
@@ -247,12 +253,7 @@ public class FlywayAutoConfiguration {
 		}
 
 		private boolean hasAtLeastOneLocation(ResourceLoader resourceLoader, Collection<String> locations) {
-			for (String location : locations) {
-				if (resourceLoader.getResource(normalizePrefix(location)).exists()) {
-					return true;
-				}
-			}
-			return false;
+			return locations.stream().anyMatch(location -> resourceLoader.getResource(normalizePrefix(location)).exists());
 		}
 
 		private String normalizePrefix(String location) {
@@ -367,11 +368,11 @@ public class FlywayAutoConfiguration {
 		}
 
 		List<String> resolveLocations(List<String> locations) {
-			if (usesVendorLocation(locations)) {
-				DatabaseDriver databaseDriver = getDatabaseDriver();
-				return replaceVendorLocations(locations, databaseDriver);
+			if (!usesVendorLocation(locations)) {
+				return locations;
 			}
-			return locations;
+			DatabaseDriver databaseDriver = getDatabaseDriver();
+			return replaceVendorLocations(locations, databaseDriver);
 		}
 
 		private List<String> replaceVendorLocations(List<String> locations, DatabaseDriver databaseDriver) {
@@ -395,12 +396,7 @@ public class FlywayAutoConfiguration {
 		}
 
 		private boolean usesVendorLocation(Collection<String> locations) {
-			for (String location : locations) {
-				if (location.contains(VENDOR_PLACEHOLDER)) {
-					return true;
-				}
-			}
-			return false;
+			return locations.stream().anyMatch(location -> location.contains(VENDOR_PLACEHOLDER));
 		}
 
 	}

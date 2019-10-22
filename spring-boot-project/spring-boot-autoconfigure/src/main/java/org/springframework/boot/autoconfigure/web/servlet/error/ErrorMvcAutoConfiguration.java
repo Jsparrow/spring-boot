@@ -72,6 +72,8 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.springframework.web.util.HtmlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} to render errors via an MVC error
@@ -233,9 +235,9 @@ public class ErrorMvcAutoConfiguration {
 
 		private String getMessage(Map<String, ?> model) {
 			Object path = model.get("path");
-			String message = "Cannot render error page for request [" + path + "]";
+			String message = new StringBuilder().append("Cannot render error page for request [").append(path).append("]").toString();
 			if (model.get("message") != null) {
-				message += " and exception [" + model.get("message") + "]";
+				message += new StringBuilder().append(" and exception [").append(model.get("message")).append("]").toString();
 			}
 			message += " as the response has already been committed.";
 			message += " As a result, the response may have the wrong status code.";
@@ -283,8 +285,10 @@ public class ErrorMvcAutoConfiguration {
 	 */
 	static class PreserveErrorControllerTargetClassPostProcessor implements BeanFactoryPostProcessor {
 
+		private final Logger logger1 = LoggerFactory.getLogger(PreserveErrorControllerTargetClassPostProcessor.class);
+
 		@Override
-		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 			String[] errorControllerBeans = beanFactory.getBeanNamesForType(ErrorController.class, false, false);
 			for (String errorControllerBean : errorControllerBeans) {
 				try {
@@ -292,6 +296,7 @@ public class ErrorMvcAutoConfiguration {
 							.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);
 				}
 				catch (Throwable ex) {
+					logger1.error(ex.getMessage(), ex);
 					// Ignore
 				}
 			}

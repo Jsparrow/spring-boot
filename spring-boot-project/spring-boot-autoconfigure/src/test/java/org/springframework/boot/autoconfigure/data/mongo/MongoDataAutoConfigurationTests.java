@@ -17,7 +17,6 @@
 package org.springframework.boot.autoconfigure.data.mongo;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Set;
 
 import com.mongodb.MongoClient;
@@ -54,6 +53,7 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 
 /**
  * Tests for {@link MongoDataAutoConfiguration}.
@@ -204,7 +204,7 @@ class MongoDataAutoConfigurationTests {
 
 		@Bean
 		MongoCustomConversions customConversions() {
-			return new MongoCustomConversions(Arrays.asList(new MyConverter()));
+			return new MongoCustomConversions(Collections.singletonList(new MyConverter()));
 		}
 
 	}

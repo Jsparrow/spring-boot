@@ -62,7 +62,7 @@ public abstract class CompositeReactiveHealthIndicatorConfiguration<H extends Re
 		}
 		catch (Exception ex) {
 			throw new IllegalStateException(
-					"Unable to create indicator " + indicatorClass + " for source " + sourceClass, ex);
+					new StringBuilder().append("Unable to create indicator ").append(indicatorClass).append(" for source ").append(sourceClass).toString(), ex);
 		}
 	}
 

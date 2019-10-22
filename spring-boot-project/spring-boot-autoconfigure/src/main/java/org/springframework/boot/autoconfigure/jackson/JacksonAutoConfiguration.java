@@ -60,6 +60,8 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Auto configuration for Jackson. The following auto-configuration will get applied:
@@ -116,6 +118,7 @@ public class JacksonAutoConfiguration {
 	static class JodaDateTimeJacksonConfiguration {
 
 		private static final Log logger = LogFactory.getLog(JodaDateTimeJacksonConfiguration.class);
+		private final Logger logger1 = LoggerFactory.getLogger(JodaDateTimeJacksonConfiguration.class);
 
 		@Bean
 		SimpleModule jodaDateTimeSerializationModule(JacksonProperties jacksonProperties) {
@@ -140,10 +143,9 @@ public class JacksonAutoConfiguration {
 							DateTimeFormat.forPattern(jacksonProperties.getDateFormat()).withZoneUTC());
 				}
 				catch (IllegalArgumentException ex) {
+					logger1.error(ex.getMessage(), ex);
 					if (logger.isWarnEnabled()) {
-						logger.warn("spring.jackson.date-format could not be used to "
-								+ "configure formatting of Joda's DateTime. You may want "
-								+ "to configure spring.jackson.joda-date-time-format as well.");
+						logger.warn(new StringBuilder().append("spring.jackson.date-format could not be used to ").append("configure formatting of Joda's DateTime. You may want ").append("to configure spring.jackson.joda-date-time-format as well.").toString());
 					}
 				}
 			}
@@ -181,9 +183,7 @@ public class JacksonAutoConfiguration {
 
 		private void customize(Jackson2ObjectMapperBuilder builder,
 				List<Jackson2ObjectMapperBuilderCustomizer> customizers) {
-			for (Jackson2ObjectMapperBuilderCustomizer customizer : customizers) {
-				customizer.customize(builder);
-			}
+			customizers.forEach(customizer -> customizer.customize(builder));
 		}
 
 	}
@@ -201,6 +201,8 @@ public class JacksonAutoConfiguration {
 
 		static final class StandardJackson2ObjectMapperBuilderCustomizer
 				implements Jackson2ObjectMapperBuilderCustomizer, Ordered {
+
+			private final Logger logger1 = LoggerFactory.getLogger(StandardJackson2ObjectMapperBuilderCustomizer.class);
 
 			private final ApplicationContext applicationContext;
 
@@ -267,6 +269,7 @@ public class JacksonAutoConfiguration {
 						builder.dateFormat((DateFormat) BeanUtils.instantiateClass(dateFormatClass));
 					}
 					catch (ClassNotFoundException ex) {
+						logger1.error(ex.getMessage(), ex);
 						SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
 						// Since Jackson 2.6.3 we always need to set a TimeZone (see
 						// gh-4170). If none in our properties fallback to the Jackson's
@@ -292,6 +295,7 @@ public class JacksonAutoConfiguration {
 						configurePropertyNamingStrategyClass(builder, ClassUtils.forName(strategy, null));
 					}
 					catch (ClassNotFoundException ex) {
+						logger1.error(ex.getMessage(), ex);
 						configurePropertyNamingStrategyField(builder, strategy);
 					}
 				}
@@ -308,8 +312,7 @@ public class JacksonAutoConfiguration {
 				// that may be added by Jackson in the future)
 				Field field = ReflectionUtils.findField(PropertyNamingStrategy.class, fieldName,
 						PropertyNamingStrategy.class);
-				Assert.notNull(field, () -> "Constant named '" + fieldName + "' not found on "
-						+ PropertyNamingStrategy.class.getName());
+				Assert.notNull(field, () -> new StringBuilder().append("Constant named '").append(fieldName).append("' not found on ").append(PropertyNamingStrategy.class.getName()).toString());
 				try {
 					builder.propertyNamingStrategy((PropertyNamingStrategy) field.get(null));
 				}

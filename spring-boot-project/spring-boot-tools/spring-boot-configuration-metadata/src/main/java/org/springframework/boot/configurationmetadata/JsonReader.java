@@ -159,17 +159,17 @@ class JsonReader {
 	}
 
 	private Deprecation parseDeprecation(JSONObject object) throws Exception {
-		if (object.has("deprecation")) {
-			JSONObject deprecationJsonObject = object.getJSONObject("deprecation");
-			Deprecation deprecation = new Deprecation();
-			deprecation.setLevel(parseDeprecationLevel(deprecationJsonObject.optString("level", null)));
-			String reason = deprecationJsonObject.optString("reason", null);
-			deprecation.setReason(reason);
-			deprecation.setShortReason(this.sentenceExtractor.getFirstSentence(reason));
-			deprecation.setReplacement(deprecationJsonObject.optString("replacement", null));
-			return deprecation;
+		if (!object.has("deprecation")) {
+			return object.optBoolean("deprecated") ? new Deprecation() : null;
 		}
-		return object.optBoolean("deprecated") ? new Deprecation() : null;
+		JSONObject deprecationJsonObject = object.getJSONObject("deprecation");
+		Deprecation deprecation = new Deprecation();
+		deprecation.setLevel(parseDeprecationLevel(deprecationJsonObject.optString("level", null)));
+		String reason = deprecationJsonObject.optString("reason", null);
+		deprecation.setReason(reason);
+		deprecation.setShortReason(this.sentenceExtractor.getFirstSentence(reason));
+		deprecation.setReplacement(deprecationJsonObject.optString("replacement", null));
+		return deprecation;
 	}
 
 	private Deprecation.Level parseDeprecationLevel(String value) {
@@ -185,15 +185,15 @@ class JsonReader {
 	}
 
 	private Object readItemValue(Object value) throws Exception {
-		if (value instanceof JSONArray) {
-			JSONArray array = (JSONArray) value;
-			Object[] content = new Object[array.length()];
-			for (int i = 0; i < array.length(); i++) {
-				content[i] = array.get(i);
-			}
-			return content;
+		if (!(value instanceof JSONArray)) {
+			return value;
 		}
-		return value;
+		JSONArray array = (JSONArray) value;
+		Object[] content = new Object[array.length()];
+		for (int i = 0; i < array.length(); i++) {
+			content[i] = array.get(i);
+		}
+		return content;
 	}
 
 	private JSONObject readJson(InputStream in, Charset charset) throws Exception {

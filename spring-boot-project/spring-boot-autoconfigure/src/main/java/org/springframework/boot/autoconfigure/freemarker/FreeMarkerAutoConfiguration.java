@@ -61,13 +61,12 @@ public class FreeMarkerAutoConfiguration {
 
 	@PostConstruct
 	public void checkTemplateLocationExists() {
-		if (logger.isWarnEnabled() && this.properties.isCheckTemplateLocation()) {
-			List<TemplateLocation> locations = getLocations();
-			if (locations.stream().noneMatch(this::locationExists)) {
-				logger.warn("Cannot find template location(s): " + locations + " (please add some templates, "
-						+ "check your FreeMarker configuration, or set "
-						+ "spring.freemarker.checkTemplateLocation=false)");
-			}
+		if (!(logger.isWarnEnabled() && this.properties.isCheckTemplateLocation())) {
+			return;
+		}
+		List<TemplateLocation> locations = getLocations();
+		if (locations.stream().noneMatch(this::locationExists)) {
+			logger.warn(new StringBuilder().append("Cannot find template location(s): ").append(locations).append(" (please add some templates, ").append("check your FreeMarker configuration, or set ").append("spring.freemarker.checkTemplateLocation=false)").toString());
 		}
 	}
 

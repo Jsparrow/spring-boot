@@ -45,6 +45,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.annotation.Validated;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides access to {@link ConfigurationProperties @ConfigurationProperties} bean
@@ -60,6 +62,8 @@ import org.springframework.validation.annotation.Validated;
  * @see #get(ApplicationContext, Object, String)
  */
 public final class ConfigurationPropertiesBean {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConfigurationPropertiesBean.class);
 
 	private final String name;
 
@@ -164,6 +168,7 @@ public final class ConfigurationPropertiesBean {
 				}
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 		return propertiesBeans;
@@ -196,17 +201,17 @@ public final class ConfigurationPropertiesBean {
 
 	private static Method findFactoryMethod(ConfigurableApplicationContext applicationContext, String beanName) {
 		ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
-		if (beanFactory.containsBeanDefinition(beanName)) {
-			BeanDefinition beanDefinition = beanFactory.getMergedBeanDefinition(beanName);
-			if (beanDefinition instanceof RootBeanDefinition) {
-				Method resolvedFactoryMethod = ((RootBeanDefinition) beanDefinition).getResolvedFactoryMethod();
-				if (resolvedFactoryMethod != null) {
-					return resolvedFactoryMethod;
-				}
-			}
-			return findFactoryMethodUsingReflection(beanFactory, beanDefinition);
+		if (!beanFactory.containsBeanDefinition(beanName)) {
+			return null;
 		}
-		return null;
+		BeanDefinition beanDefinition = beanFactory.getMergedBeanDefinition(beanName);
+		if (beanDefinition instanceof RootBeanDefinition) {
+			Method resolvedFactoryMethod = ((RootBeanDefinition) beanDefinition).getResolvedFactoryMethod();
+			if (resolvedFactoryMethod != null) {
+				return resolvedFactoryMethod;
+			}
+		}
+		return findFactoryMethodUsingReflection(beanFactory, beanDefinition);
 	}
 
 	private static Method findFactoryMethodUsingReflection(ConfigurableListableBeanFactory beanFactory,
@@ -232,7 +237,7 @@ public final class ConfigurationPropertiesBean {
 	static ConfigurationPropertiesBean forValueObject(Class<?> beanClass, String beanName) {
 		ConfigurationPropertiesBean propertiesBean = create(beanName, null, beanClass, null);
 		Assert.state(propertiesBean != null && propertiesBean.getBindMethod() == BindMethod.VALUE_OBJECT,
-				"Bean '" + beanName + "' is not a @ConfigurationProperties value object");
+				new StringBuilder().append("Bean '").append(beanName).append("' is not a @ConfigurationProperties value object").toString());
 		return propertiesBean;
 	}
 

@@ -89,7 +89,7 @@ class WebServerPortFileWriterTests {
 		String managementFile = file.getName();
 		managementFile = managementFile.substring(0,
 				managementFile.length() - StringUtils.getFilenameExtension(managementFile).length() - 1);
-		managementFile = managementFile + "-management." + StringUtils.getFilenameExtension(file.getName());
+		managementFile = new StringBuilder().append(managementFile).append("-management.").append(StringUtils.getFilenameExtension(file.getName())).toString();
 		String content = contentOf(new File(file.getParentFile(), managementFile));
 		assertThat(content).isEqualTo("9090");
 		assertThat(collectFileNames(file.getParentFile())).contains(managementFile);
@@ -104,7 +104,7 @@ class WebServerPortFileWriterTests {
 		String managementFile = file.getName();
 		managementFile = managementFile.substring(0,
 				managementFile.length() - StringUtils.getFilenameExtension(managementFile).length() - 1);
-		managementFile = managementFile + "-MANAGEMENT." + StringUtils.getFilenameExtension(file.getName());
+		managementFile = new StringBuilder().append(managementFile).append("-MANAGEMENT.").append(StringUtils.getFilenameExtension(file.getName())).toString();
 		String content = contentOf(new File(file.getParentFile(), managementFile));
 		assertThat(content).isEqualTo("9090");
 		assertThat(collectFileNames(file.getParentFile())).contains(managementFile);

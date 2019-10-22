@@ -21,6 +21,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link OutputCaptureExtension} when used via {@link ExtendWith @ExtendWith}.
@@ -31,6 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(OutputExtensionExtendWithTests.BeforeAllExtension.class)
 class OutputExtensionExtendWithTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(OutputExtensionExtendWithTests.class);
+
 	@Test
 	void captureShouldReturnOutputCapturedBeforeTestMethod(CapturedOutput output) {
 		assertThat(output).contains("Before all").doesNotContain("Hello");
@@ -38,16 +42,18 @@ class OutputExtensionExtendWithTests {
 
 	@Test
 	void captureShouldReturnAllCapturedOutput(CapturedOutput output) {
-		System.out.println("Hello World");
-		System.err.println("Error!!!");
+		logger.info("Hello World");
+		logger.error("Error!!!");
 		assertThat(output).contains("Before all").contains("Hello World").contains("Error!!!");
 	}
 
 	static class BeforeAllExtension implements BeforeAllCallback {
 
+		private final Logger logger1 = LoggerFactory.getLogger(BeforeAllExtension.class);
+
 		@Override
 		public void beforeAll(ExtensionContext context) {
-			System.out.println("Before all");
+			logger1.info("Before all");
 		}
 
 	}

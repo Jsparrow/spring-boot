@@ -24,6 +24,8 @@ import java.util.Properties;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for components exposing unstructured data with dedicated methods for well
@@ -34,6 +36,7 @@ import org.springframework.util.Assert;
  */
 public class InfoProperties implements Iterable<InfoProperties.Entry> {
 
+	private static final Logger logger = LoggerFactory.getLogger(InfoProperties.class);
 	private final Properties entries;
 
 	/**
@@ -67,6 +70,7 @@ public class InfoProperties implements Iterable<InfoProperties.Entry> {
 				return Instant.ofEpochMilli(Long.parseLong(s));
 			}
 			catch (NumberFormatException ex) {
+				logger.error(ex.getMessage(), ex);
 				// Not valid epoch time
 			}
 		}

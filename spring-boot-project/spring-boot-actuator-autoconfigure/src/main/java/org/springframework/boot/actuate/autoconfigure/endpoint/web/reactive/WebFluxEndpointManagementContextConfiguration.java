@@ -80,7 +80,7 @@ public class WebFluxEndpointManagementContextConfiguration {
 
 	private boolean shouldRegisterLinksMapping(Environment environment, String basePath) {
 		return StringUtils.hasText(basePath)
-				|| ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT);
+				|| ManagementPortType.get(environment) == ManagementPortType.DIFFERENT;
 	}
 
 	@Bean

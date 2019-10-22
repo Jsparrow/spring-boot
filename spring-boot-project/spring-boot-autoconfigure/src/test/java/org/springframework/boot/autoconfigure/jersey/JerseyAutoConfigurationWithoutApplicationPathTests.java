@@ -62,6 +62,16 @@ class JerseyAutoConfigurationWithoutApplicationPathTests {
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@Configuration
+	@Import({ ServletWebServerFactoryAutoConfiguration.class, JerseyAutoConfiguration.class,
+			PropertyPlaceholderAutoConfiguration.class })
+	protected @interface MinimalWebConfiguration {
+
+	}
+
 	@MinimalWebConfiguration
 	@Path("/hello")
 	public static class Application extends ResourceConfig {
@@ -81,16 +91,6 @@ class JerseyAutoConfigurationWithoutApplicationPathTests {
 		static void main(String[] args) {
 			SpringApplication.run(Application.class, args);
 		}
-
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@Configuration
-	@Import({ ServletWebServerFactoryAutoConfiguration.class, JerseyAutoConfiguration.class,
-			PropertyPlaceholderAutoConfiguration.class })
-	protected @interface MinimalWebConfiguration {
 
 	}
 

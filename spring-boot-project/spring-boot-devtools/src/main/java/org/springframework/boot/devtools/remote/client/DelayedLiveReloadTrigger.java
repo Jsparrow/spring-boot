@@ -30,6 +30,8 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Runnable} that waits to triggers live reload until the remote server has
@@ -38,6 +40,8 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  */
 class DelayedLiveReloadTrigger implements Runnable {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(DelayedLiveReloadTrigger.class);
 
 	private static final long SHUTDOWN_TIME = 1000;
 
@@ -96,6 +100,7 @@ class DelayedLiveReloadTrigger implements Runnable {
 			this.liveReloadServer.triggerReload();
 		}
 		catch (InterruptedException ex) {
+			logger1.error(ex.getMessage(), ex);
 			Thread.currentThread().interrupt();
 		}
 	}
@@ -107,6 +112,7 @@ class DelayedLiveReloadTrigger implements Runnable {
 			return response.getStatusCode() == HttpStatus.OK;
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

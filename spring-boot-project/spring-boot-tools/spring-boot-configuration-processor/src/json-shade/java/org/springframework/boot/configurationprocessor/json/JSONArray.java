@@ -283,13 +283,13 @@ public class JSONArray {
 		try {
 			Object value = this.values.get(index);
 			if (value == null) {
-				throw new JSONException("Value at " + index + " is null.");
+				throw new JSONException(new StringBuilder().append("Value at ").append(index).append(" is null.").toString());
 			}
 			return value;
 		}
 		catch (IndexOutOfBoundsException e) {
 			throw new JSONException(
-					"Index " + index + " out of range [0.." + this.values.size() + ")");
+					new StringBuilder().append("Index ").append(index).append(" out of range [0..").append(this.values.size()).append(")").toString());
 		}
 	}
 

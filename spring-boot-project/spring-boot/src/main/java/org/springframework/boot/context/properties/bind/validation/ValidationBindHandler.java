@@ -33,6 +33,8 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
 import org.springframework.core.ResolvableType;
 import org.springframework.validation.AbstractBindingResult;
 import org.springframework.validation.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link BindHandler} to apply {@link Validator Validators} to bound results.
@@ -142,6 +144,8 @@ public class ValidationBindHandler extends AbstractBindHandler {
 	 */
 	private class ValidationResult extends AbstractBindingResult {
 
+		private final Logger logger = LoggerFactory.getLogger(ValidationResult.class);
+
 		private final ConfigurationPropertyName name;
 
 		private Object target;
@@ -172,6 +176,7 @@ public class ValidationBindHandler extends AbstractBindHandler {
 				}
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 			return super.getFieldType(field);
 		}
@@ -182,6 +187,7 @@ public class ValidationBindHandler extends AbstractBindHandler {
 				return ValidationBindHandler.this.boundResults.get(getName(field));
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 			return null;
 		}

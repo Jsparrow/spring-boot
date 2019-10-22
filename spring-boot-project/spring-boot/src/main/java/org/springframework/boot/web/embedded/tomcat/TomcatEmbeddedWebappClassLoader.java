@@ -25,6 +25,8 @@ import org.apache.catalina.loader.ParallelWebappClassLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extension of Tomcat's {@link ParallelWebappClassLoader} that does not consider the
@@ -38,6 +40,7 @@ import org.apache.tomcat.util.compat.JreCompat;
  */
 public class TomcatEmbeddedWebappClassLoader extends ParallelWebappClassLoader {
 
+	private static final Logger logger1 = LoggerFactory.getLogger(TomcatEmbeddedWebappClassLoader.class);
 	private static final Log logger = LogFactory.getLog(TomcatEmbeddedWebappClassLoader.class);
 
 	static {
@@ -102,7 +105,7 @@ public class TomcatEmbeddedWebappClassLoader extends ParallelWebappClassLoader {
 	protected void addURL(URL url) {
 		// Ignore URLs added by the Tomcat 8 implementation (see gh-919)
 		if (logger.isTraceEnabled()) {
-			logger.trace("Ignoring request to add " + url + " to the tomcat classloader");
+			logger.trace(new StringBuilder().append("Ignoring request to add ").append(url).append(" to the tomcat classloader").toString());
 		}
 	}
 
@@ -114,6 +117,7 @@ public class TomcatEmbeddedWebappClassLoader extends ParallelWebappClassLoader {
 			return Class.forName(name, false, this.parent);
 		}
 		catch (ClassNotFoundException ex) {
+			logger1.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -123,6 +127,7 @@ public class TomcatEmbeddedWebappClassLoader extends ParallelWebappClassLoader {
 			return findClass(name);
 		}
 		catch (ClassNotFoundException ex) {
+			logger1.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

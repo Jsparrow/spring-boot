@@ -102,7 +102,7 @@ class AetherGrapeEngineTests {
 	@Test
 	void dependencyResolutionWithExclusions() {
 		Map<String, Object> args = new HashMap<>();
-		args.put("excludes", Arrays.asList(createExclusion("org.springframework", "spring-core")));
+		args.put("excludes", Collections.singletonList(createExclusion("org.springframework", "spring-core")));
 
 		createGrapeEngine(this.springMilestones).grab(args,
 				createDependency("org.springframework", "spring-jdbc", "3.2.4.RELEASE"),

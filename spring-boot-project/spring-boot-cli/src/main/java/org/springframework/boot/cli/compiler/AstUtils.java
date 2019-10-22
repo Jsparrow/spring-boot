@@ -61,12 +61,7 @@ public abstract class AstUtils {
 		if (hasAtLeastOneAnnotation((AnnotatedNode) node, annotations)) {
 			return true;
 		}
-		for (MethodNode method : node.getMethods()) {
-			if (hasAtLeastOneAnnotation(method, annotations)) {
-				return true;
-			}
-		}
-		return false;
+		return node.getMethods().stream().anyMatch(method -> hasAtLeastOneAnnotation(method, annotations));
 	}
 
 	/**
@@ -98,17 +93,8 @@ public abstract class AstUtils {
 	 */
 	public static boolean hasAtLeastOneFieldOrMethod(ClassNode node, String... types) {
 		Set<String> typesSet = new HashSet<>(Arrays.asList(types));
-		for (FieldNode field : node.getFields()) {
-			if (typesSet.contains(field.getType().getName())) {
-				return true;
-			}
-		}
-		for (MethodNode method : node.getMethods()) {
-			if (typesSet.contains(method.getReturnType().getName())) {
-				return true;
-			}
-		}
-		return false;
+		return node.getFields().stream().filter(field -> typesSet.contains(field.getType().getName())).findFirst().map(field -> true).orElse(
+				node.getMethods().stream().anyMatch(method -> typesSet.contains(method.getReturnType().getName())));
 	}
 
 	/**
@@ -164,11 +150,7 @@ public abstract class AstUtils {
 
 	private static List<ExpressionStatement> getExpressionStatements(BlockStatement block) {
 		List<ExpressionStatement> statements = new ArrayList<>();
-		for (Statement statement : block.getStatements()) {
-			if (statement instanceof ExpressionStatement) {
-				statements.add((ExpressionStatement) statement);
-			}
-		}
+		block.getStatements().stream().filter(statement -> statement instanceof ExpressionStatement).forEach(statement -> statements.add((ExpressionStatement) statement));
 		return statements;
 	}
 

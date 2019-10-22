@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages a {@link ServletWebServerFactory} document root.
@@ -33,6 +35,8 @@ import org.apache.commons.logging.Log;
  * @see AbstractServletWebServerFactory
  */
 class DocumentRoot {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(DocumentRoot.class);
 
 	private static final String[] COMMON_DOC_ROOTS = { "src/main/webapp", "public", "static" };
 
@@ -116,6 +120,7 @@ class DocumentRoot {
 			return new File(path);
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -126,7 +131,7 @@ class DocumentRoot {
 		}
 		if (codeSourceFile != null && codeSourceFile.exists()) {
 			String path = codeSourceFile.getAbsolutePath();
-			int webInfPathIndex = path.indexOf(File.separatorChar + "WEB-INF" + File.separatorChar);
+			int webInfPathIndex = path.indexOf(new StringBuilder().append(File.separatorChar).append("WEB-INF").append(File.separatorChar).toString());
 			if (webInfPathIndex >= 0) {
 				path = path.substring(0, webInfPathIndex);
 				return new File(path);
@@ -146,8 +151,7 @@ class DocumentRoot {
 	}
 
 	private void logNoDocumentRoots() {
-		this.logger.debug("None of the document roots " + Arrays.asList(COMMON_DOC_ROOTS)
-				+ " point to a directory and will be ignored.");
+		this.logger.debug(new StringBuilder().append("None of the document roots ").append(Arrays.asList(COMMON_DOC_ROOTS)).append(" point to a directory and will be ignored.").toString());
 	}
 
 }

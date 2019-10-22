@@ -21,6 +21,8 @@ import java.lang.reflect.Method;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ApplicationListener} to cleanup caches once the context is loaded.
@@ -28,6 +30,8 @@ import org.springframework.util.ReflectionUtils;
  * @author Phillip Webb
  */
 class ClearCachesApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
+
+	private static final Logger logger = LoggerFactory.getLogger(ClearCachesApplicationListener.class);
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -44,6 +48,7 @@ class ClearCachesApplicationListener implements ApplicationListener<ContextRefre
 			clearCacheMethod.invoke(classLoader);
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 		clearClassLoaderCaches(classLoader.getParent());

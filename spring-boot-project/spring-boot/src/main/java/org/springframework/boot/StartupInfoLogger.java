@@ -31,6 +31,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Logs application information on startup.
@@ -39,6 +41,8 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  */
 class StartupInfoLogger {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(StartupInfoLogger.class);
 
 	private static final Log logger = LogFactory.getLog(StartupInfoLogger.class);
 
@@ -94,6 +98,7 @@ class StartupInfoLogger {
 			message.append(" (JVM running for ").append(uptime).append(")");
 		}
 		catch (Throwable ex) {
+			logger1.error(ex.getMessage(), ex);
 			// No JVM time available
 		}
 		return message;
@@ -112,17 +117,18 @@ class StartupInfoLogger {
 		long startTime = System.currentTimeMillis();
 		append(message, "on ", () -> InetAddress.getLocalHost().getHostName());
 		long resolveTime = System.currentTimeMillis() - startTime;
-		if (resolveTime > HOST_NAME_RESOLVE_THRESHOLD && logger.isWarnEnabled()) {
-			StringBuilder warning = new StringBuilder();
-			warning.append("InetAddress.getLocalHost().getHostName() took ");
-			warning.append(resolveTime);
-			warning.append(" milliseconds to respond.");
-			warning.append(" Please verify your network configuration");
-			if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-				warning.append(" (macOS machines may need to add entries to /etc/hosts)");
-			}
-			logger.warn(warning.append("."));
+		if (!(resolveTime > HOST_NAME_RESOLVE_THRESHOLD && logger.isWarnEnabled())) {
+			return;
 		}
+		StringBuilder warning = new StringBuilder();
+		warning.append("InetAddress.getLocalHost().getHostName() took ");
+		warning.append(resolveTime);
+		warning.append(" milliseconds to respond.");
+		warning.append(" Please verify your network configuration");
+		if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+			warning.append(" (macOS machines may need to add entries to /etc/hosts)");
+		}
+		logger.warn(warning.append("."));
 	}
 
 	private void appendPid(StringBuilder message) {
@@ -137,11 +143,12 @@ class StartupInfoLogger {
 		}
 		append(context, "started by ", () -> System.getProperty("user.name"));
 		append(context, "in ", () -> System.getProperty("user.dir"));
-		if (context.length() > 0) {
-			message.append(" (");
-			message.append(context);
-			message.append(")");
+		if (context.length() <= 0) {
+			return;
 		}
+		message.append(" (");
+		message.append(context);
+		message.append(")");
 	}
 
 	private void append(StringBuilder message, String prefix, Callable<Object> call) {
@@ -154,11 +161,12 @@ class StartupInfoLogger {
 		if (!StringUtils.hasLength(value)) {
 			value = defaultValue;
 		}
-		if (StringUtils.hasLength(value)) {
-			message.append((message.length() > 0) ? " " : "");
-			message.append(prefix);
-			message.append(value);
+		if (!StringUtils.hasLength(value)) {
+			return;
 		}
+		message.append((message.length() > 0) ? " " : "");
+		message.append(prefix);
+		message.append(value);
 	}
 
 	private Object callIfPossible(Callable<Object> call) {
@@ -166,6 +174,7 @@ class StartupInfoLogger {
 			return call.call();
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

@@ -40,12 +40,11 @@ class RunCommandIntegrationTests {
 
 	@RegisterExtension
 	CliTester cli;
+	private Properties systemProperties = new Properties();
 
 	RunCommandIntegrationTests(CapturedOutput output) {
 		this.cli = new CliTester("src/it/resources/run-command/", output);
 	}
-
-	private Properties systemProperties = new Properties();
 
 	@BeforeEach
 	void captureSystemProperties() {

@@ -25,6 +25,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link ThreadDumpEndpoint}.
@@ -33,6 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Andy Wilkinson
  */
 class ThreadDumpEndpointTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(ThreadDumpEndpointTests.class);
 
 	@Test
 	void dumpThreads() {
@@ -49,6 +53,7 @@ class ThreadDumpEndpointTests {
 				latch.await();
 			}
 			catch (InterruptedException ex) {
+				logger.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 		}, "Awaiting CountDownLatch");
@@ -64,6 +69,7 @@ class ThreadDumpEndpointTests {
 					monitor.wait();
 				}
 				catch (InterruptedException ex) {
+					logger.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 				}
 			}
@@ -77,6 +83,7 @@ class ThreadDumpEndpointTests {
 				latch.await();
 			}
 			catch (InterruptedException ex) {
+				logger.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 			finally {

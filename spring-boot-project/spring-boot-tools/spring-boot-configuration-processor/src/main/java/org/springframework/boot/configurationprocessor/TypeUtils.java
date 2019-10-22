@@ -231,19 +231,20 @@ class TypeUtils {
 	}
 
 	private void process(TypeDescriptor descriptor, TypeMirror type) {
-		if (type.getKind() == TypeKind.DECLARED) {
-			DeclaredType declaredType = (DeclaredType) type;
-			DeclaredType freshType = (DeclaredType) this.env.getElementUtils()
-					.getTypeElement(this.types.asElement(type).toString()).asType();
-			List<? extends TypeMirror> arguments = declaredType.getTypeArguments();
-			for (int i = 0; i < arguments.size(); i++) {
-				TypeMirror specificType = arguments.get(i);
-				TypeMirror signatureType = freshType.getTypeArguments().get(i);
-				descriptor.registerIfNecessary(signatureType, specificType);
-			}
-			TypeElement element = (TypeElement) this.types.asElement(type);
-			process(descriptor, element.getSuperclass());
+		if (type.getKind() != TypeKind.DECLARED) {
+			return;
 		}
+		DeclaredType declaredType = (DeclaredType) type;
+		DeclaredType freshType = (DeclaredType) this.env.getElementUtils()
+				.getTypeElement(this.types.asElement(type).toString()).asType();
+		List<? extends TypeMirror> arguments = declaredType.getTypeArguments();
+		for (int i = 0; i < arguments.size(); i++) {
+			TypeMirror specificType = arguments.get(i);
+			TypeMirror signatureType = freshType.getTypeArguments().get(i);
+			descriptor.registerIfNecessary(signatureType, specificType);
+		}
+		TypeElement element = (TypeElement) this.types.asElement(type);
+		process(descriptor, element.getSuperclass());
 	}
 
 	/**
@@ -275,7 +276,7 @@ class TypeUtils {
 
 		private String determineQualifiedName(DeclaredType type, TypeElement enclosingElement) {
 			if (enclosingElement != null) {
-				return getQualifiedName(enclosingElement) + "$" + type.asElement().getSimpleName();
+				return new StringBuilder().append(getQualifiedName(enclosingElement)).append("$").append(type.asElement().getSimpleName()).toString();
 			}
 			return getQualifiedName(type.asElement());
 		}
@@ -330,8 +331,7 @@ class TypeUtils {
 			}
 			TypeElement enclosingElement = getEnclosingTypeElement(element.asType());
 			if (enclosingElement != null) {
-				return getQualifiedName(enclosingElement) + "$"
-						+ ((DeclaredType) element.asType()).asElement().getSimpleName();
+				return new StringBuilder().append(getQualifiedName(enclosingElement)).append("$").append(((DeclaredType) element.asType()).asElement().getSimpleName()).toString();
 			}
 			if (element instanceof TypeElement) {
 				return ((TypeElement) element).getQualifiedName().toString();
@@ -373,12 +373,13 @@ class TypeUtils {
 		}
 
 		private void registerIfNecessary(TypeMirror variable, TypeMirror resolution) {
-			if (variable instanceof TypeVariable) {
-				TypeVariable typeVariable = (TypeVariable) variable;
-				if (this.generics.keySet().stream()
-						.noneMatch((candidate) -> getParameterName(candidate).equals(getParameterName(typeVariable)))) {
-					this.generics.put(typeVariable, resolution);
-				}
+			if (!(variable instanceof TypeVariable)) {
+				return;
+			}
+			TypeVariable typeVariable = (TypeVariable) variable;
+			if (this.generics.keySet().stream()
+					.noneMatch((candidate) -> getParameterName(candidate).equals(getParameterName(typeVariable)))) {
+				this.generics.put(typeVariable, resolution);
 			}
 		}
 

@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class NoWebTestClientBeanChecker implements ImportSelector, BeanFactoryAware {
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		assertThat(BeanFactoryUtils.beanNamesForTypeIncludingAncestors((ListableBeanFactory) beanFactory,
 				WebTestClient.class)).isEmpty();
 	}

@@ -45,6 +45,8 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import org.springframework.web.servlet.view.groovy.GroovyMarkupConfig;
 import org.springframework.web.servlet.view.groovy.GroovyMarkupConfigurer;
 import org.springframework.web.servlet.view.groovy.GroovyMarkupViewResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Auto-configuration support for Groovy templates in MVC. By default creates a
@@ -69,6 +71,8 @@ public class GroovyTemplateAutoConfiguration {
 	@ConditionalOnClass(GroovyMarkupConfigurer.class)
 	public static class GroovyMarkupConfiguration {
 
+		private final Logger logger1 = LoggerFactory.getLogger(GroovyMarkupConfiguration.class);
+
 		private final ApplicationContext applicationContext;
 
 		private final GroovyTemplateProperties properties;
@@ -81,13 +85,12 @@ public class GroovyTemplateAutoConfiguration {
 
 		@PostConstruct
 		public void checkTemplateLocationExists() {
-			if (this.properties.isCheckTemplateLocation() && !isUsingGroovyAllJar()) {
-				TemplateLocation location = new TemplateLocation(this.properties.getResourceLoaderPath());
-				if (!location.exists(this.applicationContext)) {
-					logger.warn("Cannot find template location: " + location
-							+ " (please add some templates, check your Groovy "
-							+ "configuration, or set spring.groovy.template.check-template-location=false)");
-				}
+			if (!(this.properties.isCheckTemplateLocation() && !isUsingGroovyAllJar())) {
+				return;
+			}
+			TemplateLocation location = new TemplateLocation(this.properties.getResourceLoaderPath());
+			if (!location.exists(this.applicationContext)) {
+				logger.warn(new StringBuilder().append("Cannot find template location: ").append(location).append(" (please add some templates, check your Groovy ").append("configuration, or set spring.groovy.template.check-template-location=false)").toString());
 			}
 		}
 
@@ -105,6 +108,7 @@ public class GroovyTemplateAutoConfiguration {
 				return codeSource != null && codeSource.getLocation().toString().contains("-all");
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				return false;
 			}
 		}

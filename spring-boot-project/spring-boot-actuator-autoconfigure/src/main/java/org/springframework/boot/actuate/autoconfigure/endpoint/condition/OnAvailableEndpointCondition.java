@@ -64,16 +64,11 @@ class OnAvailableEndpointCondition extends AbstractEndpointCondition {
 				metadata);
 		EndpointId id = EndpointId.of(environment, attributes.getString("id"));
 		Set<ExposureInformation> exposureInformations = getExposureInformation(environment);
-		for (ExposureInformation exposureInformation : exposureInformations) {
-			if (exposureInformation.isExposed(id)) {
-				return new ConditionOutcome(true,
-						message.andCondition(ConditionalOnAvailableEndpoint.class)
-								.because("marked as exposed by a 'management.endpoints."
-										+ exposureInformation.getPrefix() + ".exposure' property"));
-			}
-		}
-		return new ConditionOutcome(false, message.andCondition(ConditionalOnAvailableEndpoint.class)
-				.because("no 'management.endpoints' property marked it as exposed"));
+		return exposureInformations.stream().filter(exposureInformation -> exposureInformation.isExposed(id)).findFirst().map(exposureInformation -> new ConditionOutcome(true,
+				message.andCondition(ConditionalOnAvailableEndpoint.class)
+						.because(new StringBuilder().append("marked as exposed by a 'management.endpoints.").append(exposureInformation.getPrefix()).append(".exposure' property").toString())))
+				.orElse(new ConditionOutcome(false, message.andCondition(ConditionalOnAvailableEndpoint.class)
+						.because("no 'management.endpoints' property marked it as exposed")));
 	}
 
 	private Set<ExposureInformation> getExposureInformation(Environment environment) {
@@ -102,17 +97,15 @@ class OnAvailableEndpointCondition extends AbstractEndpointCondition {
 
 		ExposureInformation(Binder binder, String prefix, String... exposeDefaults) {
 			this.prefix = prefix;
-			this.include = bind(binder, "management.endpoints." + prefix + ".exposure.include");
-			this.exclude = bind(binder, "management.endpoints." + prefix + ".exposure.exclude");
+			this.include = bind(binder, new StringBuilder().append("management.endpoints.").append(prefix).append(".exposure.include").toString());
+			this.exclude = bind(binder, new StringBuilder().append("management.endpoints.").append(prefix).append(".exposure.exclude").toString());
 			this.exposeDefaults = new HashSet<>(Arrays.asList(exposeDefaults));
 		}
 
 		private Set<String> bind(Binder binder, String name) {
 			List<String> values = binder.bind(name, Bindable.listOf(String.class)).orElse(Collections.emptyList());
 			Set<String> result = new HashSet<>(values.size());
-			for (String value : values) {
-				result.add("*".equals(value) ? "*" : EndpointId.fromPropertyValue(value).toLowerCaseString());
-			}
+			values.forEach(value -> result.add("*".equals(value) ? "*" : EndpointId.fromPropertyValue(value).toLowerCaseString()));
 			return result;
 		}
 
@@ -122,15 +115,13 @@ class OnAvailableEndpointCondition extends AbstractEndpointCondition {
 
 		boolean isExposed(EndpointId endpointId) {
 			String id = endpointId.toLowerCaseString();
-			if (!this.exclude.isEmpty()) {
-				if (this.exclude.contains("*") || this.exclude.contains(id)) {
-					return false;
-				}
+			boolean condition = !this.exclude.isEmpty() && (this.exclude.contains("*") || this.exclude.contains(id));
+			if (condition) {
+				return false;
 			}
-			if (this.include.isEmpty()) {
-				if (this.exposeDefaults.contains("*") || this.exposeDefaults.contains(id)) {
-					return true;
-				}
+			boolean condition1 = this.include.isEmpty() && (this.exposeDefaults.contains("*") || this.exposeDefaults.contains(id));
+			if (condition1) {
+				return true;
 			}
 			return this.include.contains("*") || this.include.contains(id);
 		}

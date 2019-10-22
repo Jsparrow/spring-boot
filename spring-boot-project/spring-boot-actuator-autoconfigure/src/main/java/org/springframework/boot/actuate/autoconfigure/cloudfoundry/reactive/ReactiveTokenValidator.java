@@ -34,6 +34,8 @@ import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryA
 import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException.Reason;
 import org.springframework.boot.actuate.autoconfigure.cloudfoundry.Token;
 import org.springframework.util.Base64Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Validator used to ensure that a signed {@link Token} has not been tampered with.
@@ -41,6 +43,8 @@ import org.springframework.util.Base64Utils;
  * @author Madhura Bhave
  */
 class ReactiveTokenValidator {
+
+	private static final Logger logger = LoggerFactory.getLogger(ReactiveTokenValidator.class);
 
 	private final ReactiveCloudFoundrySecurityService securityService;
 
@@ -61,9 +65,9 @@ class ReactiveTokenValidator {
 			return Mono.error(new CloudFoundryAuthorizationException(Reason.INVALID_SIGNATURE,
 					"Signing algorithm cannot be null"));
 		}
-		if (!algorithm.equals("RS256")) {
+		if (!"RS256".equals(algorithm)) {
 			return Mono.error(new CloudFoundryAuthorizationException(Reason.UNSUPPORTED_TOKEN_SIGNING_ALGORITHM,
-					"Signing algorithm " + algorithm + " not supported"));
+					new StringBuilder().append("Signing algorithm ").append(algorithm).append(" not supported").toString()));
 		}
 		return Mono.empty();
 	}
@@ -100,6 +104,7 @@ class ReactiveTokenValidator {
 			return signature.verify(token.getSignature());
 		}
 		catch (GeneralSecurityException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

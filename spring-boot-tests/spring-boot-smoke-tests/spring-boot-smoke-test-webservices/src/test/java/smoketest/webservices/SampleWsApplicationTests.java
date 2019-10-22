@@ -45,16 +45,12 @@ class SampleWsApplicationTests {
 
 	@BeforeEach
 	void setUp() {
-		this.webServiceTemplate.setDefaultUri("http://localhost:" + this.serverPort + "/services/");
+		this.webServiceTemplate.setDefaultUri(new StringBuilder().append("http://localhost:").append(this.serverPort).append("/services/").toString());
 	}
 
 	@Test
 	void testSendingHolidayRequest(CapturedOutput output) {
-		final String request = "<hr:HolidayRequest xmlns:hr=\"https://company.example.com/hr/schemas\">"
-				+ "   <hr:Holiday>      <hr:StartDate>2013-10-20</hr:StartDate>"
-				+ "      <hr:EndDate>2013-11-22</hr:EndDate>   </hr:Holiday>   <hr:Employee>"
-				+ "      <hr:Number>1</hr:Number>      <hr:FirstName>John</hr:FirstName>"
-				+ "      <hr:LastName>Doe</hr:LastName>   </hr:Employee></hr:HolidayRequest>";
+		final String request = new StringBuilder().append("<hr:HolidayRequest xmlns:hr=\"https://company.example.com/hr/schemas\">").append("   <hr:Holiday>      <hr:StartDate>2013-10-20</hr:StartDate>").append("      <hr:EndDate>2013-11-22</hr:EndDate>   </hr:Holiday>   <hr:Employee>").append("      <hr:Number>1</hr:Number>      <hr:FirstName>John</hr:FirstName>").append("      <hr:LastName>Doe</hr:LastName>   </hr:Employee></hr:HolidayRequest>").toString();
 		StreamSource source = new StreamSource(new StringReader(request));
 		StreamResult result = new StreamResult(System.out);
 		this.webServiceTemplate.sendSourceAndReceiveToResult(source, result);

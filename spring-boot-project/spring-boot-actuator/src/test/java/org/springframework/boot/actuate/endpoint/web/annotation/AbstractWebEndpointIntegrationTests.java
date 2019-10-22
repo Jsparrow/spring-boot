@@ -414,7 +414,7 @@ public abstract class AbstractWebEndpointIntegrationTests<T extends Configurable
 		applicationContext.refresh();
 		try {
 			InetSocketAddress address = new InetSocketAddress(getPort(applicationContext));
-			String url = "http://" + address.getHostString() + ":" + address.getPort() + endpointPath;
+			String url = new StringBuilder().append("http://").append(address.getHostString()).append(":").append(address.getPort()).append(endpointPath).toString();
 			consumer.accept(applicationContext,
 					WebTestClient.bindToServer().baseUrl(url).responseTimeout(TIMEOUT).build());
 		}
@@ -667,12 +667,12 @@ public abstract class AbstractWebEndpointIntegrationTests<T extends Configurable
 
 		@ReadOperation
 		Map<String, String> query(String one, Integer two) {
-			return Collections.singletonMap("query", one + " " + two);
+			return Collections.singletonMap("query", new StringBuilder().append(one).append(" ").append(two).toString());
 		}
 
 		@ReadOperation
 		Map<String, String> queryWithParameterList(@Selector String list, String one, List<String> two) {
-			return Collections.singletonMap("query", list + " " + one + " " + two);
+			return Collections.singletonMap("query", new StringBuilder().append(list).append(" ").append(one).append(" ").append(two).toString());
 		}
 
 	}
@@ -682,7 +682,7 @@ public abstract class AbstractWebEndpointIntegrationTests<T extends Configurable
 
 		@ReadOperation
 		Map<String, String> queryWithParameterList(String one, List<String> two) {
-			return Collections.singletonMap("query", one + " " + two);
+			return Collections.singletonMap("query", new StringBuilder().append(one).append(" ").append(two).toString());
 		}
 
 	}
@@ -842,7 +842,7 @@ public abstract class AbstractWebEndpointIntegrationTests<T extends Configurable
 
 		@ReadOperation
 		String read(SecurityContext securityContext, String role) {
-			return role + ": " + securityContext.isUserInRole(role);
+			return new StringBuilder().append(role).append(": ").append(securityContext.isUserInRole(role)).toString();
 		}
 
 	}

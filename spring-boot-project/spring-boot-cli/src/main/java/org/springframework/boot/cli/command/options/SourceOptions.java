@@ -26,6 +26,7 @@ import joptsimple.OptionSet;
 import org.springframework.boot.cli.util.ResourceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import java.util.stream.Collectors;
 
 /**
  * Extract source file options (anything following '--' in an {@link OptionSet}).
@@ -89,11 +90,7 @@ public class SourceOptions {
 				else if (!isAbsoluteWindowsFile(fileCandidate)) {
 					urls.addAll(ResourceUtils.getUrls(filename, classLoader));
 				}
-				for (String url : urls) {
-					if (isSource(url)) {
-						sources.add(url);
-					}
-				}
+				sources.addAll(urls.stream().filter(this::isSource).collect(Collectors.toList()));
 				if (isSource(filename)) {
 					if (urls.isEmpty()) {
 						throw new IllegalArgumentException("Can't find " + filename);

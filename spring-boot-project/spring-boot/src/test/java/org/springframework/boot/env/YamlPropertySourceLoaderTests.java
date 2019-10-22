@@ -29,6 +29,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link YamlPropertySourceLoader}.
@@ -39,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class YamlPropertySourceLoaderTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(YamlPropertySourceLoaderTests.class);
 	private YamlPropertySourceLoader loader = new YamlPropertySourceLoader();
 
 	@Test
@@ -92,7 +95,7 @@ class YamlPropertySourceLoaderTests {
 		for (PropertySource<?> source : loaded) {
 			EnumerablePropertySource<?> enumerableSource = (EnumerablePropertySource<?>) source;
 			for (String name : enumerableSource.getPropertyNames()) {
-				System.out.println(name + " = " + enumerableSource.getProperty(name));
+				logger.info(new StringBuilder().append(name).append(" = ").append(enumerableSource.getProperty(name)).toString());
 			}
 		}
 	}

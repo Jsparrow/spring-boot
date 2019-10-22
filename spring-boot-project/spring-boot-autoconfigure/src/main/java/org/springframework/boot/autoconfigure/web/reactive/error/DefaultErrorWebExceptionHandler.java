@@ -41,6 +41,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.all;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basic global {@link org.springframework.web.server.WebExceptionHandler}, rendering
@@ -74,6 +76,8 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
  * @since 2.0.0
  */
 public class DefaultErrorWebExceptionHandler extends AbstractErrorWebExceptionHandler {
+
+	private static final Logger logger = LoggerFactory.getLogger(DefaultErrorWebExceptionHandler.class);
 
 	private static final MediaType TEXT_HTML_UTF8 = new MediaType("text", "html", StandardCharsets.UTF_8);
 
@@ -188,6 +192,7 @@ public class DefaultErrorWebExceptionHandler extends AbstractErrorWebExceptionHa
 				return acceptedMediaTypes.stream().anyMatch(MediaType.TEXT_HTML::isCompatibleWith);
 			}
 			catch (InvalidMediaTypeException ex) {
+				logger.error(ex.getMessage(), ex);
 				return false;
 			}
 		};

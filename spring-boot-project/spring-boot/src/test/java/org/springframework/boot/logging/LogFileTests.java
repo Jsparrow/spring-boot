@@ -85,9 +85,9 @@ class LogFileTests {
 		LogFile logFile = LogFile.get(resolver);
 		Properties properties = new Properties();
 		logFile.applyTo(properties);
-		assertThat(logFile.toString()).isEqualTo("logpath" + File.separatorChar + "spring.log");
+		assertThat(logFile.toString()).isEqualTo(new StringBuilder().append("logpath").append(File.separatorChar).append("spring.log").toString());
 		assertThat(properties.getProperty(LoggingSystemProperties.LOG_FILE))
-				.isEqualTo("logpath" + File.separatorChar + "spring.log");
+				.isEqualTo(new StringBuilder().append("logpath").append(File.separatorChar).append("spring.log").toString());
 		assertThat(properties.getProperty(LoggingSystemProperties.LOG_PATH)).isEqualTo("logpath");
 	}
 

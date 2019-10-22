@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link TypeExcludeFilter} for {@link WebMvcTest @WebMvcTest}.
@@ -45,6 +47,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Madhura Bhave
  */
 class WebMvcTypeExcludeFilter extends StandardAnnotationCustomizableTypeExcludeFilter<WebMvcTest> {
+
+	private static final Logger logger = LoggerFactory.getLogger(WebMvcTypeExcludeFilter.class);
 
 	private static final Class<?>[] NO_CONTROLLERS = {};
 
@@ -72,6 +76,7 @@ class WebMvcTypeExcludeFilter extends StandardAnnotationCustomizableTypeExcludeF
 				includes.add(ClassUtils.forName(optionalInclude, null));
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}

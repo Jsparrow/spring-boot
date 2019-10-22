@@ -38,6 +38,8 @@ import org.apache.commons.logging.Log;
 import org.springframework.boot.devtools.logger.DevToolsLogFactory;
 import org.springframework.boot.devtools.settings.DevToolsSettings;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A filtered collection of URLs which can change after the application has started.
@@ -46,6 +48,8 @@ import org.springframework.util.StringUtils;
  * @author Andy Wilkinson
  */
 final class ChangeableUrls implements Iterable<URL> {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(ChangeableUrls.class);
 
 	private static final Log logger = DevToolsLogFactory.getLog(ChangeableUrls.class);
 
@@ -113,7 +117,7 @@ final class ChangeableUrls implements Iterable<URL> {
 			return new File(classPathEntry).toURI().toURL();
 		}
 		catch (MalformedURLException ex) {
-			throw new IllegalArgumentException("URL could not be created from '" + classPathEntry + "'", ex);
+			throw new IllegalArgumentException(new StringBuilder().append("URL could not be created from '").append(classPathEntry).append("'").toString(), ex);
 		}
 	}
 
@@ -133,6 +137,7 @@ final class ChangeableUrls implements Iterable<URL> {
 			}
 		}
 		catch (Exception ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Assume it's not a jar and continue
 		}
 		return Collections.emptyList();
@@ -171,9 +176,7 @@ final class ChangeableUrls implements Iterable<URL> {
 			}
 		}
 		if (!nonExistentEntries.isEmpty()) {
-			logger.info("The Class-Path manifest attribute in " + jarFile.getName()
-					+ " referenced one or more files that do not exist: "
-					+ StringUtils.collectionToCommaDelimitedString(nonExistentEntries));
+			logger.info(new StringBuilder().append("The Class-Path manifest attribute in ").append(jarFile.getName()).append(" referenced one or more files that do not exist: ").append(StringUtils.collectionToCommaDelimitedString(nonExistentEntries)).toString());
 		}
 		return urls;
 	}

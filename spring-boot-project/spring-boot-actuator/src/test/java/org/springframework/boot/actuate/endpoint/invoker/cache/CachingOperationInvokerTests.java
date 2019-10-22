@@ -157,7 +157,7 @@ class CachingOperationInvokerTests {
 		static int invocations;
 
 		@Override
-		public Object invoke(InvocationContext context) throws MissingParametersException {
+		public Object invoke(InvocationContext context) {
 			return Mono.fromCallable(() -> {
 				invocations++;
 				return Mono.just("test");
@@ -171,7 +171,7 @@ class CachingOperationInvokerTests {
 		static int invocations;
 
 		@Override
-		public Object invoke(InvocationContext context) throws MissingParametersException {
+		public Object invoke(InvocationContext context) {
 			return Flux.fromIterable(() -> {
 				invocations++;
 				return Arrays.asList("spring", "boot").iterator();

@@ -24,6 +24,8 @@ import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.jdbc.datasource.DelegatingDataSource;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Unwraps a {@link DataSource} that may have been proxied or wrapped in a custom
@@ -35,6 +37,7 @@ import org.springframework.util.ClassUtils;
  */
 public final class DataSourceUnwrapper {
 
+	private static final Logger logger = LoggerFactory.getLogger(DataSourceUnwrapper.class);
 	private static final boolean DELEGATING_DATA_SOURCE_PRESENT = ClassUtils.isPresent(
 			"org.springframework.jdbc.datasource.DelegatingDataSource", DataSourceUnwrapper.class.getClassLoader());
 
@@ -79,6 +82,7 @@ public final class DataSourceUnwrapper {
 			}
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// Continue
 		}
 		return null;

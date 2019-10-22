@@ -19,6 +19,8 @@ package org.springframework.boot.ansi;
 import java.util.Locale;
 
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generates ANSI encoded output, automatically attempting to detect if the terminal
@@ -28,6 +30,8 @@ import org.springframework.util.Assert;
  * @since 1.0.0
  */
 public abstract class AnsiOutput {
+
+	private static final Logger logger = LoggerFactory.getLogger(AnsiOutput.class);
 
 	private static final String ENCODE_JOIN = ";";
 
@@ -78,7 +82,7 @@ public abstract class AnsiOutput {
 	 */
 	public static String encode(AnsiElement element) {
 		if (isEnabled()) {
-			return ENCODE_START + element + ENCODE_END;
+			return new StringBuilder().append(ENCODE_START).append(element).append(ENCODE_END).toString();
 		}
 		return "";
 	}
@@ -122,11 +126,12 @@ public abstract class AnsiOutput {
 			}
 			sb.append(element);
 		}
-		if (containsEncoding) {
-			sb.append(writingAnsi ? ENCODE_JOIN : ENCODE_START);
-			sb.append(RESET);
-			sb.append(ENCODE_END);
+		if (!containsEncoding) {
+			return;
 		}
+		sb.append(writingAnsi ? ENCODE_JOIN : ENCODE_START);
+		sb.append(RESET);
+		sb.append(ENCODE_END);
 	}
 
 	private static void buildDisabled(StringBuilder sb, Object[] elements) {
@@ -138,13 +143,13 @@ public abstract class AnsiOutput {
 	}
 
 	private static boolean isEnabled() {
-		if (enabled == Enabled.DETECT) {
-			if (ansiCapable == null) {
-				ansiCapable = detectIfAnsiCapable();
-			}
-			return ansiCapable;
+		if (enabled != Enabled.DETECT) {
+			return enabled == Enabled.ALWAYS;
 		}
-		return enabled == Enabled.ALWAYS;
+		if (ansiCapable == null) {
+			ansiCapable = detectIfAnsiCapable();
+		}
+		return ansiCapable;
 	}
 
 	private static boolean detectIfAnsiCapable() {
@@ -158,6 +163,7 @@ public abstract class AnsiOutput {
 			return !(OPERATING_SYSTEM_NAME.contains("win"));
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

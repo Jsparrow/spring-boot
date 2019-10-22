@@ -45,47 +45,42 @@ class NoUniqueBeanDefinitionFailureAnalyzerTests {
 	void failureAnalysisForFieldConsumer() {
 		FailureAnalysis failureAnalysis = analyzeFailure(createFailure(FieldConsumer.class));
 		assertThat(failureAnalysis.getDescription()).startsWith(
-				"Field testBean in " + FieldConsumer.class.getName() + " required a single bean, but 6 were found:");
+				new StringBuilder().append("Field testBean in ").append(FieldConsumer.class.getName()).append(" required a single bean, but 6 were found:").toString());
 		assertFoundBeans(failureAnalysis);
 	}
 
 	@Test
 	void failureAnalysisForMethodConsumer() {
 		FailureAnalysis failureAnalysis = analyzeFailure(createFailure(MethodConsumer.class));
-		assertThat(failureAnalysis.getDescription()).startsWith("Parameter 0 of method consumer in "
-				+ MethodConsumer.class.getName() + " required a single bean, but 6 were found:");
+		assertThat(failureAnalysis.getDescription()).startsWith(new StringBuilder().append("Parameter 0 of method consumer in ").append(MethodConsumer.class.getName()).append(" required a single bean, but 6 were found:").toString());
 		assertFoundBeans(failureAnalysis);
 	}
 
 	@Test
 	void failureAnalysisForConstructorConsumer() {
 		FailureAnalysis failureAnalysis = analyzeFailure(createFailure(ConstructorConsumer.class));
-		assertThat(failureAnalysis.getDescription()).startsWith("Parameter 0 of constructor in "
-				+ ConstructorConsumer.class.getName() + " required a single bean, but 6 were found:");
+		assertThat(failureAnalysis.getDescription()).startsWith(new StringBuilder().append("Parameter 0 of constructor in ").append(ConstructorConsumer.class.getName()).append(" required a single bean, but 6 were found:").toString());
 		assertFoundBeans(failureAnalysis);
 	}
 
 	@Test
 	void failureAnalysisForObjectProviderMethodConsumer() {
 		FailureAnalysis failureAnalysis = analyzeFailure(createFailure(ObjectProviderMethodConsumer.class));
-		assertThat(failureAnalysis.getDescription()).startsWith("Method consumer in "
-				+ ObjectProviderMethodConsumer.class.getName() + " required a single bean, but 6 were found:");
+		assertThat(failureAnalysis.getDescription()).startsWith(new StringBuilder().append("Method consumer in ").append(ObjectProviderMethodConsumer.class.getName()).append(" required a single bean, but 6 were found:").toString());
 		assertFoundBeans(failureAnalysis);
 	}
 
 	@Test
 	void failureAnalysisForXmlConsumer() {
 		FailureAnalysis failureAnalysis = analyzeFailure(createFailure(XmlConsumer.class));
-		assertThat(failureAnalysis.getDescription()).startsWith("Parameter 0 of constructor in "
-				+ TestBeanConsumer.class.getName() + " required a single bean, but 6 were found:");
+		assertThat(failureAnalysis.getDescription()).startsWith(new StringBuilder().append("Parameter 0 of constructor in ").append(TestBeanConsumer.class.getName()).append(" required a single bean, but 6 were found:").toString());
 		assertFoundBeans(failureAnalysis);
 	}
 
 	@Test
 	void failureAnalysisForObjectProviderConstructorConsumer() {
 		FailureAnalysis failureAnalysis = analyzeFailure(createFailure(ObjectProviderConstructorConsumer.class));
-		assertThat(failureAnalysis.getDescription()).startsWith("Constructor in "
-				+ ObjectProviderConstructorConsumer.class.getName() + " required a single bean, but 6 were found:");
+		assertThat(failureAnalysis.getDescription()).startsWith(new StringBuilder().append("Constructor in ").append(ObjectProviderConstructorConsumer.class.getName()).append(" required a single bean, but 6 were found:").toString());
 		assertFoundBeans(failureAnalysis);
 	}
 

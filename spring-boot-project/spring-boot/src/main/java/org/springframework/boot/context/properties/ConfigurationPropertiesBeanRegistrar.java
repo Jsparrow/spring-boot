@@ -62,7 +62,7 @@ final class ConfigurationPropertiesBeanRegistrar {
 
 	private String getName(Class<?> type, MergedAnnotation<ConfigurationProperties> annotation) {
 		String prefix = annotation.isPresent() ? annotation.getString("prefix") : "";
-		return (StringUtils.hasText(prefix) ? prefix + "-" + type.getName() : type.getName());
+		return (StringUtils.hasText(prefix) ? new StringBuilder().append(prefix).append("-").append(type.getName()).toString() : type.getName());
 	}
 
 	private boolean containsBeanDefinition(String name) {
@@ -82,8 +82,7 @@ final class ConfigurationPropertiesBeanRegistrar {
 
 	private void registerBeanDefinition(String beanName, Class<?> type,
 			MergedAnnotation<ConfigurationProperties> annotation) {
-		Assert.state(annotation.isPresent(), () -> "No " + ConfigurationProperties.class.getSimpleName()
-				+ " annotation found on  '" + type.getName() + "'.");
+		Assert.state(annotation.isPresent(), () -> new StringBuilder().append("No ").append(ConfigurationProperties.class.getSimpleName()).append(" annotation found on  '").append(type.getName()).append("'.").toString());
 		this.registry.registerBeanDefinition(beanName, createBeanDefinition(beanName, type));
 	}
 

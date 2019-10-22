@@ -42,11 +42,11 @@ public class ExampleWebExceptionHandler implements WebExceptionHandler {
 
 	@Override
 	public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
-		if (ex instanceof RuntimeException && "foo".equals(ex.getMessage())) {
-			exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
-			return exchange.getResponse().setComplete();
+		if (!(ex instanceof RuntimeException && "foo".equals(ex.getMessage()))) {
+			return this.fallback.handle(exchange, ex);
 		}
-		return this.fallback.handle(exchange, ex);
+		exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
+		return exchange.getResponse().setComplete();
 	}
 
 }

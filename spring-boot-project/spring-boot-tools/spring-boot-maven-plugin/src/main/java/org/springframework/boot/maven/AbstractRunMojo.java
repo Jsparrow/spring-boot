@@ -259,18 +259,18 @@ public abstract class AbstractRunMojo extends AbstractDependencyFilterMojo {
 	 * conditions are present that require to enable it.
 	 */
 	protected void logDisabledFork() {
-		if (getLog().isWarnEnabled()) {
-			if (hasAgent()) {
-				getLog().warn("Fork mode disabled, ignoring agent");
-			}
-			if (hasJvmArgs()) {
-				RunArguments runArguments = resolveJvmArguments();
-				getLog().warn("Fork mode disabled, ignoring JVM argument(s) ["
-						+ String.join(" ", runArguments.asArray()) + "]");
-			}
-			if (hasWorkingDirectorySet()) {
-				getLog().warn("Fork mode disabled, ignoring working directory configuration");
-			}
+		if (!getLog().isWarnEnabled()) {
+			return;
+		}
+		if (hasAgent()) {
+			getLog().warn("Fork mode disabled, ignoring agent");
+		}
+		if (hasJvmArgs()) {
+			RunArguments runArguments = resolveJvmArguments();
+			getLog().warn(new StringBuilder().append("Fork mode disabled, ignoring JVM argument(s) [").append(String.join(" ", runArguments.asArray())).append("]").toString());
+		}
+		if (hasWorkingDirectorySet()) {
+			getLog().warn("Fork mode disabled, ignoring working directory configuration");
 		}
 	}
 
@@ -379,17 +379,18 @@ public abstract class AbstractRunMojo extends AbstractDependencyFilterMojo {
 	}
 
 	private void addActiveProfileArgument(RunArguments arguments) {
-		if (this.profiles.length > 0) {
-			StringBuilder arg = new StringBuilder("--spring.profiles.active=");
-			for (int i = 0; i < this.profiles.length; i++) {
-				arg.append(this.profiles[i]);
-				if (i < this.profiles.length - 1) {
-					arg.append(",");
-				}
-			}
-			arguments.getArgs().addFirst(arg.toString());
-			logArguments("Active profile(s): ", this.profiles);
+		if (this.profiles.length <= 0) {
+			return;
 		}
+		StringBuilder arg = new StringBuilder("--spring.profiles.active=");
+		for (int i = 0; i < this.profiles.length; i++) {
+			arg.append(this.profiles[i]);
+			if (i < this.profiles.length - 1) {
+				arg.append(",");
+			}
+		}
+		arguments.getArgs().addFirst(arg.toString());
+		logArguments("Active profile(s): ", this.profiles);
 	}
 
 	private void addClasspath(List<String> args) throws MojoExecutionException {
@@ -509,12 +510,13 @@ public abstract class AbstractRunMojo extends AbstractDependencyFilterMojo {
 
 		@Override
 		public void uncaughtException(Thread thread, Throwable ex) {
-			if (!(ex instanceof ThreadDeath)) {
-				synchronized (this.monitor) {
-					this.exception = (this.exception != null) ? this.exception : ex;
-				}
-				getLog().warn(ex);
+			if (ex instanceof ThreadDeath) {
+				return;
 			}
+			synchronized (this.monitor) {
+				this.exception = (this.exception != null) ? this.exception : ex;
+			}
+			getLog().warn(ex);
 		}
 
 		void rethrowUncaughtException() throws MojoExecutionException {

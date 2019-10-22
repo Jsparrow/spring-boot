@@ -127,7 +127,7 @@ class MetricsEndpointTests {
 		this.registry.counter("cache", "host", "1", "region", "east", "result", "hit");
 		this.registry.counter("cache", "host", "1", "region", "east", "result", "miss");
 		MetricsEndpoint.MetricResponse response = this.endpoint.metric("cache", Collections.singletonList("host:1"));
-		assertThat(response.getAvailableTags().stream().filter((t) -> t.getTag().equals("region"))
+		assertThat(response.getAvailableTags().stream().filter((t) -> "region".equals(t.getTag()))
 				.flatMap((t) -> t.getValues().stream())).containsExactly("east");
 	}
 

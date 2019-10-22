@@ -130,7 +130,7 @@ class MultipartAutoConfigurationTests {
 	void webServerWithAutomatedMultipartTomcatConfiguration() {
 		this.context = new AnnotationConfigServletWebServerApplicationContext(WebServerWithEverythingTomcat.class,
 				BaseConfiguration.class);
-		new RestTemplate().getForObject("http://localhost:" + this.context.getWebServer().getPort() + "/",
+		new RestTemplate().getForObject(new StringBuilder().append("http://localhost:").append(this.context.getWebServer().getPort()).append("/").toString(),
 				String.class);
 		this.context.getBean(MultipartConfigElement.class);
 		assertThat(this.context.getBean(StandardServletMultipartResolver.class))
@@ -237,14 +237,14 @@ class MultipartAutoConfigurationTests {
 	private void verify404() throws Exception {
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		ClientHttpRequest request = requestFactory.createRequest(
-				new URI("http://localhost:" + this.context.getWebServer().getPort() + "/"), HttpMethod.GET);
+				new URI(new StringBuilder().append("http://localhost:").append(this.context.getWebServer().getPort()).append("/").toString()), HttpMethod.GET);
 		ClientHttpResponse response = request.execute();
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
 	private void verifyServletWorks() {
 		RestTemplate restTemplate = new RestTemplate();
-		String url = "http://localhost:" + this.context.getWebServer().getPort() + "/";
+		String url = new StringBuilder().append("http://localhost:").append(this.context.getWebServer().getPort()).append("/").toString();
 		assertThat(restTemplate.getForObject(url, String.class)).isEqualTo("Hello");
 	}
 

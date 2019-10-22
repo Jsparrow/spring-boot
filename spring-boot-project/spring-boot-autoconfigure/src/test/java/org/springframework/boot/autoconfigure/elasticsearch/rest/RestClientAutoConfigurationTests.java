@@ -87,9 +87,7 @@ class RestClientAutoConfigurationTests {
 			RestClient restClient = context.getBean(RestClient.class);
 			Map<String, RestHighLevelClient> restHighLevelClients = context.getBeansOfType(RestHighLevelClient.class);
 			assertThat(restHighLevelClients).hasSize(2);
-			for (RestHighLevelClient restHighLevelClient : restHighLevelClients.values()) {
-				assertThat(restHighLevelClient.getLowLevelClient()).isNotSameAs(restClient);
-			}
+			restHighLevelClients.values().forEach(restHighLevelClient -> assertThat(restHighLevelClient.getLowLevelClient()).isNotSameAs(restClient));
 		});
 	}
 

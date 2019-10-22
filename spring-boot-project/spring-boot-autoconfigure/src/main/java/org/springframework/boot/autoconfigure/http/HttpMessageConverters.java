@@ -33,6 +33,8 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Bean used to manage the {@link HttpMessageConverter}s used in a Spring Boot
@@ -57,6 +59,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
  */
 public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> {
 
+	private static final Logger logger = LoggerFactory.getLogger(HttpMessageConverters.class);
 	private static final List<Class<?>> NON_REPLACING_CONVERTERS;
 
 	static {
@@ -226,6 +229,7 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
 			list.add(Class.forName(className));
 		}
 		catch (ClassNotFoundException | NoClassDefFoundError ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}

@@ -48,7 +48,7 @@ class JarResourceManager implements ResourceManager {
 
 	@Override
 	public Resource getResource(String path) throws IOException {
-		URL url = new URL("jar:file:" + this.jarPath + "!" + (path.startsWith("/") ? path : "/" + path));
+		URL url = new URL(new StringBuilder().append("jar:file:").append(this.jarPath).append("!").append(path.startsWith("/") ? path : "/" + path).toString());
 		URLResource resource = new URLResource(url, path);
 		if (StringUtils.hasText(path) && !"/".equals(path) && resource.getContentLength() < 0) {
 			return null;

@@ -50,6 +50,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link TomcatReactiveWebServerFactory}.
@@ -59,6 +61,8 @@ import static org.mockito.Mockito.verify;
  * @author HaiTao Zhang
  */
 class TomcatReactiveWebServerFactoryTests extends AbstractReactiveWebServerFactoryTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(TomcatReactiveWebServerFactoryTests.class);
 
 	@Override
 	protected TomcatReactiveWebServerFactory getFactory() {
@@ -218,14 +222,12 @@ class TomcatReactiveWebServerFactoryTests extends AbstractReactiveWebServerFacto
 
 	@Test
 	void portClashOfPrimaryConnectorResultsInPortInUseException() throws IOException {
-		doWithBlockedPort((port) -> {
-			assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
-				AbstractReactiveWebServerFactory factory = getFactory();
-				factory.setPort(port);
-				this.webServer = factory.getWebServer(mock(HttpHandler.class));
-				this.webServer.start();
-			}).satisfies((ex) -> handleExceptionCausedByBlockedPortOnPrimaryConnector(ex, port));
-		});
+		doWithBlockedPort((port) -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
+			AbstractReactiveWebServerFactory factory = getFactory();
+			factory.setPort(port);
+			this.webServer = factory.getWebServer(mock(HttpHandler.class));
+			this.webServer.start();
+		}).satisfies((ex) -> handleExceptionCausedByBlockedPortOnPrimaryConnector(ex, port)));
 	}
 
 	private void doWithBlockedPort(BlockedPortAction action) throws IOException {
@@ -237,6 +239,7 @@ class TomcatReactiveWebServerFactoryTests extends AbstractReactiveWebServerFacto
 				break;
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 		try {

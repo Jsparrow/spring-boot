@@ -22,6 +22,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains a location that templates can be loaded from.
@@ -31,6 +33,7 @@ import org.springframework.util.Assert;
  */
 public class TemplateLocation {
 
+	private static final Logger logger = LoggerFactory.getLogger(TemplateLocation.class);
 	private final String path;
 
 	public TemplateLocation(String path) {
@@ -53,6 +56,7 @@ public class TemplateLocation {
 			return anyExists(resolver);
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

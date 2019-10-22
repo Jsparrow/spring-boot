@@ -27,6 +27,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Alternative {@link DependencyInjectionTestExecutionListener} prints the
@@ -36,6 +38,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @since 1.4.1
  */
 public class SpringBootDependencyInjectionTestExecutionListener extends DependencyInjectionTestExecutionListener {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(SpringBootDependencyInjectionTestExecutionListener.class);
 
 	@Override
 	public void prepareTestInstance(TestContext testContext) throws Exception {
@@ -54,10 +59,11 @@ public class SpringBootDependencyInjectionTestExecutionListener extends Dependen
 			if (context instanceof ConfigurableApplicationContext) {
 				ConditionEvaluationReport report = ConditionEvaluationReport
 						.get(((ConfigurableApplicationContext) context).getBeanFactory());
-				System.err.println(new ConditionEvaluationReportMessage(report));
+				logger.error(String.valueOf(new ConditionEvaluationReportMessage(report)));
 			}
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// Allow original failure to be reported
 		}
 	}

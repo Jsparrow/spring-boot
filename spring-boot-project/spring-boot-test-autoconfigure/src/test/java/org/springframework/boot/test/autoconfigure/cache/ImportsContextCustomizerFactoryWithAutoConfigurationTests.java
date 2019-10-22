@@ -83,6 +83,16 @@ class ImportsContextCustomizerFactoryWithAutoConfigurationTests {
 		launcher.execute(request);
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface Unrelated1 {
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface Unrelated2 {
+
+	}
+
 	@DataJpaTest
 	@ContextConfiguration(classes = EmptyConfig.class)
 	@Unrelated1
@@ -140,16 +150,6 @@ class ImportsContextCustomizerFactoryWithAutoConfigurationTests {
 		void test() {
 			contextFromTest = this.context;
 		}
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface Unrelated1 {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface Unrelated2 {
 
 	}
 

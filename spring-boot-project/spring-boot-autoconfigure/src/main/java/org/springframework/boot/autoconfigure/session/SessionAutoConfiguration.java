@@ -62,6 +62,8 @@ import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for Spring Session.
@@ -215,6 +217,8 @@ public class SessionAutoConfiguration {
 	 */
 	abstract static class AbstractSessionRepositoryImplementationValidator {
 
+		private final Logger logger = LoggerFactory.getLogger(AbstractSessionRepositoryImplementationValidator.class);
+
 		private final List<String> candidates;
 
 		private final ClassLoader classLoader;
@@ -231,9 +235,7 @@ public class SessionAutoConfiguration {
 		@PostConstruct
 		void checkAvailableImplementations() {
 			List<Class<?>> availableCandidates = new ArrayList<>();
-			for (String candidate : this.candidates) {
-				addCandidateIfAvailable(availableCandidates, candidate);
-			}
+			this.candidates.forEach(candidate -> addCandidateIfAvailable(availableCandidates, candidate));
 			StoreType storeType = this.sessionProperties.getStoreType();
 			if (availableCandidates.size() > 1 && storeType == null) {
 				throw new NonUniqueSessionRepositoryException(availableCandidates);
@@ -248,6 +250,7 @@ public class SessionAutoConfiguration {
 				}
 			}
 			catch (Throwable ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}
@@ -309,9 +312,7 @@ public class SessionAutoConfiguration {
 			if (storeType != StoreType.NONE && this.sessionRepositoryProvider.getIfAvailable() == null
 					&& storeType != null) {
 				throw new SessionRepositoryUnavailableException(
-						"No session repository could be auto-configured, check your "
-								+ "configuration (session store type is '"
-								+ storeType.name().toLowerCase(Locale.ENGLISH) + "')",
+						new StringBuilder().append("No session repository could be auto-configured, check your ").append("configuration (session store type is '").append(storeType.name().toLowerCase(Locale.ENGLISH)).append("')").toString(),
 						storeType);
 			}
 		}

@@ -70,7 +70,7 @@ public class ClassPathFileSystemWatcher implements InitializingBean, DisposableB
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 

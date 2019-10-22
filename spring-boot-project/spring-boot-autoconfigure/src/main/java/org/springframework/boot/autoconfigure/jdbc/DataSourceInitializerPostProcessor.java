@@ -32,21 +32,21 @@ import org.springframework.core.Ordered;
  */
 class DataSourceInitializerPostProcessor implements BeanPostProcessor, Ordered {
 
+	@Autowired
+	private BeanFactory beanFactory;
+
 	@Override
 	public int getOrder() {
 		return Ordered.HIGHEST_PRECEDENCE + 1;
 	}
 
-	@Autowired
-	private BeanFactory beanFactory;
-
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		return bean;
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		if (bean instanceof DataSource) {
 			// force initialization of this bean as soon as we see a DataSource
 			this.beanFactory.getBean(DataSourceInitializerInvoker.class);

@@ -62,10 +62,10 @@ public final class BuildPropertiesWriter {
 		File parent = file.getParentFile();
 		if (!parent.isDirectory() && !parent.mkdirs()) {
 			throw new IllegalStateException(
-					"Cannot create parent directory for '" + this.outputFile.getAbsolutePath() + "'");
+					new StringBuilder().append("Cannot create parent directory for '").append(this.outputFile.getAbsolutePath()).append("'").toString());
 		}
 		if (!file.createNewFile()) {
-			throw new IllegalStateException("Cannot create target file '" + this.outputFile.getAbsolutePath() + "'");
+			throw new IllegalStateException(new StringBuilder().append("Cannot create target file '").append(this.outputFile.getAbsolutePath()).append("'").toString());
 		}
 	}
 
@@ -154,7 +154,7 @@ public final class BuildPropertiesWriter {
 	public static class NullAdditionalPropertyValueException extends IllegalArgumentException {
 
 		public NullAdditionalPropertyValueException(String name) {
-			super("Additional property '" + name + "' is illegal as its value is null");
+			super(new StringBuilder().append("Additional property '").append(name).append("' is illegal as its value is null").toString());
 		}
 
 	}

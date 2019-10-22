@@ -68,11 +68,11 @@ public class NettyWebServerFactoryCustomizer
 	}
 
 	private boolean getOrDeduceUseForwardHeaders() {
-		if (this.serverProperties.getForwardHeadersStrategy().equals(ServerProperties.ForwardHeadersStrategy.NONE)) {
-			CloudPlatform platform = CloudPlatform.getActive(this.environment);
-			return platform != null && platform.isUsingForwardHeaders();
+		if (this.serverProperties.getForwardHeadersStrategy() != ServerProperties.ForwardHeadersStrategy.NONE) {
+			return this.serverProperties.getForwardHeadersStrategy() == ServerProperties.ForwardHeadersStrategy.NATIVE;
 		}
-		return this.serverProperties.getForwardHeadersStrategy().equals(ServerProperties.ForwardHeadersStrategy.NATIVE);
+		CloudPlatform platform = CloudPlatform.getActive(this.environment);
+		return platform != null && platform.isUsingForwardHeaders();
 	}
 
 	private void customizeMaxHttpHeaderSize(NettyReactiveWebServerFactory factory, DataSize maxHttpHeaderSize) {
@@ -81,11 +81,12 @@ public class NettyWebServerFactoryCustomizer
 	}
 
 	private void customizeGenericConnectionTimeout(NettyReactiveWebServerFactory factory, Duration connectionTimeout) {
-		if (!connectionTimeout.isZero()) {
-			long timeoutMillis = connectionTimeout.isNegative() ? 0 : connectionTimeout.toMillis();
-			factory.addServerCustomizers((httpServer) -> httpServer.tcpConfiguration((tcpServer) -> tcpServer
-					.selectorOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) timeoutMillis)));
+		if (connectionTimeout.isZero()) {
+			return;
 		}
+		long timeoutMillis = connectionTimeout.isNegative() ? 0 : connectionTimeout.toMillis();
+		factory.addServerCustomizers((httpServer) -> httpServer.tcpConfiguration((tcpServer) -> tcpServer
+				.selectorOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) timeoutMillis)));
 	}
 
 	private void customizeConnectionTimeout(NettyReactiveWebServerFactory factory, Duration connectionTimeout) {

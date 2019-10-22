@@ -17,6 +17,8 @@
 package org.springframework.boot.context.properties.source;
 
 import org.springframework.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link PropertyMapper} implementation. Names are mapped by removing invalid
@@ -29,6 +31,8 @@ import org.springframework.util.ObjectUtils;
  * @see SpringConfigurationPropertySource
  */
 final class DefaultPropertyMapper implements PropertyMapper {
+
+	private static final Logger logger = LoggerFactory.getLogger(DefaultPropertyMapper.class);
 
 	public static final PropertyMapper INSTANCE = new DefaultPropertyMapper();
 
@@ -72,6 +76,7 @@ final class DefaultPropertyMapper implements PropertyMapper {
 			}
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 		return NO_MAPPINGS;
 	}

@@ -32,6 +32,8 @@ import org.springframework.boot.web.server.Ssl;
 import org.springframework.boot.web.server.WebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.core.Ordered;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link WebServerFactoryCustomizer} that customizes the {@link WebServerFactory} used to
@@ -43,6 +45,8 @@ import org.springframework.core.Ordered;
  */
 public abstract class ManagementWebServerFactoryCustomizer<T extends ConfigurableWebServerFactory>
 		implements WebServerFactoryCustomizer<T>, Ordered {
+
+	private static final Logger logger = LoggerFactory.getLogger(ManagementWebServerFactoryCustomizer.class);
 
 	private final ListableBeanFactory beanFactory;
 
@@ -87,6 +91,7 @@ public abstract class ManagementWebServerFactoryCustomizer<T extends Configurabl
 			return BeanFactoryUtils.beanOfTypeIncludingAncestors(this.beanFactory, customizerClass);
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

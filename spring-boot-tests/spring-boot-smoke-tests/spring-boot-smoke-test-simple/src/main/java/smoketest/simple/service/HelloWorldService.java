@@ -31,7 +31,7 @@ public class HelloWorldService {
 	private Duration duration;
 
 	public String getHelloMessage() {
-		return "Hello " + this.name + " for " + this.duration.getSeconds() + " seconds";
+		return new StringBuilder().append("Hello ").append(this.name).append(" for ").append(this.duration.getSeconds()).append(" seconds").toString();
 	}
 
 }

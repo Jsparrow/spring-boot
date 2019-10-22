@@ -45,7 +45,7 @@ public class YamlPropertySourceLoader implements PropertySourceLoader {
 	public List<PropertySource<?>> load(String name, Resource resource) throws IOException {
 		if (!ClassUtils.isPresent("org.yaml.snakeyaml.Yaml", null)) {
 			throw new IllegalStateException(
-					"Attempted to load " + name + " but snakeyaml was not found on the classpath");
+					new StringBuilder().append("Attempted to load ").append(name).append(" but snakeyaml was not found on the classpath").toString());
 		}
 		List<Map<String, Object>> loaded = new OriginTrackedYamlLoader(resource).load();
 		if (loaded.isEmpty()) {
@@ -53,7 +53,7 @@ public class YamlPropertySourceLoader implements PropertySourceLoader {
 		}
 		List<PropertySource<?>> propertySources = new ArrayList<>(loaded.size());
 		for (int i = 0; i < loaded.size(); i++) {
-			String documentNumber = (loaded.size() != 1) ? " (document #" + i + ")" : "";
+			String documentNumber = (loaded.size() != 1) ? new StringBuilder().append(" (document #").append(i).append(")").toString() : "";
 			propertySources.add(new OriginTrackedMapPropertySource(name + documentNumber,
 					Collections.unmodifiableMap(loaded.get(i)), true));
 		}

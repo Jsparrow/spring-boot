@@ -40,7 +40,7 @@ class IntegrationAutoConfigurationScanRegistrar extends IntegrationComponentScan
 	private BeanFactory beanFactory;
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 

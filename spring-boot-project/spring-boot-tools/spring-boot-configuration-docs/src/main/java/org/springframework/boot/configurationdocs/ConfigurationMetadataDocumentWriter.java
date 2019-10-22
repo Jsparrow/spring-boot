@@ -102,9 +102,7 @@ public class ConfigurationMetadataDocumentWriter {
 			CompoundConfigurationTableEntry entry = new CompoundConfigurationTableEntry(keyPrefix, description);
 			List<String> matchingKeys = unmappedKeys.stream().filter((key) -> key.startsWith(keyPrefix))
 					.collect(Collectors.toList());
-			for (String matchingKey : matchingKeys) {
-				entry.addConfigurationKeys(metadataProperties.get(matchingKey));
-			}
+			matchingKeys.forEach(matchingKey -> entry.addConfigurationKeys(metadataProperties.get(matchingKey)));
 			overrides.put(keyPrefix, entry);
 			unmappedKeys.removeAll(matchingKeys);
 		});
@@ -115,17 +113,14 @@ public class ConfigurationMetadataDocumentWriter {
 			List<String> unmappedKeys, Map<String, CompoundConfigurationTableEntry> overrides, String id,
 			List<String> keyPrefixes) {
 		ConfigurationTable table = new ConfigurationTable(id);
-		for (String keyPrefix : keyPrefixes) {
+		keyPrefixes.forEach(keyPrefix -> {
 			List<String> matchingOverrides = overrides.keySet().stream()
 					.filter((overrideKey) -> overrideKey.startsWith(keyPrefix)).collect(Collectors.toList());
 			matchingOverrides.forEach((match) -> table.addEntry(overrides.remove(match)));
-		}
+		});
 		List<String> matchingKeys = unmappedKeys.stream()
 				.filter((key) -> keyPrefixes.stream().anyMatch(key::startsWith)).collect(Collectors.toList());
-		for (String matchingKey : matchingKeys) {
-			ConfigurationMetadataProperty property = metadataProperties.get(matchingKey);
-			table.addEntry(new SingleConfigurationTableEntry(property));
-		}
+		matchingKeys.stream().map(metadataProperties::get).forEach(property -> table.addEntry(new SingleConfigurationTableEntry(property)));
 		unmappedKeys.removeAll(matchingKeys);
 		return table;
 	}

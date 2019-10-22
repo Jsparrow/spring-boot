@@ -183,9 +183,7 @@ public class DeferredLog implements Log {
 	 */
 	public void replayTo(Log destination) {
 		synchronized (this.lines) {
-			for (Line line : this.lines) {
-				logTo(destination, line.getLevel(), line.getMessage(), line.getThrowable());
-			}
+			this.lines.forEach(line -> logTo(destination, line.getLevel(), line.getMessage(), line.getThrowable()));
 			this.lines.clear();
 		}
 	}

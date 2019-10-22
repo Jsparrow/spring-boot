@@ -30,6 +30,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.GenericConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility to deduce the {@link ConversionService} to use for configuration properties
@@ -39,6 +41,7 @@ import org.springframework.core.convert.converter.GenericConverter;
  */
 class ConversionServiceDeducer {
 
+	private static final Logger logger = LoggerFactory.getLogger(ConversionServiceDeducer.class);
 	private final ApplicationContext applicationContext;
 
 	ConversionServiceDeducer(ApplicationContext applicationContext) {
@@ -51,6 +54,7 @@ class ConversionServiceDeducer {
 					ConversionService.class);
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			return new Factory(this.applicationContext.getAutowireCapableBeanFactory()).create();
 		}
 	}
@@ -87,9 +91,7 @@ class ConversionServiceDeducer {
 			for (Converter<?, ?> converter : this.converters) {
 				conversionService.addConverter(converter);
 			}
-			for (GenericConverter genericConverter : this.genericConverters) {
-				conversionService.addConverter(genericConverter);
-			}
+			this.genericConverters.forEach(conversionService::addConverter);
 			return conversionService;
 		}
 

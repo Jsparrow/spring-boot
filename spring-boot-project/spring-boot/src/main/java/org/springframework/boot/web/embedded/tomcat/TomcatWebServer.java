@@ -42,6 +42,8 @@ import org.springframework.boot.web.server.PortInUseException;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.server.WebServerException;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link WebServer} that can be used to control a Tomcat web server. Usually this class
@@ -53,6 +55,8 @@ import org.springframework.util.Assert;
  * @since 2.0.0
  */
 public class TomcatWebServer implements WebServer {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(TomcatWebServer.class);
 
 	private static final Log logger = LogFactory.getLog(TomcatWebServer.class);
 
@@ -88,7 +92,7 @@ public class TomcatWebServer implements WebServer {
 		initialize();
 	}
 
-	private void initialize() throws WebServerException {
+	private void initialize() {
 		logger.info("Tomcat initialized with port(s): " + getPortsDescription(false));
 		synchronized (this.monitor) {
 			try {
@@ -113,6 +117,7 @@ public class TomcatWebServer implements WebServer {
 					ContextBindings.bindClassLoader(context, context.getNamingToken(), getClass().getClassLoader());
 				}
 				catch (NamingException ex) {
+					logger1.error(ex.getMessage(), ex);
 					// Naming is not enabled. Continue
 				}
 
@@ -139,10 +144,11 @@ public class TomcatWebServer implements WebServer {
 
 	private void addInstanceIdToEngineName() {
 		int instanceId = containerCounter.incrementAndGet();
-		if (instanceId > 0) {
-			Engine engine = this.tomcat.getEngine();
-			engine.setName(engine.getName() + "-" + instanceId);
+		if (instanceId <= 0) {
+			return;
 		}
+		Engine engine = this.tomcat.getEngine();
+		engine.setName(new StringBuilder().append(engine.getName()).append("-").append(instanceId).toString());
 	}
 
 	private void removeServiceConnectors() {
@@ -167,7 +173,7 @@ public class TomcatWebServer implements WebServer {
 					}
 				}
 			}
-			if (!LifecycleState.STARTED.equals(container.getState())) {
+			if (LifecycleState.STARTED != container.getState()) {
 				throw new IllegalStateException(container + " failed to start");
 			}
 		}
@@ -188,7 +194,7 @@ public class TomcatWebServer implements WebServer {
 	}
 
 	@Override
-	public void start() throws WebServerException {
+	public void start() {
 		synchronized (this.monitor) {
 			if (this.started) {
 				return;
@@ -201,8 +207,7 @@ public class TomcatWebServer implements WebServer {
 				}
 				checkThatConnectorsHaveStarted();
 				this.started = true;
-				logger.info("Tomcat started on port(s): " + getPortsDescription(true) + " with context path '"
-						+ getContextPath() + "'");
+				logger.info(new StringBuilder().append("Tomcat started on port(s): ").append(getPortsDescription(true)).append(" with context path '").append(getContextPath()).append("'").toString());
 			}
 			catch (ConnectorStartFailedException ex) {
 				stopSilently();
@@ -229,7 +234,7 @@ public class TomcatWebServer implements WebServer {
 	}
 
 	private void checkConnectorHasStarted(Connector connector) {
-		if (LifecycleState.FAILED.equals(connector.getState())) {
+		if (LifecycleState.FAILED == connector.getState()) {
 			throw new ConnectorStartFailedException(connector.getPort());
 		}
 	}
@@ -249,6 +254,7 @@ public class TomcatWebServer implements WebServer {
 			stopTomcat();
 		}
 		catch (LifecycleException ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}
@@ -258,6 +264,7 @@ public class TomcatWebServer implements WebServer {
 			this.tomcat.destroy();
 		}
 		catch (LifecycleException ex) {
+			logger1.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}
@@ -315,7 +322,7 @@ public class TomcatWebServer implements WebServer {
 	}
 
 	@Override
-	public void stop() throws WebServerException {
+	public void stop() {
 		synchronized (this.monitor) {
 			boolean wasStarted = this.started;
 			try {
@@ -325,6 +332,7 @@ public class TomcatWebServer implements WebServer {
 					this.tomcat.destroy();
 				}
 				catch (LifecycleException ex) {
+					logger1.error(ex.getMessage(), ex);
 					// swallow and continue
 				}
 			}

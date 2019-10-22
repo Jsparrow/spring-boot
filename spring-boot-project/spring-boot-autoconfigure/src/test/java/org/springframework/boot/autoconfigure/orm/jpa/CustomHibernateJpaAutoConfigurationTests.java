@@ -44,6 +44,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Additional tests for {@link HibernateJpaAutoConfiguration}.
@@ -113,6 +115,8 @@ class CustomHibernateJpaAutoConfigurationTests {
 	@Configuration(proxyBeanMethods = false)
 	static class MockDataSourceConfiguration {
 
+		private final Logger logger = LoggerFactory.getLogger(MockDataSourceConfiguration.class);
+
 		@Bean
 		DataSource dataSource() {
 			DataSource dataSource = mock(DataSource.class);
@@ -121,6 +125,7 @@ class CustomHibernateJpaAutoConfigurationTests {
 				given(dataSource.getConnection().getMetaData()).willReturn(mock(DatabaseMetaData.class));
 			}
 			catch (SQLException ex) {
+				logger.error(ex.getMessage(), ex);
 				// Do nothing
 			}
 			return dataSource;

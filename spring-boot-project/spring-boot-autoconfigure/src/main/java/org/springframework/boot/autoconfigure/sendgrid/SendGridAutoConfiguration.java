@@ -47,11 +47,11 @@ public class SendGridAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean(SendGridAPI.class)
 	public SendGrid sendGrid(SendGridProperties properties) {
-		if (properties.isProxyConfigured()) {
-			HttpHost proxy = new HttpHost(properties.getProxy().getHost(), properties.getProxy().getPort());
-			return new SendGrid(properties.getApiKey(), new Client(HttpClientBuilder.create().setProxy(proxy).build()));
+		if (!properties.isProxyConfigured()) {
+			return new SendGrid(properties.getApiKey());
 		}
-		return new SendGrid(properties.getApiKey());
+		HttpHost proxy = new HttpHost(properties.getProxy().getHost(), properties.getProxy().getPort());
+		return new SendGrid(properties.getApiKey(), new Client(HttpClientBuilder.create().setProxy(proxy).build()));
 	}
 
 }

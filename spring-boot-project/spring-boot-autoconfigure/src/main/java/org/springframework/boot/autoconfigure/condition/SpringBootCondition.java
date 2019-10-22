@@ -50,11 +50,8 @@ public abstract class SpringBootCondition implements Condition {
 			return outcome.isMatch();
 		}
 		catch (NoClassDefFoundError ex) {
-			throw new IllegalStateException("Could not evaluate condition on " + classOrMethodName + " due to "
-					+ ex.getMessage() + " not found. Make sure your own configuration does not rely on "
-					+ "that class. This can also happen if you are "
-					+ "@ComponentScanning a springframework package (e.g. if you "
-					+ "put a @ComponentScan in the default package by mistake)", ex);
+			throw new IllegalStateException(new StringBuilder().append("Could not evaluate condition on ").append(classOrMethodName).append(" due to ").append(ex.getMessage()).append(" not found. Make sure your own configuration does not rely on ").append("that class. This can also happen if you are ").append("@ComponentScanning a springframework package (e.g. if you ")
+					.append("put a @ComponentScan in the default package by mistake)").toString(), ex);
 		}
 		catch (RuntimeException ex) {
 			throw new IllegalStateException("Error processing condition on " + getName(metadata), ex);
@@ -65,11 +62,11 @@ public abstract class SpringBootCondition implements Condition {
 		if (metadata instanceof AnnotationMetadata) {
 			return ((AnnotationMetadata) metadata).getClassName();
 		}
-		if (metadata instanceof MethodMetadata) {
-			MethodMetadata methodMetadata = (MethodMetadata) metadata;
-			return methodMetadata.getDeclaringClassName() + "." + methodMetadata.getMethodName();
+		if (!(metadata instanceof MethodMetadata)) {
+			return metadata.toString();
 		}
-		return metadata.toString();
+		MethodMetadata methodMetadata = (MethodMetadata) metadata;
+		return new StringBuilder().append(methodMetadata.getDeclaringClassName()).append(".").append(methodMetadata.getMethodName()).toString();
 	}
 
 	private static String getClassOrMethodName(AnnotatedTypeMetadata metadata) {
@@ -78,7 +75,7 @@ public abstract class SpringBootCondition implements Condition {
 			return classMetadata.getClassName();
 		}
 		MethodMetadata methodMetadata = (MethodMetadata) metadata;
-		return methodMetadata.getDeclaringClassName() + "#" + methodMetadata.getMethodName();
+		return new StringBuilder().append(methodMetadata.getDeclaringClassName()).append("#").append(methodMetadata.getMethodName()).toString();
 	}
 
 	protected final void logOutcome(String classOrMethodName, ConditionOutcome outcome) {

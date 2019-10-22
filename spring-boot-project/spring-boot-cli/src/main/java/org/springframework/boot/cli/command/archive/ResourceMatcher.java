@@ -94,12 +94,7 @@ class ResourceMatcher {
 	}
 
 	private boolean isExcluded(MatchedResource matchedResource) {
-		for (String exclude : this.excludes) {
-			if (this.pathMatcher.match(exclude, matchedResource.getName())) {
-				return true;
-			}
-		}
-		return false;
+		return this.excludes.stream().anyMatch(exclude -> this.pathMatcher.match(exclude, matchedResource.getName()));
 	}
 
 	private List<String> getOptions(List<String> values, String[] defaults) {

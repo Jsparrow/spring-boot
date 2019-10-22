@@ -56,7 +56,7 @@ class MetricsEndpointDocumentationTests extends MockMvcEndpointDocumentationTest
 								fieldWithPath("baseUnit").description("Base unit of the metric"),
 								fieldWithPath("measurements").description("Measurements of the metric"),
 								fieldWithPath("measurements[].statistic").description(
-										"Statistic of the measurement. (" + describeEnumValues(Statistic.class) + ")."),
+										new StringBuilder().append("Statistic of the measurement. (").append(describeEnumValues(Statistic.class)).append(").").toString()),
 								fieldWithPath("measurements[].value").description("Value of the measurement."),
 								fieldWithPath("availableTags").description("Tags that are available for drill-down."),
 								fieldWithPath("availableTags[].tag").description("Name of the tag."),

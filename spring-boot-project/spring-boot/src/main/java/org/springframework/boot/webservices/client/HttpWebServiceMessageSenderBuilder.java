@@ -111,7 +111,8 @@ public class HttpWebServiceMessageSenderBuilder {
 				return method;
 			}
 			throw new IllegalStateException(
-					"Request factory " + factory.getClass() + " does not have a " + this.methodName + "(int) method");
+					new StringBuilder().append("Request factory ").append(factory.getClass()).append(" does not have a ").append(this.methodName).append("(int) method")
+							.toString());
 		}
 
 	}

@@ -98,14 +98,14 @@ public final class AnsiColors {
 	}
 
 	private Map<AnsiElement, LabColor> getLookup(BitDepth bitDepth) {
-		if (bitDepth == BitDepth.EIGHT) {
-			Map<Ansi8BitColor, LabColor> lookup = new LinkedHashMap<>();
-			for (int i = 0; i < ANSI_8BIT_COLOR_CODE_LOOKUP.length; i++) {
-				lookup.put(Ansi8BitColor.foreground(i), new LabColor(ANSI_8BIT_COLOR_CODE_LOOKUP[i]));
-			}
-			return Collections.unmodifiableMap(lookup);
+		if (bitDepth != BitDepth.EIGHT) {
+			return ANSI_COLOR_MAP;
 		}
-		return ANSI_COLOR_MAP;
+		Map<Ansi8BitColor, LabColor> lookup = new LinkedHashMap<>();
+		for (int i = 0; i < ANSI_8BIT_COLOR_CODE_LOOKUP.length; i++) {
+			lookup.put(Ansi8BitColor.foreground(i), new LabColor(ANSI_8BIT_COLOR_CODE_LOOKUP[i]));
+		}
+		return Collections.unmodifiableMap(lookup);
 	}
 
 	/**
@@ -139,6 +139,40 @@ public final class AnsiColors {
 	@Deprecated
 	public static AnsiColor getClosest(Color color) {
 		return (AnsiColor) new AnsiColors(BitDepth.FOUR).findClosest(color);
+	}
+
+	/**
+	 * Bit depths supported by this class.
+	 */
+	public enum BitDepth {
+
+		/**
+		 * 4 bits (16 color).
+		 * @see AnsiColor
+		 */
+		FOUR(4),
+
+		/**
+		 * 8 bits (256 color).
+		 * @see Ansi8BitColor
+		 */
+		EIGHT(8);
+
+		private final int bits;
+
+		BitDepth(int bits) {
+			this.bits = bits;
+		}
+
+		public static BitDepth of(int bits) {
+			for (BitDepth candidate : values()) {
+				if (candidate.bits == bits) {
+					return candidate;
+				}
+			}
+			throw new IllegalArgumentException(new StringBuilder().append("Unsupported ANSI bit depth '").append(bits).append("'").toString());
+		}
+
 	}
 
 	/**
@@ -190,40 +224,6 @@ public final class AnsiColors {
 			double deltaH = Math.sqrt(Math.max(0.0, deltaA * deltaA + deltaB * deltaB - deltaC * deltaC));
 			return Math.sqrt(Math.max(0.0, Math.pow((this.l - other.l) / (1.0), 2)
 					+ Math.pow(deltaC / (1 + 0.045 * c1), 2) + Math.pow(deltaH / (1 + 0.015 * c1), 2.0)));
-		}
-
-	}
-
-	/**
-	 * Bit depths supported by this class.
-	 */
-	public enum BitDepth {
-
-		/**
-		 * 4 bits (16 color).
-		 * @see AnsiColor
-		 */
-		FOUR(4),
-
-		/**
-		 * 8 bits (256 color).
-		 * @see Ansi8BitColor
-		 */
-		EIGHT(8);
-
-		private final int bits;
-
-		BitDepth(int bits) {
-			this.bits = bits;
-		}
-
-		public static BitDepth of(int bits) {
-			for (BitDepth candidate : values()) {
-				if (candidate.bits == bits) {
-					return candidate;
-				}
-			}
-			throw new IllegalArgumentException("Unsupported ANSI bit depth '" + bits + "'");
 		}
 
 	}

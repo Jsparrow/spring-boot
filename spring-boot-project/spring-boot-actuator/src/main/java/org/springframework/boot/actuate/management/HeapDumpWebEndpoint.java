@@ -45,6 +45,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Web {@link Endpoint @Endpoint} to expose heap dumps.
@@ -57,6 +59,8 @@ import org.springframework.util.ReflectionUtils;
  */
 @WebEndpoint(id = "heapdump")
 public class HeapDumpWebEndpoint {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(HeapDumpWebEndpoint.class);
 
 	private final long timeout;
 
@@ -85,12 +89,15 @@ public class HeapDumpWebEndpoint {
 			}
 		}
 		catch (InterruptedException ex) {
+			logger1.error(ex.getMessage(), ex);
 			Thread.currentThread().interrupt();
 		}
 		catch (IOException ex) {
+			logger1.error(ex.getMessage(), ex);
 			return new WebEndpointResponse<>(WebEndpointResponse.STATUS_INTERNAL_SERVER_ERROR);
 		}
 		catch (HeapDumperUnavailableException ex) {
+			logger1.error(ex.getMessage(), ex);
 			return new WebEndpointResponse<>(WebEndpointResponse.STATUS_SERVICE_UNAVAILABLE);
 		}
 		return new WebEndpointResponse<>(WebEndpointResponse.STATUS_TOO_MANY_REQUESTS);
@@ -107,7 +114,7 @@ public class HeapDumpWebEndpoint {
 
 	private File createTempFile(boolean live) throws IOException {
 		String date = new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(new Date());
-		File file = File.createTempFile("heapdump" + date + (live ? "-live" : ""), ".hprof");
+		File file = File.createTempFile(new StringBuilder().append("heapdump").append(date).append(live ? "-live" : "").toString(), ".hprof");
 		file.delete();
 		return file;
 	}
@@ -117,7 +124,7 @@ public class HeapDumpWebEndpoint {
 	 * @return the heap dumper to use
 	 * @throws HeapDumperUnavailableException if the heap dumper cannot be created
 	 */
-	protected HeapDumper createHeapDumper() throws HeapDumperUnavailableException {
+	protected HeapDumper createHeapDumper() {
 		return new HotSpotDiagnosticMXBeanHeapDumper();
 	}
 
@@ -240,7 +247,7 @@ public class HeapDumpWebEndpoint {
 			}
 			catch (IOException ex) {
 				TemporaryFileSystemResource.this.logger
-						.warn("Failed to delete temporary heap dump file '" + getFile() + "'", ex);
+						.warn(new StringBuilder().append("Failed to delete temporary heap dump file '").append(getFile()).append("'").toString(), ex);
 			}
 		}
 

@@ -43,6 +43,8 @@ import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Banner implementation that prints ASCII art generated from an image resource
@@ -55,6 +57,8 @@ import org.springframework.util.Assert;
  * @since 1.4.0
  */
 public class ImageBanner implements Banner {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(ImageBanner.class);
 
 	private static final String PROPERTY_PREFIX = "spring.banner.image.";
 
@@ -78,8 +82,8 @@ public class ImageBanner implements Banner {
 			printBanner(environment, out);
 		}
 		catch (Throwable ex) {
-			logger.warn("Image banner not printable: " + this.image + " (" + ex.getClass() + ": '" + ex.getMessage()
-					+ "')");
+			logger.warn(new StringBuilder().append("Image banner not printable: ").append(this.image).append(" (").append(ex.getClass()).append(": '")
+					.append(ex.getMessage()).append("')").toString());
 			logger.debug("Image banner printing failure", ex);
 		}
 		finally {
@@ -194,7 +198,7 @@ public class ImageBanner implements Banner {
 
 	private void resetCursor(BufferedImage image, PrintStream out) {
 		int lines = image.getHeight() + 3;
-		out.print("\033[" + lines + "A\r");
+		out.print(new StringBuilder().append("\033[").append(lines).append("A\r").toString());
 	}
 
 	private void printBanner(BufferedImage image, int margin, boolean invert, BitDepth bitDepth, PixelMode pixelMode,
@@ -256,29 +260,9 @@ public class ImageBanner implements Banner {
 			Thread.sleep(delay);
 		}
 		catch (InterruptedException ex) {
+			logger1.error(ex.getMessage(), ex);
 			Thread.currentThread().interrupt();
 		}
-	}
-
-	private static class Frame {
-
-		private final BufferedImage image;
-
-		private final int delayTime;
-
-		Frame(BufferedImage image, int delayTime) {
-			this.image = image;
-			this.delayTime = delayTime;
-		}
-
-		BufferedImage getImage() {
-			return this.image;
-		}
-
-		int getDelayTime() {
-			return this.delayTime;
-		}
-
 	}
 
 	/**
@@ -304,6 +288,27 @@ public class ImageBanner implements Banner {
 
 		char[] getPixels() {
 			return this.pixels;
+		}
+
+	}
+
+	private static class Frame {
+
+		private final BufferedImage image;
+
+		private final int delayTime;
+
+		Frame(BufferedImage image, int delayTime) {
+			this.image = image;
+			this.delayTime = delayTime;
+		}
+
+		BufferedImage getImage() {
+			return this.image;
+		}
+
+		int getDelayTime() {
+			return this.delayTime;
 		}
 
 	}

@@ -40,12 +40,7 @@ public class InMemoryCustomerRepository implements CustomerRepository {
 
 	@Override
 	public Customer findOne(Long id) {
-		for (Customer customer : this.customers) {
-			if (ObjectUtils.nullSafeEquals(customer.getId(), id)) {
-				return customer;
-			}
-		}
-		return null;
+		return this.customers.stream().filter(customer -> ObjectUtils.nullSafeEquals(customer.getId(), id)).findFirst().orElse(null);
 	}
 
 }

@@ -33,6 +33,8 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyS
 import org.springframework.boot.context.properties.source.ConfigurationPropertyState;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link DataObjectBinder} for mutable Java Beans.
@@ -156,11 +158,12 @@ class JavaBeanBinder implements DataObjectBinder {
 
 		private void addMethodIfPossible(Method method, String prefix, int parameterCount,
 				BiConsumer<BeanProperty, Method> consumer) {
-			if (method != null && method.getParameterCount() == parameterCount && method.getName().startsWith(prefix)
-					&& method.getName().length() > prefix.length()) {
-				String propertyName = Introspector.decapitalize(method.getName().substring(prefix.length()));
-				consumer.accept(this.properties.computeIfAbsent(propertyName, this::getBeanProperty), method);
+			if (!(method != null && method.getParameterCount() == parameterCount && method.getName().startsWith(prefix)
+					&& method.getName().length() > prefix.length())) {
+				return;
 			}
+			String propertyName = Introspector.decapitalize(method.getName().substring(prefix.length()));
+			consumer.accept(this.properties.computeIfAbsent(propertyName, this::getBeanProperty), method);
 		}
 
 		private BeanProperty getBeanProperty(String name) {
@@ -260,6 +263,8 @@ class JavaBeanBinder implements DataObjectBinder {
 	 */
 	static class BeanProperty {
 
+		private final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
+
 		private final String name;
 
 		private final ResolvableType declaringClassType;
@@ -315,6 +320,7 @@ class JavaBeanBinder implements DataObjectBinder {
 				return (this.field != null) ? this.field.getDeclaredAnnotations() : null;
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				return null;
 			}
 		}

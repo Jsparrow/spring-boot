@@ -65,6 +65,16 @@ class JerseyAutoConfigurationCustomObjectMapperProviderTests {
 		assertThat("{\"subject\":\"Jersey\"}").isEqualTo(response.getBody());
 	}
 
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@Configuration
+	@Import({ ServletWebServerFactoryAutoConfiguration.class, JacksonAutoConfiguration.class,
+			JerseyAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
+	protected @interface MinimalWebConfiguration {
+
+	}
+
 	@MinimalWebConfiguration
 	@ApplicationPath("/rest")
 	@Path("/message")
@@ -111,16 +121,6 @@ class JerseyAutoConfigurationCustomObjectMapperProviderTests {
 		public void setBody(String body) {
 			this.body = body;
 		}
-
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@Configuration
-	@Import({ ServletWebServerFactoryAutoConfiguration.class, JacksonAutoConfiguration.class,
-			JerseyAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
-	protected @interface MinimalWebConfiguration {
 
 	}
 

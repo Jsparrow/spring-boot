@@ -23,6 +23,8 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sample showcasing the use of {@link CapturedOutput}.
@@ -33,9 +35,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(OutputCaptureExtension.class)
 class OutputCaptureTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(OutputCaptureTests.class);
+
 	@Test
 	void testName(CapturedOutput output) {
-		System.out.println("Hello World!");
+		logger.info("Hello World!");
 		assertThat(output).contains("World");
 	}
 

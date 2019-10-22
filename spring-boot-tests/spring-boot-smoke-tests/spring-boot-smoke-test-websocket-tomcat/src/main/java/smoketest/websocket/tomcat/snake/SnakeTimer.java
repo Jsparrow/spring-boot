@@ -26,11 +26,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sets up the timer for the multi-player snake game WebSocket example.
  */
 public final class SnakeTimer {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(SnakeTimer.class);
 
 	private static final long TICK_DELAY = 100;
 
@@ -87,6 +91,7 @@ public final class SnakeTimer {
 				snake.sendMessage(message);
 			}
 			catch (Throwable ex) {
+				logger1.error(ex.getMessage(), ex);
 				// if Snake#sendMessage fails the client is removed
 				removeSnake(snake);
 			}

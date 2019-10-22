@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.jar.Manifest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Archive} implementation backed by an exploded archive directory.
@@ -43,7 +45,9 @@ import java.util.jar.Manifest;
  */
 public class ExplodedArchive implements Archive {
 
-	private static final Set<String> SKIPPED_NAMES = new HashSet<>(Arrays.asList(".", ".."));
+	private static final Logger logger = LoggerFactory.getLogger(ExplodedArchive.class);
+
+	private static final Set<String> SKIPPED_NAMES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(".", "..")));
 
 	private final File root;
 
@@ -125,6 +129,7 @@ public class ExplodedArchive implements Archive {
 			return getUrl().toString();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return "exploded archive";
 		}
 	}

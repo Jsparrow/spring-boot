@@ -84,9 +84,7 @@ public class AetherGrapeEngine implements GrapeEngine {
 		this.repositories = new ArrayList<>();
 		List<RemoteRepository> remotes = new ArrayList<>(remoteRepositories);
 		Collections.reverse(remotes); // priority is reversed in addRepository
-		for (RemoteRepository repository : remotes) {
-			addRepository(repository);
-		}
+		remotes.forEach(this::addRepository);
 		this.progressReporter = getProgressReporter(this.session, quiet);
 	}
 
@@ -131,9 +129,7 @@ public class AetherGrapeEngine implements GrapeEngine {
 		if (args != null) {
 			List<Map<String, Object>> exclusionMaps = (List<Map<String, Object>>) args.get("excludes");
 			if (exclusionMaps != null) {
-				for (Map<String, Object> exclusionMap : exclusionMaps) {
-					exclusions.add(createExclusion(exclusionMap));
-				}
+				exclusionMaps.forEach(exclusionMap -> exclusions.add(createExclusion(exclusionMap)));
 			}
 		}
 		return exclusions;
@@ -195,17 +191,13 @@ public class AetherGrapeEngine implements GrapeEngine {
 
 	private List<Dependency> getDependencies(DependencyResult dependencyResult) {
 		List<Dependency> dependencies = new ArrayList<>();
-		for (ArtifactResult artifactResult : dependencyResult.getArtifactResults()) {
-			dependencies.add(new Dependency(artifactResult.getArtifact(), JavaScopes.COMPILE));
-		}
+		dependencyResult.getArtifactResults().forEach(artifactResult -> dependencies.add(new Dependency(artifactResult.getArtifact(), JavaScopes.COMPILE)));
 		return dependencies;
 	}
 
 	private List<File> getFiles(DependencyResult dependencyResult) {
 		List<File> files = new ArrayList<>();
-		for (ArtifactResult result : dependencyResult.getArtifactResults()) {
-			files.add(result.getArtifact().getFile());
-		}
+		dependencyResult.getArtifactResults().forEach(result -> files.add(result.getArtifact().getFile()));
 		return files;
 	}
 
@@ -276,9 +268,7 @@ public class AetherGrapeEngine implements GrapeEngine {
 		try {
 			List<File> files = resolve(dependencies);
 			List<URI> uris = new ArrayList<>(files.size());
-			for (File file : files) {
-				uris.add(file.toURI());
-			}
+			files.forEach(file -> uris.add(file.toURI()));
 			return uris.toArray(new URI[0]);
 		}
 		catch (Exception ex) {

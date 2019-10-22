@@ -194,7 +194,7 @@ public abstract class JpaBaseConfiguration implements BeanFactoryAware {
 	}
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 	}
 
@@ -217,9 +217,7 @@ public abstract class JpaBaseConfiguration implements BeanFactoryAware {
 		@Bean
 		public OpenEntityManagerInViewInterceptor openEntityManagerInViewInterceptor() {
 			if (this.jpaProperties.getOpenInView() == null) {
-				logger.warn("spring.jpa.open-in-view is enabled by default. "
-						+ "Therefore, database queries may be performed during view "
-						+ "rendering. Explicitly configure spring.jpa.open-in-view to disable this warning");
+				logger.warn(new StringBuilder().append("spring.jpa.open-in-view is enabled by default. ").append("Therefore, database queries may be performed during view ").append("rendering. Explicitly configure spring.jpa.open-in-view to disable this warning").toString());
 			}
 			return new OpenEntityManagerInViewInterceptor();
 		}

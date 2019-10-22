@@ -172,12 +172,10 @@ public class RabbitProperties {
 	 */
 	public String determineAddresses() {
 		if (CollectionUtils.isEmpty(this.parsedAddresses)) {
-			return this.host + ":" + this.port;
+			return new StringBuilder().append(this.host).append(":").append(this.port).toString();
 		}
 		List<String> addressStrings = new ArrayList<>();
-		for (Address parsedAddress : this.parsedAddresses) {
-			addressStrings.add(parsedAddress.host + ":" + parsedAddress.port);
-		}
+		this.parsedAddresses.forEach(parsedAddress -> addressStrings.add(new StringBuilder().append(parsedAddress.host).append(":").append(parsedAddress.port).toString()));
 		return StringUtils.collectionToCommaDelimitedString(addressStrings);
 	}
 
@@ -278,7 +276,7 @@ public class RabbitProperties {
 	@DeprecatedConfigurationProperty(reason = "replaced to support additional confirm types",
 			replacement = "spring.rabbitmq.publisher-confirm-type")
 	public boolean isPublisherConfirms() {
-		return ConfirmType.CORRELATED.equals(this.publisherConfirmType);
+		return ConfirmType.CORRELATED == this.publisherConfirmType;
 	}
 
 	@Deprecated
@@ -320,6 +318,21 @@ public class RabbitProperties {
 
 	public Template getTemplate() {
 		return this.template;
+	}
+
+	public enum ContainerType {
+
+		/**
+		 * Container where the RabbitMQ consumer dispatches messages to an invoker thread.
+		 */
+		SIMPLE,
+
+		/**
+		 * Container where the listener is invoked directly on the RabbitMQ consumer
+		 * thread.
+		 */
+		DIRECT
+
 	}
 
 	public static class Ssl {
@@ -531,21 +544,6 @@ public class RabbitProperties {
 			}
 
 		}
-
-	}
-
-	public enum ContainerType {
-
-		/**
-		 * Container where the RabbitMQ consumer dispatches messages to an invoker thread.
-		 */
-		SIMPLE,
-
-		/**
-		 * Container where the listener is invoked directly on the RabbitMQ consumer
-		 * thread.
-		 */
-		DIRECT
 
 	}
 

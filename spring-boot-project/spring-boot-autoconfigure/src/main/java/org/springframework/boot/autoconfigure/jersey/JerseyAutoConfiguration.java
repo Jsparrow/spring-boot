@@ -175,12 +175,13 @@ public class JerseyAutoConfiguration implements ServletContextAware {
 	public void setServletContext(ServletContext servletContext) {
 		String servletRegistrationName = getServletRegistrationName();
 		ServletRegistration registration = servletContext.getServletRegistration(servletRegistrationName);
-		if (registration != null) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Configuring existing registration for Jersey servlet '" + servletRegistrationName + "'");
-			}
-			registration.setInitParameters(this.jersey.getInit());
+		if (registration == null) {
+			return;
 		}
+		if (logger.isInfoEnabled()) {
+			logger.info(new StringBuilder().append("Configuring existing registration for Jersey servlet '").append(servletRegistrationName).append("'").toString());
+		}
+		registration.setInitParameters(this.jersey.getInit());
 	}
 
 	@Order(Ordered.HIGHEST_PRECEDENCE)

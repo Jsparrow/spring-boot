@@ -51,6 +51,8 @@ import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Custom {@link URLClassLoader} that modifies the class path.
@@ -59,6 +61,8 @@ import org.springframework.util.StringUtils;
  * @author Christoph Dreis
  */
 final class ModifiedClassPathClassLoader extends URLClassLoader {
+
+	private static final Logger logger = LoggerFactory.getLogger(ModifiedClassPathClassLoader.class);
 
 	private static final Pattern INTELLIJ_CLASSPATH_JAR_PATTERN = Pattern.compile(".*classpath(\\d+)?\\.jar");
 
@@ -131,6 +135,7 @@ final class ModifiedClassPathClassLoader extends URLClassLoader {
 				return createdBy != null && createdBy.contains("IntelliJ");
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 		return false;
@@ -190,7 +195,7 @@ final class ModifiedClassPathClassLoader extends URLClassLoader {
 		DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 		LocalRepository localRepository = new LocalRepository(System.getProperty("user.home") + "/.m2/repository");
 		session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(session, localRepository));
-		CollectRequest collectRequest = new CollectRequest(null, Arrays.asList(
+		CollectRequest collectRequest = new CollectRequest(null, Collections.singletonList(
 				new RemoteRepository.Builder("central", "default", "https://repo.maven.apache.org/maven2").build()));
 
 		collectRequest.setDependencies(createDependencies(coordinates));
@@ -204,6 +209,7 @@ final class ModifiedClassPathClassLoader extends URLClassLoader {
 			return resolvedArtifacts;
 		}
 		catch (Exception ignored) {
+			logger.error(ignored.getMessage(), ignored);
 			return Collections.emptyList();
 		}
 	}
@@ -220,6 +226,8 @@ final class ModifiedClassPathClassLoader extends URLClassLoader {
 	 * Filter for class path entries.
 	 */
 	private static final class ClassPathEntryFilter {
+
+		private final Logger logger1 = LoggerFactory.getLogger(ClassPathEntryFilter.class);
 
 		private final List<String> exclusions;
 
@@ -244,6 +252,7 @@ final class ModifiedClassPathClassLoader extends URLClassLoader {
 					}
 				}
 				catch (URISyntaxException ex) {
+					logger1.error(ex.getMessage(), ex);
 				}
 			}
 			return false;

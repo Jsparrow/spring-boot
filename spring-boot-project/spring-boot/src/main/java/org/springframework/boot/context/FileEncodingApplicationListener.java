@@ -63,16 +63,13 @@ public class FileEncodingApplicationListener
 		}
 		String encoding = System.getProperty("file.encoding");
 		String desired = environment.getProperty("spring.mandatory-file-encoding");
-		if (encoding != null && !desired.equalsIgnoreCase(encoding)) {
-			logger.error("System property 'file.encoding' is currently '" + encoding + "'. It should be '" + desired
-					+ "' (as defined in 'spring.mandatoryFileEncoding').");
-			logger.error("Environment variable LANG is '" + System.getenv("LANG")
-					+ "'. You could use a locale setting that matches encoding='" + desired + "'.");
-			logger.error("Environment variable LC_ALL is '" + System.getenv("LC_ALL")
-					+ "'. You could use a locale setting that matches encoding='" + desired + "'.");
-			throw new IllegalStateException("The Java Virtual Machine has not been configured to use the "
-					+ "desired default character encoding (" + desired + ").");
+		if (!(encoding != null && !desired.equalsIgnoreCase(encoding))) {
+			return;
 		}
+		logger.error(new StringBuilder().append("System property 'file.encoding' is currently '").append(encoding).append("'. It should be '").append(desired).append("' (as defined in 'spring.mandatoryFileEncoding').").toString());
+		logger.error(new StringBuilder().append("Environment variable LANG is '").append(System.getenv("LANG")).append("'. You could use a locale setting that matches encoding='").append(desired).append("'.").toString());
+		logger.error(new StringBuilder().append("Environment variable LC_ALL is '").append(System.getenv("LC_ALL")).append("'. You could use a locale setting that matches encoding='").append(desired).append("'.").toString());
+		throw new IllegalStateException(new StringBuilder().append("The Java Virtual Machine has not been configured to use the ").append("desired default character encoding (").append(desired).append(").").toString());
 	}
 
 }

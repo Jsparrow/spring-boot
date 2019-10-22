@@ -88,10 +88,11 @@ final class SummaryProgressReporter implements ProgressReporter {
 
 	@Override
 	public void finished() {
-		if (this.started && !this.finished) {
-			this.finished = true;
-			this.out.println();
+		if (!(this.started && !this.finished)) {
+			return;
 		}
+		this.finished = true;
+		this.out.println();
 	}
 
 }

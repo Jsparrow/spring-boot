@@ -265,7 +265,7 @@ class DefaultErrorWebExceptionHandlerIntegrationTests {
 
 	private String getErrorTemplatesLocation() {
 		String packageName = getClass().getPackage().getName();
-		return "classpath:/" + packageName.replace('.', '/') + "/templates/";
+		return new StringBuilder().append("classpath:/").append(packageName.replace('.', '/')).append("/templates/").toString();
 	}
 
 	private WebTestClient getWebClient(AssertableReactiveWebApplicationContext context) {

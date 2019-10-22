@@ -42,7 +42,7 @@ class WebFluxDifferentPortSampleActuatorApplicationTests {
 	@Test
 	void linksEndpointShouldBeAvailable() {
 		ResponseEntity<String> entity = new TestRestTemplate("user", getPassword())
-				.getForEntity("http://localhost:" + this.managementPort + "/", String.class);
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/").toString(), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).contains("\"_links\"");
 	}

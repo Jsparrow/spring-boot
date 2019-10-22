@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -54,6 +53,8 @@ import org.springframework.boot.ansi.AnsiColor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Integration tests for Spring Boot's launch script on OSs that use SysVinit.
@@ -63,9 +64,11 @@ import static org.hamcrest.Matchers.containsString;
  */
 public class SysVinitLaunchScriptIT {
 
-	private final SpringBootDockerCmdExecFactory commandExecFactory = new SpringBootDockerCmdExecFactory();
+	private static final Logger logger = LoggerFactory.getLogger(SysVinitLaunchScriptIT.class);
 
 	private static final char ESC = 27;
+
+	private final SpringBootDockerCmdExecFactory commandExecFactory = new SpringBootDockerCmdExecFactory();
 
 	@ParameterizedTest(name = "{0} {1}")
 	@MethodSource("parameters")
@@ -80,7 +83,7 @@ public class SysVinitLaunchScriptIT {
 	public void statusWhenStarted(String os, String version) throws Exception {
 		String output = doTest(os, version, "status-when-started.sh");
 		assertThat(output).contains("Status: 0");
-		assertThat(output).has(coloredString(AnsiColor.GREEN, "Started [" + extractPid(output) + "]"));
+		assertThat(output).has(coloredString(AnsiColor.GREEN, new StringBuilder().append("Started [").append(extractPid(output)).append("]").toString()));
 	}
 
 	@ParameterizedTest(name = "{0} {1}")
@@ -89,7 +92,7 @@ public class SysVinitLaunchScriptIT {
 		String output = doTest(os, version, "status-when-killed.sh");
 		assertThat(output).contains("Status: 1");
 		assertThat(output)
-				.has(coloredString(AnsiColor.RED, "Not running (process " + extractPid(output) + " not found)"));
+				.has(coloredString(AnsiColor.RED, new StringBuilder().append("Not running (process ").append(extractPid(output)).append(" not found)").toString()));
 	}
 
 	@ParameterizedTest(name = "{0} {1}")
@@ -113,7 +116,7 @@ public class SysVinitLaunchScriptIT {
 	public void startWhenStarted(String os, String version) throws Exception {
 		String output = doTest(os, version, "start-when-started.sh");
 		assertThat(output).contains("Status: 0");
-		assertThat(output).has(coloredString(AnsiColor.YELLOW, "Already running [" + extractPid(output) + "]"));
+		assertThat(output).has(coloredString(AnsiColor.YELLOW, new StringBuilder().append("Already running [").append(extractPid(output)).append("]").toString()));
 	}
 
 	@ParameterizedTest(name = "{0} {1}")
@@ -122,7 +125,7 @@ public class SysVinitLaunchScriptIT {
 		String output = doTest(os, version, "restart-when-stopped.sh");
 		assertThat(output).contains("Status: 0");
 		assertThat(output).has(coloredString(AnsiColor.YELLOW, "Not running (pidfile not found)"));
-		assertThat(output).has(coloredString(AnsiColor.GREEN, "Started [" + extractPid(output) + "]"));
+		assertThat(output).has(coloredString(AnsiColor.GREEN, new StringBuilder().append("Started [").append(extractPid(output)).append("]").toString()));
 	}
 
 	@ParameterizedTest(name = "{0} {1}")
@@ -130,9 +133,9 @@ public class SysVinitLaunchScriptIT {
 	public void restartWhenStarted(String os, String version) throws Exception {
 		String output = doTest(os, version, "restart-when-started.sh");
 		assertThat(output).contains("Status: 0");
-		assertThat(output).has(coloredString(AnsiColor.GREEN, "Started [" + extract("PID1", output) + "]"));
-		assertThat(output).has(coloredString(AnsiColor.GREEN, "Stopped [" + extract("PID1", output) + "]"));
-		assertThat(output).has(coloredString(AnsiColor.GREEN, "Started [" + extract("PID2", output) + "]"));
+		assertThat(output).has(coloredString(AnsiColor.GREEN, new StringBuilder().append("Started [").append(extract("PID1", output)).append("]").toString()));
+		assertThat(output).has(coloredString(AnsiColor.GREEN, new StringBuilder().append("Stopped [").append(extract("PID1", output)).append("]").toString()));
+		assertThat(output).has(coloredString(AnsiColor.GREEN, new StringBuilder().append("Started [").append(extract("PID2", output)).append("]").toString()));
 	}
 
 	@ParameterizedTest(name = "{0} {1}")
@@ -140,7 +143,7 @@ public class SysVinitLaunchScriptIT {
 	public void startWhenStopped(String os, String version) throws Exception {
 		String output = doTest(os, version, "start-when-stopped.sh");
 		assertThat(output).contains("Status: 0");
-		assertThat(output).has(coloredString(AnsiColor.GREEN, "Started [" + extractPid(output) + "]"));
+		assertThat(output).has(coloredString(AnsiColor.GREEN, new StringBuilder().append("Started [").append(extractPid(output)).append("]").toString()));
 	}
 
 	@ParameterizedTest(name = "{0} {1}")
@@ -212,7 +215,7 @@ public class SysVinitLaunchScriptIT {
 	@MethodSource("parameters")
 	public void launchWithUseOfStartStopDaemonDisabled(String os, String version) throws Exception {
 		// CentOS doesn't have start-stop-daemon
-		Assumptions.assumeFalse(os.equals("CentOS"));
+		Assumptions.assumeFalse("CentOS".equals(os));
 		doLaunch(os, version, "launch-with-use-of-start-stop-daemon-disabled.sh");
 	}
 
@@ -220,9 +223,9 @@ public class SysVinitLaunchScriptIT {
 	@MethodSource("parameters")
 	public void launchWithRelativePidFolder(String os, String version) throws Exception {
 		String output = doTest(os, version, "launch-with-relative-pid-folder.sh");
-		assertThat(output).has(coloredString(AnsiColor.GREEN, "Started [" + extractPid(output) + "]"));
-		assertThat(output).has(coloredString(AnsiColor.GREEN, "Running [" + extractPid(output) + "]"));
-		assertThat(output).has(coloredString(AnsiColor.GREEN, "Stopped [" + extractPid(output) + "]"));
+		assertThat(output).has(coloredString(AnsiColor.GREEN, new StringBuilder().append("Started [").append(extractPid(output)).append("]").toString()));
+		assertThat(output).has(coloredString(AnsiColor.GREEN, new StringBuilder().append("Running [").append(extractPid(output)).append("]").toString()));
+		assertThat(output).has(coloredString(AnsiColor.GREEN, new StringBuilder().append("Stopped [").append(extractPid(output)).append("]").toString()));
 	}
 
 	@ParameterizedTest(name = "{0} {1}")
@@ -342,6 +345,7 @@ public class SysVinitLaunchScriptIT {
 				docker.removeContainerCmd(container).exec();
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				// Continue
 			}
 		}
@@ -354,8 +358,8 @@ public class SysVinitLaunchScriptIT {
 	}
 
 	private String buildImage(String os, String version, DockerClient docker) {
-		String dockerfile = "src/test/resources/conf/" + os + "/" + version + "/Dockerfile";
-		String tag = "spring-boot-it/" + os.toLowerCase(Locale.ENGLISH) + ":" + version;
+		String dockerfile = new StringBuilder().append("src/test/resources/conf/").append(os).append("/").append(version).append("/Dockerfile").toString();
+		String tag = new StringBuilder().append("spring-boot-it/").append(os.toLowerCase(Locale.ENGLISH)).append(":").append(version).toString();
 		BuildImageResultCallback resultCallback = new BuildImageResultCallback() {
 
 			private List<BuildResponseItem> items = new ArrayList<>();
@@ -404,23 +408,23 @@ public class SysVinitLaunchScriptIT {
 			}
 
 		};
-		docker.buildImageCmd(new File(dockerfile)).withTags(new HashSet<>(Arrays.asList(tag))).exec(resultCallback);
+		docker.buildImageCmd(new File(dockerfile)).withTags(new HashSet<>(Collections.singletonList(tag))).exec(resultCallback);
 		String imageId = resultCallback.awaitImageId();
 		return imageId;
 	}
 
 	private String createContainer(DockerClient docker, String imageId, String testScript) {
 		return docker.createContainerCmd(imageId).withTty(false)
-				.withCmd("/bin/bash", "-c", "chmod +x " + testScript + " && ./" + testScript).exec().getId();
+				.withCmd("/bin/bash", "-c", new StringBuilder().append("chmod +x ").append(testScript).append(" && ./").append(testScript).toString()).exec().getId();
 	}
 
 	private void copyFilesToContainer(DockerClient docker, final String container, String script) {
-		copyToContainer(docker, container, findApplication());
-		copyToContainer(docker, container, new File("src/test/resources/scripts/test-functions.sh"));
-		copyToContainer(docker, container, new File("src/test/resources/scripts/" + script));
+		copyToContainer(container, findApplication());
+		copyToContainer(container, new File("src/test/resources/scripts/test-functions.sh"));
+		copyToContainer(container, new File("src/test/resources/scripts/" + script));
 	}
 
-	private void copyToContainer(DockerClient docker, final String container, final File file) {
+	private void copyToContainer(final String container, final File file) {
 		this.commandExecFactory.createCopyToContainerCmdExec().exec(new CopyToContainerCmd(container, file));
 	}
 
@@ -437,7 +441,8 @@ public class SysVinitLaunchScriptIT {
 	}
 
 	private Condition<String> coloredString(AnsiColor color, String string) {
-		String colorString = ESC + "[0;" + color + "m" + string + ESC + "[0m";
+		String colorString = new StringBuilder().append(ESC).append("[0;").append(color).append("m").append(string).append(ESC)
+				.append("[0m").toString();
 		return new Condition<String>() {
 
 			@Override
@@ -453,12 +458,12 @@ public class SysVinitLaunchScriptIT {
 	}
 
 	private String extract(String label, String output) {
-		Pattern pattern = Pattern.compile(".*" + label + ": ([0-9]+).*", Pattern.DOTALL);
+		Pattern pattern = Pattern.compile(new StringBuilder().append(".*").append(label).append(": ([0-9]+).*").toString(), Pattern.DOTALL);
 		java.util.regex.Matcher matcher = pattern.matcher(output);
 		if (matcher.matches()) {
 			return matcher.group(1);
 		}
-		throw new IllegalArgumentException("Failed to extract " + label + " from output: " + output);
+		throw new IllegalArgumentException(new StringBuilder().append("Failed to extract ").append(label).append(" from output: ").append(output).toString());
 	}
 
 	private static final class CopyToContainerCmdExec extends AbstrSyncDockerCmdExec<CopyToContainerCmd, Void> {
@@ -471,7 +476,7 @@ public class SysVinitLaunchScriptIT {
 		protected Void execute(CopyToContainerCmd command) {
 			try (InputStream streamToUpload = new FileInputStream(
 					CompressArchiveUtil.archiveTARFiles(command.getFile().getParentFile(),
-							Arrays.asList(command.getFile()), command.getFile().getName()))) {
+							Collections.singletonList(command.getFile()), command.getFile().getName()))) {
 				WebTarget webResource = getBaseResource().path("/containers/{id}/archive").resolveTemplate("id",
 						command.getContainer());
 				webResource.queryParam("path", ".").queryParam("noOverwriteDirNonDir", false).request()

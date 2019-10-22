@@ -111,18 +111,18 @@ public final class Verify {
 		public void assertHasNoEntryNameStartingWith(String entry) {
 			for (String name : this.content.keySet()) {
 				if (name.startsWith(entry)) {
-					throw new IllegalStateException("Entry starting with " + entry + " should not have been found");
+					throw new IllegalStateException(new StringBuilder().append("Entry starting with ").append(entry).append(" should not have been found").toString());
 				}
 			}
 		}
 
 		public void assertHasNonUnpackEntry(String entryName) {
-			assertThat(hasNonUnpackEntry(entryName)).as("Entry starting with " + entryName + " was an UNPACK entry")
+			assertThat(hasNonUnpackEntry(entryName)).as(new StringBuilder().append("Entry starting with ").append(entryName).append(" was an UNPACK entry").toString())
 					.isTrue();
 		}
 
 		public void assertHasUnpackEntry(String entryName) {
-			assertThat(hasUnpackEntry(entryName)).as("Entry starting with " + entryName + " was not an UNPACK entry")
+			assertThat(hasUnpackEntry(entryName)).as(new StringBuilder().append("Entry starting with ").append(entryName).append(" was not an UNPACK entry").toString())
 					.isTrue();
 		}
 
@@ -152,7 +152,7 @@ public final class Verify {
 		public InputStream getEntryContent(String entry) throws IOException {
 			ZipEntry zipEntry = getEntry(entry);
 			if (zipEntry == null) {
-				throw new IllegalArgumentException("No entry with name [" + entry + "]");
+				throw new IllegalArgumentException(new StringBuilder().append("No entry with name [").append(entry).append("]").toString());
 			}
 			return this.zipFile.getInputStream(zipEntry);
 		}

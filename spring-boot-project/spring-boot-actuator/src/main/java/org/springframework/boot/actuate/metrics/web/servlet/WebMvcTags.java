@@ -28,6 +28,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.pattern.PathPattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory methods for {@link Tag Tags} associated with a request-response exchange that
@@ -40,6 +42,8 @@ import org.springframework.web.util.pattern.PathPattern;
  * @since 2.0.0
  */
 public final class WebMvcTags {
+
+	private static final Logger logger = LoggerFactory.getLogger(WebMvcTags.class);
 
 	private static final String DATA_REST_PATH_PATTERN_ATTRIBUTE = "org.springframework.data.rest.webmvc.RepositoryRestHandlerMapping.EFFECTIVE_REPOSITORY_RESOURCE_LOOKUP_PATH";
 
@@ -123,6 +127,7 @@ public final class WebMvcTags {
 			return HttpStatus.valueOf(response.getStatus());
 		}
 		catch (IllegalArgumentException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -149,11 +154,11 @@ public final class WebMvcTags {
 	 * @return the exception tag derived from the exception
 	 */
 	public static Tag exception(Throwable exception) {
-		if (exception != null) {
-			String simpleName = exception.getClass().getSimpleName();
-			return Tag.of("exception", StringUtils.hasText(simpleName) ? simpleName : exception.getClass().getName());
+		if (exception == null) {
+			return EXCEPTION_NONE;
 		}
-		return EXCEPTION_NONE;
+		String simpleName = exception.getClass().getSimpleName();
+		return Tag.of("exception", StringUtils.hasText(simpleName) ? simpleName : exception.getClass().getName());
 	}
 
 	/**

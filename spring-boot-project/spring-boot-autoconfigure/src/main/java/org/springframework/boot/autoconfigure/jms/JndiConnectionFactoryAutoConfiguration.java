@@ -36,6 +36,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jndi.JndiLocatorDelegate;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for JMS provided from JNDI.
@@ -51,6 +53,7 @@ import org.springframework.util.StringUtils;
 @EnableConfigurationProperties(JmsProperties.class)
 public class JndiConnectionFactoryAutoConfiguration {
 
+	private static final Logger logger = LoggerFactory.getLogger(JndiConnectionFactoryAutoConfiguration.class);
 	// Keep these in sync with the condition below
 	private static final String[] JNDI_LOCATIONS = { "java:/JmsXA", "java:/XAConnectionFactory" };
 
@@ -69,6 +72,7 @@ public class JndiConnectionFactoryAutoConfiguration {
 				return jndiLocatorDelegate.lookup(name, ConnectionFactory.class);
 			}
 			catch (NamingException ex) {
+				logger.error(ex.getMessage(), ex);
 				// Swallow and continue
 			}
 		}

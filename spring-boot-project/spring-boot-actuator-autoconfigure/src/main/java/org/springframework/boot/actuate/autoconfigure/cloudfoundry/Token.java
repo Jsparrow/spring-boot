@@ -105,7 +105,7 @@ public class Token {
 		}
 		if (!type.isInstance(value)) {
 			throw new CloudFoundryAuthorizationException(Reason.INVALID_TOKEN,
-					"Unexpected value type from key " + key + " value " + value);
+					new StringBuilder().append("Unexpected value type from key ").append(key).append(" value ").append(value).toString());
 		}
 		return (T) value;
 	}

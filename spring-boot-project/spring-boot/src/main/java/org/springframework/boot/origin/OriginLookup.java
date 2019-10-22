@@ -16,6 +16,9 @@
 
 package org.springframework.boot.origin;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * An interface that may be implemented by an object that can lookup {@link Origin}
  * information from a given key. Can be used to add origin support to existing classes.
@@ -26,6 +29,8 @@ package org.springframework.boot.origin;
  */
 @FunctionalInterface
 public interface OriginLookup<K> {
+
+	Logger logger = LoggerFactory.getLogger(OriginLookup.class);
 
 	/**
 	 * Return the origin of the given key or {@code null} if the origin cannot be
@@ -63,6 +68,7 @@ public interface OriginLookup<K> {
 			return ((OriginLookup<K>) source).getOrigin(key);
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

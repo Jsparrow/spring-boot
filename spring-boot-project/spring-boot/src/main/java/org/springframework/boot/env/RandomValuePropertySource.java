@@ -76,16 +76,16 @@ public class RandomValuePropertySource extends PropertySource<Random> {
 			return null;
 		}
 		if (logger.isTraceEnabled()) {
-			logger.trace("Generating random property for '" + name + "'");
+			logger.trace(new StringBuilder().append("Generating random property for '").append(name).append("'").toString());
 		}
 		return getRandomValue(name.substring(PREFIX.length()));
 	}
 
 	private Object getRandomValue(String type) {
-		if (type.equals("int")) {
+		if ("int".equals(type)) {
 			return getSource().nextInt();
 		}
-		if (type.equals("long")) {
+		if ("long".equals(type)) {
 			return getSource().nextLong();
 		}
 		String range = getRange(type, "int");
@@ -96,7 +96,7 @@ public class RandomValuePropertySource extends PropertySource<Random> {
 		if (range != null) {
 			return getNextLongInRange(range);
 		}
-		if (type.equals("uuid")) {
+		if ("uuid".equals(type)) {
 			return UUID.randomUUID().toString();
 		}
 		return getRandomBytes();

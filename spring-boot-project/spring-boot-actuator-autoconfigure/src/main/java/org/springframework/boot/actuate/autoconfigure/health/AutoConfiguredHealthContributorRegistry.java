@@ -49,7 +49,7 @@ class AutoConfiguredHealthContributorRegistry extends DefaultHealthContributorRe
 
 	private void assertDoesNotClashWithGroup(String name) {
 		Assert.state(!this.groupNames.contains(name),
-				() -> "HealthContributor with name \"" + name + "\" clashes with group");
+				() -> new StringBuilder().append("HealthContributor with name \"").append(name).append("\" clashes with group").toString());
 	}
 
 }

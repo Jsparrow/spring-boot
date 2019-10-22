@@ -216,6 +216,21 @@ public class WebMvcProperties {
 		return this.pathmatch;
 	}
 
+	public enum LocaleResolver {
+
+		/**
+		 * Always use the configured locale.
+		 */
+		FIXED,
+
+		/**
+		 * Use the "Accept-Language" header or the configured locale if the header is not
+		 * set.
+		 */
+		ACCEPT_HEADER
+
+	}
+
 	public static class Async {
 
 		/**
@@ -266,7 +281,7 @@ public class WebMvcProperties {
 		}
 
 		public String getServletMapping() {
-			if (this.path.equals("") || this.path.equals("/")) {
+			if ("".equals(this.path) || "/".equals(this.path)) {
 				return "/";
 			}
 			if (this.path.endsWith("/")) {
@@ -418,21 +433,6 @@ public class WebMvcProperties {
 		public void setUseRegisteredSuffixPattern(boolean useRegisteredSuffixPattern) {
 			this.useRegisteredSuffixPattern = useRegisteredSuffixPattern;
 		}
-
-	}
-
-	public enum LocaleResolver {
-
-		/**
-		 * Always use the configured locale.
-		 */
-		FIXED,
-
-		/**
-		 * Use the "Accept-Language" header or the configured locale if the header is not
-		 * set.
-		 */
-		ACCEPT_HEADER
 
 	}
 

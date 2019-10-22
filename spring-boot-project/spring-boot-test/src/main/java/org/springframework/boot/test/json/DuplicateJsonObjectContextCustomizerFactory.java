@@ -29,6 +29,8 @@ import org.springframework.test.context.ContextConfigurationAttributes;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.ContextCustomizerFactory;
 import org.springframework.test.context.MergedContextConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ContextCustomizerFactory} that produces a {@link ContextCustomizer} that warns
@@ -46,6 +48,7 @@ class DuplicateJsonObjectContextCustomizerFactory implements ContextCustomizerFa
 
 	private static class DuplicateJsonObjectContextCustomizer implements ContextCustomizer {
 
+		private final Logger logger1 = LoggerFactory.getLogger(DuplicateJsonObjectContextCustomizer.class);
 		private final Log logger = LogFactory.getLog(DuplicateJsonObjectContextCustomizer.class);
 
 		@Override
@@ -62,6 +65,7 @@ class DuplicateJsonObjectContextCustomizerFactory implements ContextCustomizerFa
 				return Collections.list(resources);
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				// Continue
 			}
 			return Collections.emptyList();
@@ -70,9 +74,7 @@ class DuplicateJsonObjectContextCustomizerFactory implements ContextCustomizerFa
 		private void logDuplicateJsonObjectsWarning(List<URL> jsonObjects) {
 			StringBuilder message = new StringBuilder(
 					String.format("%n%nFound multiple occurrences of org.json.JSONObject on the class path:%n%n"));
-			for (URL jsonObject : jsonObjects) {
-				message.append(String.format("\t%s%n", jsonObject));
-			}
+			jsonObjects.forEach(jsonObject -> message.append(String.format("\t%s%n", jsonObject)));
 			message.append(
 					String.format("%nYou may wish to exclude one of them to ensure predictable runtime behavior%n"));
 			this.logger.warn(message);

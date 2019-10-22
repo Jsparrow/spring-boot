@@ -189,10 +189,8 @@ public class DispatcherServletsMappingDescriptionProvider implements MappingDesc
 		@Override
 		public List<DispatcherServletMappingDescription> describe(DelegatingHandlerMapping handlerMapping) {
 			List<DispatcherServletMappingDescription> descriptions = new ArrayList<>();
-			for (HandlerMapping delegate : handlerMapping.getDelegates()) {
-				descriptions.addAll(
-						DispatcherServletsMappingDescriptionProvider.describe(delegate, this.descriptionProviders));
-			}
+			handlerMapping.getDelegates().forEach(delegate -> descriptions
+					.addAll(DispatcherServletsMappingDescriptionProvider.describe(delegate, this.descriptionProviders)));
 			return descriptions;
 		}
 

@@ -44,6 +44,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriTemplateHandler;
+import java.util.Collections;
 
 /**
  * {@link TestTemplateInvocationContextProvider} for templated
@@ -54,7 +55,7 @@ import org.springframework.web.util.UriTemplateHandler;
 class EmbeddedServerContainerInvocationContextProvider
 		implements TestTemplateInvocationContextProvider, AfterAllCallback {
 
-	private static final Set<String> CONTAINERS = new HashSet<>(Arrays.asList("jetty", "tomcat", "undertow"));
+	private static final Set<String> CONTAINERS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("jetty", "tomcat", "undertow")));
 
 	private static final BuildOutput buildOutput = new BuildOutput(
 			EmbeddedServerContainerInvocationContextProvider.class);
@@ -83,8 +84,7 @@ class EmbeddedServerContainerInvocationContextProvider
 										(launcherClass) -> ReflectionUtils.newInstance(launcherClass, builder,
 												buildOutput))
 								.map((launcher) -> new EmbeddedServletContainerInvocationContext(
-										StringUtils.capitalize(builder.getContainer()) + ": "
-												+ launcher.getDescription(builder.getPackaging()),
+										new StringBuilder().append(StringUtils.capitalize(builder.getContainer())).append(": ").append(launcher.getDescription(builder.getPackaging())).toString(),
 										launcher)));
 	}
 
@@ -115,8 +115,7 @@ class EmbeddedServerContainerInvocationContextProvider
 		}
 
 		@Override
-		public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
-				throws ParameterResolutionException {
+		public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
 			if (parameterContext.getParameter().getType().equals(AbstractApplicationLauncher.class)) {
 				return true;
 			}
@@ -127,8 +126,7 @@ class EmbeddedServerContainerInvocationContextProvider
 		}
 
 		@Override
-		public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
-				throws ParameterResolutionException {
+		public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
 			if (parameterContext.getParameter().getType().equals(AbstractApplicationLauncher.class)) {
 				return this.launcher;
 			}
@@ -146,14 +144,12 @@ class EmbeddedServerContainerInvocationContextProvider
 		}
 
 		@Override
-		public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
-				throws ParameterResolutionException {
+		public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
 			return parameterContext.getParameter().getType().equals(RestTemplate.class);
 		}
 
 		@Override
-		public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
-				throws ParameterResolutionException {
+		public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
 			RestTemplate rest = new RestTemplate();
 			rest.setErrorHandler(new ResponseErrorHandler() {
 
@@ -172,14 +168,12 @@ class EmbeddedServerContainerInvocationContextProvider
 
 				@Override
 				public URI expand(String uriTemplate, Object... uriVariables) {
-					return URI.create("http://localhost:" + RestTemplateParameterResolver.this.launcher.getHttpPort()
-							+ uriTemplate);
+					return URI.create(new StringBuilder().append("http://localhost:").append(RestTemplateParameterResolver.this.launcher.getHttpPort()).append(uriTemplate).toString());
 				}
 
 				@Override
 				public URI expand(String uriTemplate, Map<String, ?> uriVariables) {
-					return URI.create("http://localhost:" + RestTemplateParameterResolver.this.launcher.getHttpPort()
-							+ uriTemplate);
+					return URI.create(new StringBuilder().append("http://localhost:").append(RestTemplateParameterResolver.this.launcher.getHttpPort()).append(uriTemplate).toString());
 				}
 
 			});

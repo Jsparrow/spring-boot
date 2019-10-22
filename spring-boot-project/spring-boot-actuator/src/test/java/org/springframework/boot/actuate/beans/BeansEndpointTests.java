@@ -71,9 +71,7 @@ class BeansEndpointTests {
 			ApplicationBeans result = context.getBean(BeansEndpoint.class).beans();
 			ContextBeans contextDescriptor = result.getContexts().get(context.getId());
 			Map<String, BeanDescriptor> beans = contextDescriptor.getBeans();
-			for (String infrastructureBean : infrastructureBeans) {
-				assertThat(beans).doesNotContainKey(infrastructureBean);
-			}
+			infrastructureBeans.forEach(infrastructureBean -> assertThat(beans).doesNotContainKey(infrastructureBean));
 		});
 	}
 
@@ -93,14 +91,12 @@ class BeansEndpointTests {
 	void beansInParentContextAreFound() {
 		ApplicationContextRunner parentRunner = new ApplicationContextRunner()
 				.withUserConfiguration(BeanConfiguration.class);
-		parentRunner.run((parent) -> {
-			new ApplicationContextRunner().withUserConfiguration(EndpointConfiguration.class).withParent(parent)
-					.run((child) -> {
-						ApplicationBeans result = child.getBean(BeansEndpoint.class).beans();
-						assertThat(result.getContexts().get(parent.getId()).getBeans()).containsKey("bean");
-						assertThat(result.getContexts().get(child.getId()).getBeans()).containsKey("endpoint");
-					});
-		});
+		parentRunner.run((parent) -> new ApplicationContextRunner().withUserConfiguration(EndpointConfiguration.class).withParent(parent)
+				.run((child) -> {
+					ApplicationBeans result = child.getBean(BeansEndpoint.class).beans();
+					assertThat(result.getContexts().get(parent.getId()).getBeans()).containsKey("bean");
+					assertThat(result.getContexts().get(child.getId()).getBeans()).containsKey("endpoint");
+				}));
 	}
 
 	@Configuration(proxyBeanMethods = false)

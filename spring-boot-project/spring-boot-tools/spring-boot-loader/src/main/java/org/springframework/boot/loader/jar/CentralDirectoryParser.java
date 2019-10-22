@@ -81,21 +81,15 @@ class CentralDirectoryParser {
 	}
 
 	private void visitStart(CentralDirectoryEndRecord endRecord, RandomAccessData centralDirectoryData) {
-		for (CentralDirectoryVisitor visitor : this.visitors) {
-			visitor.visitStart(endRecord, centralDirectoryData);
-		}
+		this.visitors.forEach(visitor -> visitor.visitStart(endRecord, centralDirectoryData));
 	}
 
 	private void visitFileHeader(int dataOffset, CentralDirectoryFileHeader fileHeader) {
-		for (CentralDirectoryVisitor visitor : this.visitors) {
-			visitor.visitFileHeader(fileHeader, dataOffset);
-		}
+		this.visitors.forEach(visitor -> visitor.visitFileHeader(fileHeader, dataOffset));
 	}
 
 	private void visitEnd() {
-		for (CentralDirectoryVisitor visitor : this.visitors) {
-			visitor.visitEnd();
-		}
+		this.visitors.forEach(CentralDirectoryVisitor::visitEnd);
 	}
 
 }

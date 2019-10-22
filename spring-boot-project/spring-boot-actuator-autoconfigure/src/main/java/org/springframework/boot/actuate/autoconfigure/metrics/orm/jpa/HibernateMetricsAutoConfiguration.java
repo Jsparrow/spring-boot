@@ -36,6 +36,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for metrics on all available
@@ -52,6 +54,7 @@ import org.springframework.util.StringUtils;
 @ConditionalOnBean({ EntityManagerFactory.class, MeterRegistry.class })
 public class HibernateMetricsAutoConfiguration {
 
+	private static final Logger logger = LoggerFactory.getLogger(HibernateMetricsAutoConfiguration.class);
 	private static final String ENTITY_MANAGER_FACTORY_SUFFIX = "entityManagerFactory";
 
 	@Autowired
@@ -68,6 +71,7 @@ public class HibernateMetricsAutoConfiguration {
 					Collections.emptyList()).bindTo(registry);
 		}
 		catch (PersistenceException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Continue
 		}
 	}

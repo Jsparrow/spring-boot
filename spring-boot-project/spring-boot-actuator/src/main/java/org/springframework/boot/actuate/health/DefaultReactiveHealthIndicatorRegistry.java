@@ -62,7 +62,7 @@ public class DefaultReactiveHealthIndicatorRegistry implements ReactiveHealthInd
 		synchronized (this.monitor) {
 			ReactiveHealthIndicator existing = this.healthIndicators.putIfAbsent(name, healthIndicator);
 			if (existing != null) {
-				throw new IllegalStateException("HealthIndicator with name '" + name + "' already registered");
+				throw new IllegalStateException(new StringBuilder().append("HealthIndicator with name '").append(name).append("' already registered").toString());
 			}
 		}
 	}

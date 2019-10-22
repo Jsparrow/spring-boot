@@ -92,9 +92,7 @@ class ActiveMQConnectionFactoryFactory {
 	}
 
 	private void customize(ActiveMQConnectionFactory connectionFactory) {
-		for (ActiveMQConnectionFactoryCustomizer factoryCustomizer : this.factoryCustomizers) {
-			factoryCustomizer.customize(connectionFactory);
-		}
+		this.factoryCustomizers.forEach(factoryCustomizer -> factoryCustomizer.customize(connectionFactory));
 	}
 
 	String determineBrokerUrl() {

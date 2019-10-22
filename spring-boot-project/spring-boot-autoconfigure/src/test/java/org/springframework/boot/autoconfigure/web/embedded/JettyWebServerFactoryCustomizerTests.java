@@ -209,9 +209,8 @@ class JettyWebServerFactoryCustomizerTests {
 		server.stop();
 		Connector[] connectors = server.getServer().getConnectors();
 		for (Connector connector : connectors) {
-			connector.getConnectionFactories().stream().filter((factory) -> factory instanceof ConnectionFactory)
-					.forEach((cf) -> {
-						ConnectionFactory factory = (ConnectionFactory) cf;
+			connector.getConnectionFactories().stream().filter((factory) -> factory instanceof ConnectionFactory).map((cf) -> (ConnectionFactory) cf)
+					.forEach((factory) -> {
 						HttpConfiguration configuration = factory.getHttpConfiguration();
 						requestHeaderSizes.add(configuration.getRequestHeaderSize());
 					});

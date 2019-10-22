@@ -37,6 +37,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for H2's web console.
@@ -54,6 +56,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(H2ConsoleProperties.class)
 public class H2ConsoleAutoConfiguration {
 
+	private static final Logger logger1 = LoggerFactory.getLogger(H2ConsoleAutoConfiguration.class);
 	private static final Log logger = LogFactory.getLog(H2ConsoleAutoConfiguration.class);
 
 	@Bean
@@ -71,10 +74,10 @@ public class H2ConsoleAutoConfiguration {
 		}
 		dataSource.ifAvailable((available) -> {
 			try (Connection connection = available.getConnection()) {
-				logger.info("H2 console available at '" + path + "'. Database available at '"
-						+ connection.getMetaData().getURL() + "'");
+				logger.info(new StringBuilder().append("H2 console available at '").append(path).append("'. Database available at '").append(connection.getMetaData().getURL()).append("'").toString());
 			}
 			catch (SQLException ex) {
+				logger1.error(ex.getMessage(), ex);
 				// Continue
 			}
 		});

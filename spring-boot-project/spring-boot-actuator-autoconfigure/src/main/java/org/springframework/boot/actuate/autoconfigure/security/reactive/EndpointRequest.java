@@ -46,6 +46,8 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory that can be used to create a {@link ServerWebExchangeMatcher} for actuator
@@ -122,6 +124,8 @@ public final class EndpointRequest {
 	public static final class EndpointServerWebExchangeMatcher
 			extends ApplicationContextServerWebExchangeMatcher<PathMappedEndpoints> {
 
+		private final Logger logger = LoggerFactory.getLogger(EndpointServerWebExchangeMatcher.class);
+
 		private final List<Object> includes;
 
 		private final List<Object> excludes;
@@ -175,6 +179,7 @@ public final class EndpointRequest {
 				return createDelegate(pathMappedEndpoints.get());
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 				return EMPTY_MATCHER;
 			}
 		}
@@ -212,7 +217,7 @@ public final class EndpointRequest {
 
 		private EndpointId getEndpointId(Class<?> source) {
 			MergedAnnotation<Endpoint> annotation = MergedAnnotations.from(source).get(Endpoint.class);
-			Assert.state(annotation.isPresent(), () -> "Class " + source + " is not annotated with @Endpoint");
+			Assert.state(annotation.isPresent(), () -> new StringBuilder().append("Class ").append(source).append(" is not annotated with @Endpoint").toString());
 			return EndpointId.of(annotation.getString("id"));
 		}
 

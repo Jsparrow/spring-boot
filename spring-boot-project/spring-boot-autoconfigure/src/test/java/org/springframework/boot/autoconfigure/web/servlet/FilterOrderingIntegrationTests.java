@@ -72,9 +72,7 @@ class FilterOrderingIntegrationTests {
 		List<RegisteredFilter> registeredFilters = this.context.getBean(MockServletWebServerFactory.class)
 				.getWebServer().getRegisteredFilters();
 		List<Filter> filters = new ArrayList<>(registeredFilters.size());
-		for (RegisteredFilter registeredFilter : registeredFilters) {
-			filters.add(registeredFilter.getFilter());
-		}
+		registeredFilters.forEach(registeredFilter -> filters.add(registeredFilter.getFilter()));
 		Iterator<Filter> iterator = filters.iterator();
 		assertThat(iterator.next()).isInstanceOf(OrderedCharacterEncodingFilter.class);
 		assertThat(iterator.next()).isInstanceOf(SessionRepositoryFilter.class);

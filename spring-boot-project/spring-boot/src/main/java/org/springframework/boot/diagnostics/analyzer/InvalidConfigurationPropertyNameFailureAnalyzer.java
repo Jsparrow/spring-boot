@@ -54,7 +54,7 @@ class InvalidConfigurationPropertyNameFailureAnalyzer
 	}
 
 	private String quote(Character c) {
-		return "'" + c + "'";
+		return new StringBuilder().append("'").append(c).append("'").toString();
 	}
 
 }

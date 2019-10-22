@@ -56,8 +56,8 @@ class JarLauncherTests extends AbstractExecutableArchiveLauncherTests {
 			List<Archive> classPathArchives = launcher.getClassPathArchives();
 			assertThat(classPathArchives).hasSize(2);
 			assertThat(getUrls(classPathArchives)).containsOnly(
-					new URL("jar:" + jarRoot.toURI().toURL() + "!/BOOT-INF/classes!/"),
-					new URL("jar:" + jarRoot.toURI().toURL() + "!/BOOT-INF/lib/foo.jar!/"));
+					new URL(new StringBuilder().append("jar:").append(jarRoot.toURI().toURL()).append("!/BOOT-INF/classes!/").toString()),
+					new URL(new StringBuilder().append("jar:").append(jarRoot.toURI().toURL()).append("!/BOOT-INF/lib/foo.jar!/").toString()));
 			for (Archive classPathArchive : classPathArchives) {
 				classPathArchive.close();
 			}

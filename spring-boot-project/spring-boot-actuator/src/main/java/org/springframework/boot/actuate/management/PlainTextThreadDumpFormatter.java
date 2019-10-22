@@ -82,7 +82,7 @@ class PlainTextThreadDumpFormatter {
 		writer.printf("\tat %s%n", element.toString());
 		LockInfo lockInfo = info.getLockInfo();
 		if (firstElement && lockInfo != null) {
-			if (element.getClassName().equals(Object.class.getName()) && element.getMethodName().equals("wait")) {
+			if (element.getClassName().equals(Object.class.getName()) && "wait".equals(element.getMethodName())) {
 				writer.printf("\t- waiting on %s%n", format(lockInfo));
 			}
 			else {
@@ -104,9 +104,7 @@ class PlainTextThreadDumpFormatter {
 	}
 
 	private void writeMonitors(PrintWriter writer, List<MonitorInfo> lockedMonitorsAtCurrentDepth) {
-		for (MonitorInfo lockedMonitor : lockedMonitorsAtCurrentDepth) {
-			writer.printf("\t- locked %s%n", format(lockedMonitor));
-		}
+		lockedMonitorsAtCurrentDepth.forEach(lockedMonitor -> writer.printf("\t- locked %s%n", format(lockedMonitor)));
 	}
 
 	private void writeLockedOwnableSynchronizers(PrintWriter writer, ThreadInfo info) {

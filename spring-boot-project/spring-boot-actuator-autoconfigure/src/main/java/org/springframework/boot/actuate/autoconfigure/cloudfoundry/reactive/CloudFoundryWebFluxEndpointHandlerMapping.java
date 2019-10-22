@@ -100,7 +100,7 @@ class CloudFoundryWebFluxEndpointHandlerMapping extends AbstractWebFluxEndpointH
 				return new LinkedHashMap<>();
 			}
 			return links.entrySet().stream()
-					.filter((entry) -> entry.getKey().equals("self") || accessLevel.isAccessAllowed(entry.getKey()))
+					.filter((entry) -> "self".equals(entry.getKey()) || accessLevel.isAccessAllowed(entry.getKey()))
 					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 		}
 
@@ -137,7 +137,7 @@ class CloudFoundryWebFluxEndpointHandlerMapping extends AbstractWebFluxEndpointH
 
 		private Mono<ResponseEntity<Object>> flatMapResponse(ServerWebExchange exchange, Map<String, String> body,
 				SecurityResponse securityResponse) {
-			if (!securityResponse.getStatus().equals(HttpStatus.OK)) {
+			if (securityResponse.getStatus() != HttpStatus.OK) {
 				return Mono.just(new ResponseEntity<>(securityResponse.getStatus()));
 			}
 			return this.delegate.handle(exchange, body);

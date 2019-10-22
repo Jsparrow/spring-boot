@@ -51,6 +51,8 @@ import static org.mockito.Mockito.verify;
 class BannerTests {
 
 	private ConfigurableApplicationContext context;
+	@Captor
+	private ArgumentCaptor<Class<?>> sourceClassCaptor;
 
 	@AfterEach
 	void cleanUp() {
@@ -58,9 +60,6 @@ class BannerTests {
 			this.context.close();
 		}
 	}
-
-	@Captor
-	private ArgumentCaptor<Class<?>> sourceClassCaptor;
 
 	@BeforeEach
 	void setup() {

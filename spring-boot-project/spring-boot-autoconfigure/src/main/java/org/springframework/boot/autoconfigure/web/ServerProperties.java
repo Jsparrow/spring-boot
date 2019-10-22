@@ -141,7 +141,7 @@ public class ServerProperties {
 	@DeprecatedConfigurationProperty(reason = "replaced to support additional strategies",
 			replacement = "server.forward-headers-strategy")
 	public Boolean isUseForwardHeaders() {
-		return ForwardHeadersStrategy.NATIVE.equals(this.forwardHeadersStrategy);
+		return ForwardHeadersStrategy.NATIVE == this.forwardHeadersStrategy;
 	}
 
 	public void setUseForwardHeaders(Boolean useForwardHeaders) {
@@ -226,6 +226,28 @@ public class ServerProperties {
 	}
 
 	/**
+	 * Strategies for supporting forward headers.
+	 */
+	public enum ForwardHeadersStrategy {
+
+		/**
+		 * Use the underlying container's native support for forwarded headers.
+		 */
+		NATIVE,
+
+		/**
+		 * Use Spring's support for handling forwarded headers.
+		 */
+		FRAMEWORK,
+
+		/**
+		 * Ignore X-Forwarded-* headers.
+		 */
+		NONE
+
+	}
+
+	/**
 	 * Servlet properties.
 	 */
 	public static class Servlet {
@@ -302,13 +324,13 @@ public class ServerProperties {
 		/**
 		 * Regular expression that matches proxies that are to be trusted.
 		 */
-		private String internalProxies = "10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" // 10/8
-				+ "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" // 192.168/16
-				+ "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" // 169.254/16
-				+ "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" // 127/8
-				+ "172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" // 172.16/12
-				+ "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" //
-				+ "0:0:0:0:0:0:0:1|::1";
+		private String internalProxies = new StringBuilder().append("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" // 10/8
+).append("192\\.168\\.\\d{1,3}\\.\\d{1,3}|" // 192.168/16
+).append("169\\.254\\.\\d{1,3}\\.\\d{1,3}|" // 169.254/16
+).append("127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" // 127/8
+).append("172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" // 172.16/12
+).append("172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" //
+).append("0:0:0:0:0:0:0:1|::1").toString();
 
 		/**
 		 * Header that holds the incoming protocol, usually named "X-Forwarded-Proto".
@@ -1487,28 +1509,6 @@ public class ServerProperties {
 			}
 
 		}
-
-	}
-
-	/**
-	 * Strategies for supporting forward headers.
-	 */
-	public enum ForwardHeadersStrategy {
-
-		/**
-		 * Use the underlying container's native support for forwarded headers.
-		 */
-		NATIVE,
-
-		/**
-		 * Use Spring's support for handling forwarded headers.
-		 */
-		FRAMEWORK,
-
-		/**
-		 * Ignore X-Forwarded-* headers.
-		 */
-		NONE
 
 	}
 

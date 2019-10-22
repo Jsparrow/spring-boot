@@ -96,17 +96,18 @@ class InvalidConfigurationPropertyValueFailureAnalyzer
 
 	private void appendAdditionalProperties(StringBuilder message, List<Descriptor> descriptors) {
 		List<Descriptor> others = descriptors.subList(1, descriptors.size());
-		if (!others.isEmpty()) {
-			message.append(
-					String.format("%n%nAdditionally, this property is also set in the following property %s:%n%n",
-							(others.size() > 1) ? "sources" : "source"));
-			for (Descriptor other : others) {
-				message.append("\t- In '").append(other.getPropertySource()).append("'");
-				message.append(" with the value '").append(other.getValue()).append("'");
-				other.appendOrigin(message);
-				message.append(String.format(".%n"));
-			}
+		if (others.isEmpty()) {
+			return;
 		}
+		message.append(
+				String.format("%n%nAdditionally, this property is also set in the following property %s:%n%n",
+						(others.size() > 1) ? "sources" : "source"));
+		others.forEach(other -> {
+			message.append("\t- In '").append(other.getPropertySource()).append("'");
+			message.append(" with the value '").append(other.getValue()).append("'");
+			other.appendOrigin(message);
+			message.append(String.format(".%n"));
+		});
 	}
 
 	private String getAction(InvalidConfigurationPropertyValueException cause) {

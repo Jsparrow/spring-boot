@@ -29,14 +29,14 @@ class ReflectiveWrapper {
 
 	final Class<?> type;
 
-	ReflectiveWrapper(ClassLoader classLoader, String type) throws Throwable {
-		this.classLoader = classLoader;
-		this.type = loadClass(type);
-	}
-
 	protected ReflectiveWrapper(ClassLoader classLoader, Class<?> type) throws Throwable {
 		this.classLoader = classLoader;
 		this.type = type;
+	}
+
+	ReflectiveWrapper(ClassLoader classLoader, String type) throws Throwable {
+		this.classLoader = classLoader;
+		this.type = loadClass(type);
 	}
 
 	protected final ClassLoader getClassLoader() {

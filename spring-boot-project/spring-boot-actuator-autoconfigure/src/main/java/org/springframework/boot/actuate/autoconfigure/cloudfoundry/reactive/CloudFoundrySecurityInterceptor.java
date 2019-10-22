@@ -41,13 +41,13 @@ class CloudFoundrySecurityInterceptor {
 
 	private static final Log logger = LogFactory.getLog(CloudFoundrySecurityInterceptor.class);
 
+	private static final Mono<SecurityResponse> SUCCESS = Mono.just(SecurityResponse.success());
+
 	private final ReactiveTokenValidator tokenValidator;
 
 	private final ReactiveCloudFoundrySecurityService cloudFoundrySecurityService;
 
 	private final String applicationId;
-
-	private static final Mono<SecurityResponse> SUCCESS = Mono.just(SecurityResponse.success());
 
 	CloudFoundrySecurityInterceptor(ReactiveTokenValidator tokenValidator,
 			ReactiveCloudFoundrySecurityService cloudFoundrySecurityService, String applicationId) {
@@ -93,12 +93,12 @@ class CloudFoundrySecurityInterceptor {
 	}
 
 	private Mono<SecurityResponse> getErrorResponse(Throwable throwable) {
-		if (throwable instanceof CloudFoundryAuthorizationException) {
-			CloudFoundryAuthorizationException cfException = (CloudFoundryAuthorizationException) throwable;
-			return Mono.just(new SecurityResponse(cfException.getStatusCode(),
-					"{\"security_error\":\"" + cfException.getMessage() + "\"}"));
+		if (!(throwable instanceof CloudFoundryAuthorizationException)) {
+			return Mono.just(new SecurityResponse(HttpStatus.INTERNAL_SERVER_ERROR, throwable.getMessage()));
 		}
-		return Mono.just(new SecurityResponse(HttpStatus.INTERNAL_SERVER_ERROR, throwable.getMessage()));
+		CloudFoundryAuthorizationException cfException = (CloudFoundryAuthorizationException) throwable;
+		return Mono.just(new SecurityResponse(cfException.getStatusCode(),
+				new StringBuilder().append("{\"security_error\":\"").append(cfException.getMessage()).append("\"}").toString()));
 	}
 
 	private Token getToken(ServerHttpRequest request) {

@@ -40,7 +40,7 @@ class ConnectionInputStreamTests {
 	void readHeader() throws Exception {
 		String header = "";
 		for (int i = 0; i < 100; i++) {
-			header += "x-something-" + i + ": xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+			header += new StringBuilder().append("x-something-").append(i).append(": xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx").toString();
 		}
 		String data = header + "\r\n\r\ncontent\r\n";
 		ConnectionInputStream inputStream = new ConnectionInputStream(new ByteArrayInputStream(data.getBytes()));

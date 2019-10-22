@@ -40,28 +40,28 @@ class DebugLogbackConfigurator extends LogbackConfigurator {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public void conversionRule(String conversionWord, Class<? extends Converter> converterClass) {
-		info("Adding conversion rule of type '" + converterClass.getName() + "' for word '" + conversionWord + "'");
+		info(new StringBuilder().append("Adding conversion rule of type '").append(converterClass.getName()).append("' for word '").append(conversionWord).append("'").toString());
 		super.conversionRule(conversionWord, converterClass);
 	}
 
 	@Override
 	public void appender(String name, Appender<?> appender) {
-		info("Adding appender '" + appender + "' named '" + name + "'");
+		info(new StringBuilder().append("Adding appender '").append(appender).append("' named '").append(name).append("'").toString());
 		super.appender(name, appender);
 	}
 
 	@Override
 	public void logger(String name, Level level, boolean additive, Appender<ILoggingEvent> appender) {
-		info("Configuring logger '" + name + "' with level '" + level + "'. Additive: " + additive);
+		info(new StringBuilder().append("Configuring logger '").append(name).append("' with level '").append(level).append("'. Additive: ").append(additive).toString());
 		if (appender != null) {
-			info("Adding appender '" + appender + "' to logger '" + name + "'");
+			info(new StringBuilder().append("Adding appender '").append(appender).append("' to logger '").append(name).append("'").toString());
 		}
 		super.logger(name, level, additive, appender);
 	}
 
 	@Override
 	public void start(LifeCycle lifeCycle) {
-		info("Starting '" + lifeCycle + "'");
+		info(new StringBuilder().append("Starting '").append(lifeCycle).append("'").toString());
 		super.start(lifeCycle);
 	}
 

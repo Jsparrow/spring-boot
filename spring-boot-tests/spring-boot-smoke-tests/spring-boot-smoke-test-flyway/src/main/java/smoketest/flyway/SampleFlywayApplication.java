@@ -20,9 +20,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SampleFlywayApplication {
+
+	private static final Logger logger = LoggerFactory.getLogger(SampleFlywayApplication.class);
 
 	public static void main(String[] args) {
 		SpringApplication.run(SampleFlywayApplication.class, args);
@@ -30,14 +34,7 @@ public class SampleFlywayApplication {
 
 	@Bean
 	public CommandLineRunner runner(PersonRepository repository) {
-		return new CommandLineRunner() {
-
-			@Override
-			public void run(String... args) throws Exception {
-				System.err.println(repository.findAll());
-			}
-
-		};
+		return (String... args) -> logger.error(String.valueOf(repository.findAll()));
 	}
 
 }

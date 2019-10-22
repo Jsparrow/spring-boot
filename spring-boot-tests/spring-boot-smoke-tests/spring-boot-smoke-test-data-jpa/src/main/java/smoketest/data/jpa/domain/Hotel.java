@@ -57,12 +57,12 @@ public class Hotel implements Serializable {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "hotel")
 	private Set<Review> reviews;
 
-	protected Hotel() {
-	}
-
 	public Hotel(City city, String name) {
 		this.city = city;
 		this.name = name;
+	}
+
+	protected Hotel() {
 	}
 
 	public City getCity() {

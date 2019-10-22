@@ -23,6 +23,8 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 import org.springframework.boot.logging.LoggingSystemProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple 'Java Logging' {@link Formatter}.
@@ -31,6 +33,8 @@ import org.springframework.boot.logging.LoggingSystemProperties;
  * @since 1.0.0
  */
 public class SimpleFormatter extends Formatter {
+
+	private static final Logger logger = LoggerFactory.getLogger(SimpleFormatter.class);
 
 	private static final String DEFAULT_FORMAT = "[%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL] - %8$s %4$s [%7$s] --- %3$s: %5$s%6$s%n";
 
@@ -74,6 +78,7 @@ public class SimpleFormatter extends Formatter {
 			value = System.getenv(key);
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// ignore
 		}
 		if (value == null) {

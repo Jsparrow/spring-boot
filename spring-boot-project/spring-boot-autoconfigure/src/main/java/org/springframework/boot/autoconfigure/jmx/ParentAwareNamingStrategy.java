@@ -28,6 +28,8 @@ import org.springframework.jmx.export.metadata.JmxAttributeSource;
 import org.springframework.jmx.export.naming.MetadataNamingStrategy;
 import org.springframework.jmx.support.ObjectNameManager;
 import org.springframework.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extension of {@link MetadataNamingStrategy} that supports a parent
@@ -37,6 +39,8 @@ import org.springframework.util.ObjectUtils;
  * @since 1.1.1
  */
 public class ParentAwareNamingStrategy extends MetadataNamingStrategy implements ApplicationContextAware {
+
+	private static final Logger logger = LoggerFactory.getLogger(ParentAwareNamingStrategy.class);
 
 	private ApplicationContext applicationContext;
 
@@ -68,7 +72,7 @@ public class ParentAwareNamingStrategy extends MetadataNamingStrategy implements
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
@@ -81,6 +85,7 @@ public class ParentAwareNamingStrategy extends MetadataNamingStrategy implements
 			return true;
 		}
 		catch (BeansException ex) {
+			logger.error(ex.getMessage(), ex);
 			return parentContextContainsSameBean(context.getParent(), beanKey);
 		}
 	}

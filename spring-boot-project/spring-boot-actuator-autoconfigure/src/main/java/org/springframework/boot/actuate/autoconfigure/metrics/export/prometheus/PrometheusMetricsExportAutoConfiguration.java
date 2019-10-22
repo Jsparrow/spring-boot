@@ -48,6 +48,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.log.LogMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for exporting metrics to Prometheus.
@@ -115,6 +117,8 @@ public class PrometheusMetricsExportAutoConfiguration {
 		 */
 		private static final String FALLBACK_JOB = "spring";
 
+		private final Logger logger1 = LoggerFactory.getLogger(PrometheusPushGatewayConfiguration.class);
+
 		@Bean
 		@ConditionalOnMissingBean
 		public PrometheusPushGatewayManager prometheusPushGatewayManager(CollectorRegistry collectorRegistry,
@@ -133,6 +137,7 @@ public class PrometheusMetricsExportAutoConfiguration {
 				return new PushGateway(new URL(url));
 			}
 			catch (MalformedURLException ex) {
+				logger1.error(ex.getMessage(), ex);
 				logger.warn(LogMessage
 						.format("Invalid PushGateway base url '%s': update your configuration to a valid URL", url));
 				return new PushGateway(url);

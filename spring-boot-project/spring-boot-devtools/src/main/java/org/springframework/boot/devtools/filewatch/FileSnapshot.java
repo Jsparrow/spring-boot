@@ -56,15 +56,15 @@ class FileSnapshot {
 		if (obj == null) {
 			return false;
 		}
-		if (obj instanceof FileSnapshot) {
-			FileSnapshot other = (FileSnapshot) obj;
-			boolean equals = this.file.equals(other.file);
-			equals = equals && this.exists == other.exists;
-			equals = equals && this.length == other.length;
-			equals = equals && this.lastModified == other.lastModified;
-			return equals;
+		if (!(obj instanceof FileSnapshot)) {
+			return super.equals(obj);
 		}
-		return super.equals(obj);
+		FileSnapshot other = (FileSnapshot) obj;
+		boolean equals = this.file.equals(other.file);
+		equals = equals && this.exists == other.exists;
+		equals = equals && this.length == other.length;
+		equals = equals && this.lastModified == other.lastModified;
+		return equals;
 	}
 
 	@Override

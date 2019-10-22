@@ -131,10 +131,6 @@ public final class HttpTrace {
 
 		private final String remoteAddress;
 
-		private Request(TraceableRequest request) {
-			this(request.getMethod(), request.getUri(), request.getHeaders(), request.getRemoteAddress());
-		}
-
 		/**
 		 * Creates a fully-configured {@code Request} instance. Primarily for use by
 		 * {@link HttpTraceRepository} implementations when recreating a request from a
@@ -150,6 +146,10 @@ public final class HttpTrace {
 			this.uri = uri;
 			this.headers = new LinkedHashMap<>(headers);
 			this.remoteAddress = remoteAddress;
+		}
+
+		private Request(TraceableRequest request) {
+			this(request.getMethod(), request.getUri(), request.getHeaders(), request.getRemoteAddress());
 		}
 
 		public String getMethod() {
@@ -179,10 +179,6 @@ public final class HttpTrace {
 
 		private final Map<String, List<String>> headers;
 
-		Response(TraceableResponse response) {
-			this(response.getStatus(), response.getHeaders());
-		}
-
 		/**
 		 * Creates a fully-configured {@code Response} instance. Primarily for use by
 		 * {@link HttpTraceRepository} implementations when recreating a response from a
@@ -194,6 +190,10 @@ public final class HttpTrace {
 		public Response(int status, Map<String, List<String>> headers) {
 			this.status = status;
 			this.headers = new LinkedHashMap<>(headers);
+		}
+
+		Response(TraceableResponse response) {
+			this(response.getStatus(), response.getHeaders());
 		}
 
 		public int getStatus() {

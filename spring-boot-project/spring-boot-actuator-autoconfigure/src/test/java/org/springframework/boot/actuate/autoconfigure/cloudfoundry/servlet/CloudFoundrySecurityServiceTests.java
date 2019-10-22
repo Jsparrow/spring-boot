@@ -137,16 +137,9 @@ class CloudFoundrySecurityServiceTests {
 	void fetchTokenKeysWhenSuccessfulShouldReturnListOfKeysFromUAA() {
 		this.server.expect(requestTo(CLOUD_CONTROLLER + "/info"))
 				.andRespond(withSuccess("{\"token_endpoint\":\"https://my-uaa.com\"}", MediaType.APPLICATION_JSON));
-		String tokenKeyValue = "-----BEGIN PUBLIC KEY-----\n"
-				+ "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0m59l2u9iDnMbrXHfqkO\n"
-				+ "rn2dVQ3vfBJqcDuFUK03d+1PZGbVlNCqnkpIJ8syFppW8ljnWweP7+LiWpRoz0I7\n"
-				+ "fYb3d8TjhV86Y997Fl4DBrxgM6KTJOuE/uxnoDhZQ14LgOU2ckXjOzOdTsnGMKQB\n"
-				+ "LCl0vpcXBtFLMaSbpv1ozi8h7DJyVZ6EnFQZUWGdgTMhDrmqevfx95U/16c5WBDO\n"
-				+ "kqwIn7Glry9n9Suxygbf8g5AzpWcusZgDLIIZ7JTUldBb8qU2a0Dl4mvLZOn4wPo\n"
-				+ "jfj9Cw2QICsc5+Pwf21fP+hzf+1WSRHbnYv8uanRO0gZ8ekGaghM/2H6gqJbo2nI\n"
-				+ "JwIDAQAB\n-----END PUBLIC KEY-----";
-		String responseBody = "{\"keys\" : [ {\"kid\":\"test-key\",\"value\" : \"" + tokenKeyValue.replace("\n", "\\n")
-				+ "\"} ]}";
+		String tokenKeyValue = new StringBuilder().append("-----BEGIN PUBLIC KEY-----\n").append("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0m59l2u9iDnMbrXHfqkO\n").append("rn2dVQ3vfBJqcDuFUK03d+1PZGbVlNCqnkpIJ8syFppW8ljnWweP7+LiWpRoz0I7\n").append("fYb3d8TjhV86Y997Fl4DBrxgM6KTJOuE/uxnoDhZQ14LgOU2ckXjOzOdTsnGMKQB\n").append("LCl0vpcXBtFLMaSbpv1ozi8h7DJyVZ6EnFQZUWGdgTMhDrmqevfx95U/16c5WBDO\n").append("kqwIn7Glry9n9Suxygbf8g5AzpWcusZgDLIIZ7JTUldBb8qU2a0Dl4mvLZOn4wPo\n").append("jfj9Cw2QICsc5+Pwf21fP+hzf+1WSRHbnYv8uanRO0gZ8ekGaghM/2H6gqJbo2nI\n").append("JwIDAQAB\n-----END PUBLIC KEY-----")
+				.toString();
+		String responseBody = new StringBuilder().append("{\"keys\" : [ {\"kid\":\"test-key\",\"value\" : \"").append(tokenKeyValue.replace("\n", "\\n")).append("\"} ]}").toString();
 		this.server.expect(requestTo(UAA_URL + "/token_keys"))
 				.andRespond(withSuccess(responseBody, MediaType.APPLICATION_JSON));
 		Map<String, String> tokenKeys = this.securityService.fetchTokenKeys();
@@ -157,7 +150,7 @@ class CloudFoundrySecurityServiceTests {
 	@Test
 	void fetchTokenKeysWhenNoKeysReturnedFromUAA() {
 		this.server.expect(requestTo(CLOUD_CONTROLLER + "/info"))
-				.andRespond(withSuccess("{\"token_endpoint\":\"" + UAA_URL + "\"}", MediaType.APPLICATION_JSON));
+				.andRespond(withSuccess(new StringBuilder().append("{\"token_endpoint\":\"").append(UAA_URL).append("\"}").toString(), MediaType.APPLICATION_JSON));
 		String responseBody = "{\"keys\": []}";
 		this.server.expect(requestTo(UAA_URL + "/token_keys"))
 				.andRespond(withSuccess(responseBody, MediaType.APPLICATION_JSON));
@@ -169,7 +162,7 @@ class CloudFoundrySecurityServiceTests {
 	@Test
 	void fetchTokenKeysWhenUnsuccessfulShouldThrowException() {
 		this.server.expect(requestTo(CLOUD_CONTROLLER + "/info"))
-				.andRespond(withSuccess("{\"token_endpoint\":\"" + UAA_URL + "\"}", MediaType.APPLICATION_JSON));
+				.andRespond(withSuccess(new StringBuilder().append("{\"token_endpoint\":\"").append(UAA_URL).append("\"}").toString(), MediaType.APPLICATION_JSON));
 		this.server.expect(requestTo(UAA_URL + "/token_keys")).andRespond(withServerError());
 		assertThatExceptionOfType(CloudFoundryAuthorizationException.class)
 				.isThrownBy(() -> this.securityService.fetchTokenKeys())
@@ -179,7 +172,7 @@ class CloudFoundrySecurityServiceTests {
 	@Test
 	void getUaaUrlShouldCallCloudControllerInfoOnlyOnce() {
 		this.server.expect(requestTo(CLOUD_CONTROLLER + "/info"))
-				.andRespond(withSuccess("{\"token_endpoint\":\"" + UAA_URL + "\"}", MediaType.APPLICATION_JSON));
+				.andRespond(withSuccess(new StringBuilder().append("{\"token_endpoint\":\"").append(UAA_URL).append("\"}").toString(), MediaType.APPLICATION_JSON));
 		String uaaUrl = this.securityService.getUaaUrl();
 		this.server.verify();
 		assertThat(uaaUrl).isEqualTo(UAA_URL);

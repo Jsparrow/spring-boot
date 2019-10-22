@@ -38,7 +38,7 @@ public interface JsonParser {
 	 * @return the parsed JSON as a map
 	 * @throws JsonParseException if the JSON cannot be parsed
 	 */
-	Map<String, Object> parseMap(String json) throws JsonParseException;
+	Map<String, Object> parseMap(String json);
 
 	/**
 	 * Parse the specified JSON string into a List.
@@ -46,6 +46,6 @@ public interface JsonParser {
 	 * @return the parsed JSON as a list
 	 * @throws JsonParseException if the JSON cannot be parsed
 	 */
-	List<Object> parseList(String json) throws JsonParseException;
+	List<Object> parseList(String json);
 
 }

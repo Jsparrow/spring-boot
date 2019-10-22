@@ -117,11 +117,11 @@ class EnvironmentEndpointWebIntegrationTests {
 	}
 
 	private String forProperty(String source, String name) {
-		return "propertySources[?(@.name=='" + source + "')].properties.['" + name + "'].value";
+		return new StringBuilder().append("propertySources[?(@.name=='").append(source).append("')].properties.['").append(name).append("'].value").toString();
 	}
 
 	private String forPropertyEntry(String source) {
-		return "propertySources[?(@.name=='" + source + "')].property.value";
+		return new StringBuilder().append("propertySources[?(@.name=='").append(source).append("')].property.value").toString();
 	}
 
 	@Configuration(proxyBeanMethods = false)

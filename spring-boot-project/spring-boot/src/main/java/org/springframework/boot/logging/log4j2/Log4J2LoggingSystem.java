@@ -211,9 +211,7 @@ public class Log4J2LoggingSystem extends Slf4JLoggingSystem {
 	public List<LoggerConfiguration> getLoggerConfigurations() {
 		List<LoggerConfiguration> result = new ArrayList<>();
 		Configuration configuration = getLoggerContext().getConfiguration();
-		for (LoggerConfig loggerConfig : configuration.getLoggers().values()) {
-			result.add(convertLoggerConfiguration(loggerConfig));
-		}
+		configuration.getLoggers().values().forEach(loggerConfig -> result.add(convertLoggerConfiguration(loggerConfig)));
 		result.sort(CONFIGURATION_COMPARATOR);
 		return result;
 	}

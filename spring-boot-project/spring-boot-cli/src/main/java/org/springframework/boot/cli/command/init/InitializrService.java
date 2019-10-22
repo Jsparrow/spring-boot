@@ -122,7 +122,7 @@ class InitializrService {
 		validateResponse(httpResponse, serviceUrl);
 		HttpEntity httpEntity = httpResponse.getEntity();
 		ContentType contentType = ContentType.getOrDefault(httpEntity);
-		if (contentType.getMimeType().equals("text/plain")) {
+		if ("text/plain".equals(contentType.getMimeType())) {
 			return getContent(httpEntity);
 		}
 		return parseJsonMetadata(httpEntity);
@@ -133,13 +133,13 @@ class InitializrService {
 			return new InitializrServiceMetadata(getContentAsJson(httpEntity));
 		}
 		catch (JSONException ex) {
-			throw new ReportableException("Invalid content received from server (" + ex.getMessage() + ")", ex);
+			throw new ReportableException(new StringBuilder().append("Invalid content received from server (").append(ex.getMessage()).append(")").toString(), ex);
 		}
 	}
 
 	private void validateResponse(CloseableHttpResponse httpResponse, String serviceUrl) {
 		if (httpResponse.getEntity() == null) {
-			throw new ReportableException("No content received from server '" + serviceUrl + "'");
+			throw new ReportableException(new StringBuilder().append("No content received from server '").append(serviceUrl).append("'").toString());
 		}
 		if (httpResponse.getStatusLine().getStatusCode() != 200) {
 			throw createException(serviceUrl, httpResponse);
@@ -184,20 +184,20 @@ class InitializrService {
 		}
 		catch (IOException ex) {
 			throw new ReportableException(
-					"Failed to " + description + " from service at '" + url + "' (" + ex.getMessage() + ")");
+					new StringBuilder().append("Failed to ").append(description).append(" from service at '").append(url).append("' (")
+							.append(ex.getMessage()).append(")").toString());
 		}
 	}
 
 	private ReportableException createException(String url, CloseableHttpResponse httpResponse) {
-		String message = "Initializr service call failed using '" + url + "' - service returned "
-				+ httpResponse.getStatusLine().getReasonPhrase();
+		String message = new StringBuilder().append("Initializr service call failed using '").append(url).append("' - service returned ").append(httpResponse.getStatusLine().getReasonPhrase()).toString();
 		String error = extractMessage(httpResponse.getEntity());
 		if (StringUtils.hasText(error)) {
-			message += ": '" + error + "'";
+			message += new StringBuilder().append(": '").append(error).append("'").toString();
 		}
 		else {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			message += " (unexpected " + statusCode + " error)";
+			message += new StringBuilder().append(" (unexpected ").append(statusCode).append(" error)").toString();
 		}
 		throw new ReportableException(message);
 	}

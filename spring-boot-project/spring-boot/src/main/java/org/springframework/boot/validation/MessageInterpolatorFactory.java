@@ -28,6 +28,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ObjectFactory} that can be used to create a {@link MessageInterpolator}.
@@ -39,6 +41,7 @@ import org.springframework.util.ClassUtils;
  */
 public class MessageInterpolatorFactory implements ObjectFactory<MessageInterpolator> {
 
+	private static final Logger logger = LoggerFactory.getLogger(MessageInterpolatorFactory.class);
 	private static final Set<String> FALLBACKS;
 
 	static {
@@ -48,7 +51,7 @@ public class MessageInterpolatorFactory implements ObjectFactory<MessageInterpol
 	}
 
 	@Override
-	public MessageInterpolator getObject() throws BeansException {
+	public MessageInterpolator getObject() {
 		try {
 			return Validation.byDefaultProvider().configure().getDefaultMessageInterpolator();
 		}
@@ -67,6 +70,7 @@ public class MessageInterpolatorFactory implements ObjectFactory<MessageInterpol
 				return getFallback(fallback);
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				// Swallow an continue
 			}
 		}

@@ -77,7 +77,9 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMappi
  * @since 2.0.0
  */
 public abstract class AbstractWebMvcEndpointHandlerMapping extends RequestMappingInfoHandlerMapping
-		implements InitializingBean, MatchableHandlerMapping {
+		implements MatchableHandlerMapping {
+
+	private static final RequestMappingInfo.BuilderConfiguration builderConfig = getBuilderConfig();
 
 	private final EndpointMapping endpointMapping;
 
@@ -91,8 +93,6 @@ public abstract class AbstractWebMvcEndpointHandlerMapping extends RequestMappin
 
 	private final Method handleMethod = ReflectionUtils.findMethod(OperationHandler.class, "handle",
 			HttpServletRequest.class, Map.class);
-
-	private static final RequestMappingInfo.BuilderConfiguration builderConfig = getBuilderConfig();
 
 	/**
 	 * Creates a new {@code WebEndpointHandlerMapping} that provides mappings for the
@@ -130,11 +130,7 @@ public abstract class AbstractWebMvcEndpointHandlerMapping extends RequestMappin
 
 	@Override
 	protected void initHandlerMethods() {
-		for (ExposableWebEndpoint endpoint : this.endpoints) {
-			for (WebOperation operation : endpoint.getOperations()) {
-				registerMappingForOperation(endpoint, operation);
-			}
-		}
+		this.endpoints.forEach(endpoint -> endpoint.getOperations().forEach(operation -> registerMappingForOperation(endpoint, operation)));
 		if (this.shouldRegisterLinksMapping) {
 			registerLinksMapping();
 		}
@@ -172,7 +168,7 @@ public abstract class AbstractWebMvcEndpointHandlerMapping extends RequestMappin
 		String path = predicate.getPath();
 		String matchAllRemainingPathSegmentsVariable = predicate.getMatchAllRemainingPathSegmentsVariable();
 		if (matchAllRemainingPathSegmentsVariable != null) {
-			path = path.replace("{*" + matchAllRemainingPathSegmentsVariable + "}", "**");
+			path = path.replace(new StringBuilder().append("{*").append(matchAllRemainingPathSegmentsVariable).append("}").toString(), "**");
 		}
 		ServletWebOperation servletWebOperation = wrapServletWebOperation(endpoint, operation,
 				new ServletWebOperationAdapter(operation));
@@ -311,7 +307,7 @@ public abstract class AbstractWebMvcEndpointHandlerMapping extends RequestMappin
 
 		@Override
 		public String toString() {
-			return "Actuator web endpoint '" + this.operation.getId() + "'";
+			return new StringBuilder().append("Actuator web endpoint '").append(this.operation.getId()).append("'").toString();
 		}
 
 		private Map<String, Object> getArguments(HttpServletRequest request, Map<String, String> body) {

@@ -35,6 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link SpringBootDependencyInjectionTestExecutionListener}.
@@ -44,6 +46,8 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(OutputCaptureExtension.class)
 class SpringBootDependencyInjectionTestExecutionListenerTests {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(SpringBootDependencyInjectionTestExecutionListenerTests.class);
 	private SpringBootDependencyInjectionTestExecutionListener reportListener = new SpringBootDependencyInjectionTestExecutionListener();
 
 	@Test
@@ -64,6 +68,7 @@ class SpringBootDependencyInjectionTestExecutionListenerTests {
 			this.reportListener.prepareTestInstance(testContext);
 		}
 		catch (IllegalStateException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Expected
 		}
 		assertThat(output).contains("CONDITIONS EVALUATION REPORT").contains("Positive matches")

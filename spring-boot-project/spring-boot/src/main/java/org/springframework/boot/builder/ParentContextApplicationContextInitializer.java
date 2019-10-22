@@ -54,10 +54,11 @@ public class ParentContextApplicationContextInitializer
 
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
-		if (applicationContext != this.parent) {
-			applicationContext.setParent(this.parent);
-			applicationContext.addApplicationListener(EventPublisher.INSTANCE);
+		if (applicationContext == this.parent) {
+			return;
 		}
+		applicationContext.setParent(this.parent);
+		applicationContext.addApplicationListener(EventPublisher.INSTANCE);
 	}
 
 	private static class EventPublisher implements ApplicationListener<ContextRefreshedEvent>, Ordered {

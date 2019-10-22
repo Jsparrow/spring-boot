@@ -41,14 +41,14 @@ class OnExpressionCondition extends SpringBootCondition {
 				.get("value");
 		expression = wrapIfNecessary(expression);
 		ConditionMessage.Builder messageBuilder = ConditionMessage.forCondition(ConditionalOnExpression.class,
-				"(" + expression + ")");
+				new StringBuilder().append("(").append(expression).append(")").toString());
 		expression = context.getEnvironment().resolvePlaceholders(expression);
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-		if (beanFactory != null) {
-			boolean result = evaluateExpression(beanFactory, expression);
-			return new ConditionOutcome(result, messageBuilder.resultedIn(result));
+		if (beanFactory == null) {
+			return ConditionOutcome.noMatch(messageBuilder.because("no BeanFactory available."));
 		}
-		return ConditionOutcome.noMatch(messageBuilder.because("no BeanFactory available."));
+		boolean result = evaluateExpression(beanFactory, expression);
+		return new ConditionOutcome(result, messageBuilder.resultedIn(result));
 	}
 
 	private Boolean evaluateExpression(ConfigurableListableBeanFactory beanFactory, String expression) {
@@ -68,7 +68,7 @@ class OnExpressionCondition extends SpringBootCondition {
 	 */
 	private String wrapIfNecessary(String expression) {
 		if (!expression.startsWith("#{")) {
-			return "#{" + expression + "}";
+			return new StringBuilder().append("#{").append(expression).append("}").toString();
 		}
 		return expression;
 	}

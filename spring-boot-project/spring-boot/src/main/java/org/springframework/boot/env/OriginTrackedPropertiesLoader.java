@@ -81,7 +81,7 @@ class OriginTrackedPropertiesLoader {
 					int index = 0;
 					do {
 						OriginTrackedValue value = loadValue(buffer, reader, true);
-						put(result, key + "[" + (index++) + "]", value);
+						put(result, new StringBuilder().append(key).append("[").append(index++).append("]").toString(), value);
 						if (!reader.isEndOfLine()) {
 							reader.read();
 						}
@@ -194,13 +194,14 @@ class OriginTrackedPropertiesLoader {
 		}
 
 		private void skipComment() throws IOException {
-			if (this.character == '#' || this.character == '!') {
-				while (this.character != '\n' && this.character != -1) {
-					this.character = this.reader.read();
-				}
-				this.columnNumber = -1;
-				read();
+			if (!(this.character == '#' || this.character == '!')) {
+				return;
 			}
+			while (this.character != '\n' && this.character != -1) {
+				this.character = this.reader.read();
+			}
+			this.columnNumber = -1;
+			read();
 		}
 
 		private void readEscaped() throws IOException {

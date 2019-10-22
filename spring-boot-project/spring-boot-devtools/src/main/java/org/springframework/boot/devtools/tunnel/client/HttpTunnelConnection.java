@@ -41,6 +41,8 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link TunnelConnection} implementation that uses HTTP to transfer data.
@@ -53,6 +55,8 @@ import org.springframework.util.Assert;
  * @see org.springframework.boot.devtools.tunnel.server.HttpTunnelServer
  */
 public class HttpTunnelConnection implements TunnelConnection {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(HttpTunnelConnection.class);
 
 	private static final Log logger = LogFactory.getLog(HttpTunnelConnection.class);
 
@@ -84,7 +88,8 @@ public class HttpTunnelConnection implements TunnelConnection {
 			this.uri = new URL(url).toURI();
 		}
 		catch (URISyntaxException | MalformedURLException ex) {
-			throw new IllegalArgumentException("Malformed URL '" + url + "'");
+			logger1.error(ex.getMessage(), ex);
+			throw new IllegalArgumentException(new StringBuilder().append("Malformed URL '").append(url).append("'").toString());
 		}
 		this.requestFactory = requestFactory;
 		this.executor = (executor != null) ? executor : Executors.newCachedThreadPool(new TunnelThreadFactory());
@@ -105,6 +110,8 @@ public class HttpTunnelConnection implements TunnelConnection {
 	 * A {@link WritableByteChannel} used to transfer traffic.
 	 */
 	protected class TunnelChannel implements WritableByteChannel {
+
+		private final Logger logger2 = LoggerFactory.getLogger(TunnelChannel.class);
 
 		private final HttpTunnelPayloadForwarder forwarder;
 
@@ -127,10 +134,11 @@ public class HttpTunnelConnection implements TunnelConnection {
 
 		@Override
 		public void close() throws IOException {
-			if (this.open) {
-				this.open = false;
-				this.closeable.close();
+			if (!(this.open)) {
+				return;
 			}
+			this.open = false;
+			this.closeable.close();
 		}
 
 		@Override
@@ -166,6 +174,7 @@ public class HttpTunnelConnection implements TunnelConnection {
 						close();
 					}
 					catch (IOException ex) {
+						logger2.error(ex.getMessage(), ex);
 						// Ignore
 					}
 				}

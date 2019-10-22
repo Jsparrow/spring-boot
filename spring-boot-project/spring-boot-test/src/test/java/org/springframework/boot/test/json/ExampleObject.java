@@ -59,7 +59,7 @@ public class ExampleObject {
 
 	@Override
 	public String toString() {
-		return this.name + " " + this.age;
+		return new StringBuilder().append(this.name).append(" ").append(this.age).toString();
 	}
 
 }

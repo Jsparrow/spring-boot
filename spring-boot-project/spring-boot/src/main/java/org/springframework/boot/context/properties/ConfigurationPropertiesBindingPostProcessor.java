@@ -74,7 +74,7 @@ public class ConfigurationPropertiesBindingPostProcessor
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
@@ -92,7 +92,7 @@ public class ConfigurationPropertiesBindingPostProcessor
 	}
 
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		bind(ConfigurationPropertiesBean.get(this.applicationContext, bean, beanName));
 		return bean;
 	}
@@ -101,8 +101,7 @@ public class ConfigurationPropertiesBindingPostProcessor
 		if (bean == null || hasBoundValueObject(bean.getName())) {
 			return;
 		}
-		Assert.state(bean.getBindMethod() == BindMethod.JAVA_BEAN, "Cannot bind @ConfigurationProperties for bean '"
-				+ bean.getName() + "'. Ensure that @ConstructorBinding has not been applied to regular bean");
+		Assert.state(bean.getBindMethod() == BindMethod.JAVA_BEAN, new StringBuilder().append("Cannot bind @ConfigurationProperties for bean '").append(bean.getName()).append("'. Ensure that @ConstructorBinding has not been applied to regular bean").toString());
 		try {
 			this.binder.bind(bean);
 		}

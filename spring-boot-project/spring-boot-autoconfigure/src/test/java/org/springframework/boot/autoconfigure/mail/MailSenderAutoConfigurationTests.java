@@ -238,7 +238,7 @@ class MailSenderAutoConfigurationTests {
 				});
 	}
 
-	private Session configureJndiSession(String name) throws IllegalStateException {
+	private Session configureJndiSession(String name) {
 		Properties properties = new Properties();
 		Session session = Session.getDefaultInstance(properties);
 		TestableInitialContextFactory.bind(name, session);

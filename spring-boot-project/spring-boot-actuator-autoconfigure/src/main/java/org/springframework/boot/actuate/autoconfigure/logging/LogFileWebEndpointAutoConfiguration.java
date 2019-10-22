@@ -77,11 +77,11 @@ public class LogFileWebEndpointAutoConfiguration {
 		}
 
 		private String getLogFileConfig(Environment environment, String configName, String deprecatedConfigName) {
-			String config = environment.resolvePlaceholders("${" + configName + ":}");
+			String config = environment.resolvePlaceholders(new StringBuilder().append("${").append(configName).append(":}").toString());
 			if (StringUtils.hasText(config)) {
 				return config;
 			}
-			return environment.resolvePlaceholders("${" + deprecatedConfigName + ":}");
+			return environment.resolvePlaceholders(new StringBuilder().append("${").append(deprecatedConfigName).append(":}").toString());
 		}
 
 	}

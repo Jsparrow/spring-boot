@@ -197,23 +197,24 @@ public final class LambdaSafe {
 			if (moduleSeparatorIndex != -1 && message.startsWith(argumentType.getName(), moduleSeparatorIndex + 1)) {
 				return true;
 			}
-			if (CLASS_GET_MODULE != null) {
-				Object module = ReflectionUtils.invokeMethod(CLASS_GET_MODULE, argumentType);
-				Object moduleName = ReflectionUtils.invokeMethod(MODULE_GET_NAME, module);
-				return message.startsWith(moduleName + "/" + argumentType.getName());
+			if (CLASS_GET_MODULE == null) {
+				return false;
 			}
-			return false;
+			Object module = ReflectionUtils.invokeMethod(CLASS_GET_MODULE, argumentType);
+			Object moduleName = ReflectionUtils.invokeMethod(MODULE_GET_NAME, module);
+			return message.startsWith(new StringBuilder().append(moduleName).append("/").append(argumentType.getName()).toString());
 		}
 
 		private void logNonMatchingType(C callback, ClassCastException ex) {
-			if (this.logger.isDebugEnabled()) {
-				Class<?> expectedType = ResolvableType.forClass(this.callbackType).resolveGeneric();
-				String expectedTypeName = (expectedType != null) ? ClassUtils.getShortName(expectedType) + " type"
-						: "type";
-				String message = "Non-matching " + expectedTypeName + " for callback "
-						+ ClassUtils.getShortName(this.callbackType) + ": " + callback;
-				this.logger.debug(message, ex);
+			if (!this.logger.isDebugEnabled()) {
+				return;
 			}
+			Class<?> expectedType = ResolvableType.forClass(this.callbackType).resolveGeneric();
+			String expectedTypeName = (expectedType != null) ? ClassUtils.getShortName(expectedType) + " type"
+					: "type";
+			String message = new StringBuilder().append("Non-matching ").append(expectedTypeName).append(" for callback ").append(ClassUtils.getShortName(this.callbackType)).append(": ").append(callback)
+					.toString();
+			this.logger.debug(message, ex);
 		}
 
 		@SuppressWarnings("unchecked")

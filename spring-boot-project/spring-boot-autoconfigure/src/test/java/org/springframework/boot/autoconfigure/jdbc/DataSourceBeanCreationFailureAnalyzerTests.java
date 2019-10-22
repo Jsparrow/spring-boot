@@ -66,12 +66,10 @@ class DataSourceBeanCreationFailureAnalyzerTests {
 	}
 
 	private BeanCreationException createFailure(Class<?> configuration) {
-		try {
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
 			context.setEnvironment(this.environment);
 			context.register(configuration);
 			context.refresh();
-			context.close();
 			return null;
 		}
 		catch (BeanCreationException ex) {

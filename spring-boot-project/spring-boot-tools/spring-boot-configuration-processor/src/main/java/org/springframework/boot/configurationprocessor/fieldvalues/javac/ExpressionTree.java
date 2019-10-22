@@ -66,18 +66,16 @@ class ExpressionTree extends ReflectionWrapper {
 	}
 
 	List<? extends ExpressionTree> getArrayExpression() throws Exception {
-		if (this.newArrayTreeType.isAssignableFrom(getInstance().getClass())) {
-			List<?> elements = (List<?>) this.arrayValueMethod.invoke(getInstance());
-			List<ExpressionTree> result = new ArrayList<>();
-			if (elements == null) {
-				return result;
-			}
-			for (Object element : elements) {
-				result.add(new ExpressionTree(element));
-			}
+		if (!this.newArrayTreeType.isAssignableFrom(getInstance().getClass())) {
+			return null;
+		}
+		List<?> elements = (List<?>) this.arrayValueMethod.invoke(getInstance());
+		List<ExpressionTree> result = new ArrayList<>();
+		if (elements == null) {
 			return result;
 		}
-		return null;
+		elements.forEach(element -> result.add(new ExpressionTree(element)));
+		return result;
 	}
 
 }

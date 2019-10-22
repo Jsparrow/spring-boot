@@ -31,6 +31,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link Bindable}.
@@ -39,6 +41,8 @@ import static org.mockito.Mockito.mock;
  * @author Madhura Bhave
  */
 class BindableTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(BindableTests.class);
 
 	@Test
 	void ofClassWhenTypeIsNullShouldThrowException() {
@@ -145,7 +149,7 @@ class BindableTests {
 	void toStringShouldShowDetails() {
 		Annotation annotation = AnnotationUtils.synthesizeAnnotation(TestAnnotation.class);
 		Bindable<String> bindable = Bindable.of(String.class).withExistingValue("foo").withAnnotations(annotation);
-		System.out.println(bindable.toString());
+		logger.info(bindable.toString());
 		assertThat(bindable.toString())
 				.contains("type = java.lang.String, value = 'provided', annotations = array<Annotation>["
 						+ "@org.springframework.boot.context.properties.bind.BindableTests$TestAnnotation()]");
@@ -210,11 +214,11 @@ class BindableTests {
 
 	static class TestNewInstanceWithNoDefaultConstructor {
 
+		private String foo = "hello world";
+
 		TestNewInstanceWithNoDefaultConstructor(String foo) {
 			this.foo = foo;
 		}
-
-		private String foo = "hello world";
 
 		String getFoo() {
 			return this.foo;

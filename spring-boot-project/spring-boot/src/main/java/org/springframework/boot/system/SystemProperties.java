@@ -16,6 +16,9 @@
 
 package org.springframework.boot.system;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Access to system properties.
  *
@@ -23,6 +26,8 @@ package org.springframework.boot.system;
  * @since 2.0.0
  */
 public final class SystemProperties {
+
+	private static final Logger logger = LoggerFactory.getLogger(SystemProperties.class);
 
 	private SystemProperties() {
 	}
@@ -37,7 +42,7 @@ public final class SystemProperties {
 				}
 			}
 			catch (Throwable ex) {
-				System.err.println("Could not resolve '" + property + "' as system property: " + ex);
+				logger.error(new StringBuilder().append("Could not resolve '").append(property).append("' as system property: ").append(ex).toString());
 			}
 		}
 		return null;

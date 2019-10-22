@@ -22,10 +22,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SampleRedisApplication implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleRedisApplication.class);
 	@Autowired
 	private StringRedisTemplate template;
 
@@ -36,7 +39,7 @@ public class SampleRedisApplication implements CommandLineRunner {
 		if (!this.template.hasKey(key)) {
 			ops.set(key, "foo");
 		}
-		System.out.println("Found key " + key + ", value=" + ops.get(key));
+		logger.info(new StringBuilder().append("Found key ").append(key).append(", value=").append(ops.get(key)).toString());
 	}
 
 	public static void main(String[] args) {

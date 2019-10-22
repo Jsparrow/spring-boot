@@ -146,7 +146,7 @@ class RemoteClientConfigurationTests {
 		if (setSecret) {
 			TestPropertyValues.of("spring.devtools.remote.secret:secret").applyTo(this.clientContext);
 		}
-		String remoteUrlProperty = "remoteUrl:" + remoteUrl + ":" + this.context.getWebServer().getPort();
+		String remoteUrlProperty = new StringBuilder().append("remoteUrl:").append(remoteUrl).append(":").append(this.context.getWebServer().getPort()).toString();
 		TestPropertyValues.of(remoteUrlProperty).applyTo(this.clientContext);
 		this.clientContext.refresh();
 	}

@@ -42,7 +42,7 @@ class ManagementPortWithLazyInitializationTests {
 	@Test
 	void testHealth() {
 		ResponseEntity<String> entity = new TestRestTemplate().withBasicAuth("user", "password")
-				.getForEntity("http://localhost:" + this.managementPort + "/actuator/health", String.class);
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/actuator/health").toString(), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).contains("\"status\":\"UP\"");
 	}

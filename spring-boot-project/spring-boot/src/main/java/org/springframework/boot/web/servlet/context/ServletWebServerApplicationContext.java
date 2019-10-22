@@ -136,7 +136,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	}
 
 	@Override
-	public final void refresh() throws BeansException, IllegalStateException {
+	public final void refresh() {
 		try {
 			super.refresh();
 		}
@@ -204,8 +204,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 					+ "ServletWebServerFactory bean.");
 		}
 		if (beanNames.length > 1) {
-			throw new ApplicationContextException("Unable to start ServletWebServerApplicationContext due to multiple "
-					+ "ServletWebServerFactory beans : " + StringUtils.arrayToCommaDelimitedString(beanNames));
+			throw new ApplicationContextException(new StringBuilder().append("Unable to start ServletWebServerApplicationContext due to multiple ").append("ServletWebServerFactory beans : ").append(StringUtils.arrayToCommaDelimitedString(beanNames)).toString());
 		}
 		return getBeanFactory().getBean(beanNames[0], ServletWebServerFactory.class);
 	}
@@ -275,13 +274,12 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		try {
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this);
 			if (logger.isDebugEnabled()) {
-				logger.debug("Published root WebApplicationContext as ServletContext attribute with name ["
-						+ WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE + "]");
+				logger.debug(new StringBuilder().append("Published root WebApplicationContext as ServletContext attribute with name [").append(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE).append("]").toString());
 			}
 			setServletContext(servletContext);
 			if (logger.isInfoEnabled()) {
 				long elapsedTime = System.currentTimeMillis() - getStartupDate();
-				logger.info("Root WebApplicationContext: initialization completed in " + elapsedTime + " ms");
+				logger.info(new StringBuilder().append("Root WebApplicationContext: initialization completed in ").append(elapsedTime).append(" ms").toString());
 			}
 		}
 		catch (RuntimeException | Error ex) {
@@ -372,12 +370,12 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 
 		public ExistingWebApplicationScopes(ConfigurableListableBeanFactory beanFactory) {
 			this.beanFactory = beanFactory;
-			for (String scopeName : SCOPES) {
+			SCOPES.forEach(scopeName -> {
 				Scope scope = beanFactory.getRegisteredScope(scopeName);
 				if (scope != null) {
 					this.scopes.put(scopeName, scope);
 				}
-			}
+			});
 		}
 
 		public void restore() {

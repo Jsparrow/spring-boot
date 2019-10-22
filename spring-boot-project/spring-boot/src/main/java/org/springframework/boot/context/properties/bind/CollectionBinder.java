@@ -24,6 +24,8 @@ import org.springframework.boot.context.properties.bind.Binder.Context;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.ResolvableType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link AggregateBinder} for collections.
@@ -32,6 +34,8 @@ import org.springframework.core.ResolvableType;
  * @author Madhura Bhave
  */
 class CollectionBinder extends IndexedElementsBinder<Collection<Object>> {
+
+	private static final Logger logger = LoggerFactory.getLogger(CollectionBinder.class);
 
 	CollectionBinder(Context context) {
 		super(context);
@@ -65,6 +69,7 @@ class CollectionBinder extends IndexedElementsBinder<Collection<Object>> {
 			return copyIfPossible(existingCollection);
 		}
 		catch (UnsupportedOperationException ex) {
+			logger.error(ex.getMessage(), ex);
 			return createNewCollection(additional);
 		}
 	}
@@ -74,6 +79,7 @@ class CollectionBinder extends IndexedElementsBinder<Collection<Object>> {
 			return existing.get();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -83,6 +89,7 @@ class CollectionBinder extends IndexedElementsBinder<Collection<Object>> {
 			return createNewCollection(collection);
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return collection;
 		}
 	}

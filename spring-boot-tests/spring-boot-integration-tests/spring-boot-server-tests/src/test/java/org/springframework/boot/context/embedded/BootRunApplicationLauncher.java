@@ -141,7 +141,7 @@ class BootRunApplicationLauncher extends AbstractApplicationLauncher {
 
 	@Override
 	protected String getDescription(String packaging) {
-		return "build system run " + packaging + " project";
+		return new StringBuilder().append("build system run ").append(packaging).append(" project").toString();
 	}
 
 }

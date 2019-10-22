@@ -156,11 +156,11 @@ class HandlerTests {
 	void fallbackToJdksJarUrlStreamHandler(@TempDir File tempDir) throws Exception {
 		File testJar = new File(tempDir, "test.jar");
 		TestJarCreator.createTestJar(testJar);
-		URLConnection connection = new URL(null, "jar:" + testJar.toURI().toURL() + "!/nested.jar!/", this.handler)
+		URLConnection connection = new URL(null, new StringBuilder().append("jar:").append(testJar.toURI().toURL()).append("!/nested.jar!/").toString(), this.handler)
 				.openConnection();
 		assertThat(connection).isInstanceOf(JarURLConnection.class);
 		((JarURLConnection) connection).getJarFile().close();
-		URLConnection jdkConnection = new URL(null, "jar:file:" + testJar.toURI().toURL() + "!/nested.jar!/",
+		URLConnection jdkConnection = new URL(null, new StringBuilder().append("jar:file:").append(testJar.toURI().toURL()).append("!/nested.jar!/").toString(),
 				this.handler).openConnection();
 		assertThat(jdkConnection).isNotInstanceOf(JarURLConnection.class);
 	}
@@ -169,7 +169,7 @@ class HandlerTests {
 	void whenJarHasAPlusInItsPathConnectionJarFileMatchesOriginalJarFile(@TempDir File tempDir) throws Exception {
 		File testJar = new File(tempDir, "t+e+s+t.jar");
 		TestJarCreator.createTestJar(testJar);
-		URL url = new URL(null, "jar:" + testJar.toURI().toURL() + "!/nested.jar!/3.dat", this.handler);
+		URL url = new URL(null, new StringBuilder().append("jar:").append(testJar.toURI().toURL()).append("!/nested.jar!/3.dat").toString(), this.handler);
 		JarURLConnection connection = (JarURLConnection) url.openConnection();
 		try {
 			assertThat(connection.getJarFile().getRootJarFile().getFile()).isEqualTo(testJar);
@@ -183,7 +183,7 @@ class HandlerTests {
 	void whenJarHasASpaceInItsPathConnectionJarFileMatchesOriginalJarFile(@TempDir File tempDir) throws Exception {
 		File testJar = new File(tempDir, "t e s t.jar");
 		TestJarCreator.createTestJar(testJar);
-		URL url = new URL(null, "jar:" + testJar.toURI().toURL() + "!/nested.jar!/3.dat", this.handler);
+		URL url = new URL(null, new StringBuilder().append("jar:").append(testJar.toURI().toURL()).append("!/nested.jar!/3.dat").toString(), this.handler);
 		JarURLConnection connection = (JarURLConnection) url.openConnection();
 		try {
 			assertThat(connection.getJarFile().getRootJarFile().getFile()).isEqualTo(testJar);

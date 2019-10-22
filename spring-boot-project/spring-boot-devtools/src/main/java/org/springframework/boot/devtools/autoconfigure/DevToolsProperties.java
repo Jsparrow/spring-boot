@@ -59,9 +59,7 @@ public class DevToolsProperties {
 	 */
 	public static class Restart {
 
-		private static final String DEFAULT_RESTART_EXCLUDES = "META-INF/maven/**,"
-				+ "META-INF/resources/**,resources/**,static/**,public/**,templates/**,"
-				+ "**/*Test.class,**/*Tests.class,git.properties,META-INF/build-info.properties";
+		private static final String DEFAULT_RESTART_EXCLUDES = new StringBuilder().append("META-INF/maven/**,").append("META-INF/resources/**,resources/**,static/**,public/**,templates/**,").append("**/*Test.class,**/*Tests.class,git.properties,META-INF/build-info.properties").toString();
 
 		/**
 		 * Whether to enable automatic restart.

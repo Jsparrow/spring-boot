@@ -37,6 +37,8 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link ErrorAttributes}. Provides the following attributes
@@ -61,6 +63,8 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class DefaultErrorAttributes implements ErrorAttributes, HandlerExceptionResolver, Ordered {
+
+	private static final Logger logger = LoggerFactory.getLogger(DefaultErrorAttributes.class);
 
 	private static final String ERROR_ATTRIBUTE = DefaultErrorAttributes.class.getName() + ".ERROR";
 
@@ -120,6 +124,7 @@ public class DefaultErrorAttributes implements ErrorAttributes, HandlerException
 			errorAttributes.put("error", HttpStatus.valueOf(status).getReasonPhrase());
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// Unable to obtain a reason
 			errorAttributes.put("error", "Http Status " + status);
 		}
@@ -155,8 +160,7 @@ public class DefaultErrorAttributes implements ErrorAttributes, HandlerException
 		}
 		if (result.hasErrors()) {
 			errorAttributes.put("errors", result.getAllErrors());
-			errorAttributes.put("message", "Validation failed for object='" + result.getObjectName()
-					+ "'. Error count: " + result.getErrorCount());
+			errorAttributes.put("message", new StringBuilder().append("Validation failed for object='").append(result.getObjectName()).append("'. Error count: ").append(result.getErrorCount()).toString());
 		}
 		else {
 			errorAttributes.put("message", "No errors");

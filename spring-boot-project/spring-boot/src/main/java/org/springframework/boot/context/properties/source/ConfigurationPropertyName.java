@@ -272,12 +272,12 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 		if (result != 0) {
 			return result;
 		}
-		if (type1 == ElementType.NUMERICALLY_INDEXED && type2 == ElementType.NUMERICALLY_INDEXED) {
-			long v1 = Long.parseLong(e1);
-			long v2 = Long.parseLong(e2);
-			return Long.compare(v1, v2);
+		if (!(type1 == ElementType.NUMERICALLY_INDEXED && type2 == ElementType.NUMERICALLY_INDEXED)) {
+			return e1.compareTo(e2);
 		}
-		return e1.compareTo(e2);
+		long v1 = Long.parseLong(e1);
+		long v2 = Long.parseLong(e2);
+		return Long.compare(v1, v2);
 	}
 
 	@Override
@@ -407,19 +407,19 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	private boolean fastElementEquals(Elements e1, Elements e2, int i) {
 		int length1 = e1.getLength(i);
 		int length2 = e2.getLength(i);
-		if (length1 == length2) {
-			int i1 = 0;
-			while (length1-- != 0) {
-				char ch1 = e1.charAt(i, i1);
-				char ch2 = e2.charAt(i, i1);
-				if (ch1 != ch2) {
-					return false;
-				}
-				i1++;
-			}
-			return true;
+		if (length1 != length2) {
+			return false;
 		}
-		return false;
+		int i1 = 0;
+		while (length1-- != 0) {
+			char ch1 = e1.charAt(i, i1);
+			char ch2 = e2.charAt(i, i1);
+			if (ch1 != ch2) {
+				return false;
+			}
+			i1++;
+		}
+		return true;
 	}
 
 	@Override
@@ -617,6 +617,62 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	}
 
 	/**
+	 * The various types of element that we can detect.
+	 */
+	private enum ElementType {
+
+		/**
+		 * The element is logically empty (contains no valid chars).
+		 */
+		EMPTY(false),
+
+		/**
+		 * The element is a uniform name (a-z, 0-9, no dashes, lowercase).
+		 */
+		UNIFORM(false),
+
+		/**
+		 * The element is almost uniform, but it contains (but does not start with) at
+		 * least one dash.
+		 */
+		DASHED(false),
+
+		/**
+		 * The element contains non uniform characters and will need to be converted.
+		 */
+		NON_UNIFORM(false),
+
+		/**
+		 * The element is non-numerically indexed.
+		 */
+		INDEXED(true),
+
+		/**
+		 * The element is numerically indexed.
+		 */
+		NUMERICALLY_INDEXED(true);
+
+		private final boolean indexed;
+
+		ElementType(boolean indexed) {
+			this.indexed = indexed;
+		}
+
+		public boolean isIndexed() {
+			return this.indexed;
+		}
+
+		public boolean allowsFastEqualityCheck() {
+			return this == UNIFORM || this == NUMERICALLY_INDEXED;
+		}
+
+		public boolean allowsDashIgnoringEqualityCheck() {
+			return allowsFastEqualityCheck() || this == DASHED;
+		}
+
+	}
+
+	/**
 	 * Allows access to the individual elements that make up the name. We store the
 	 * indexes in arrays rather than a list of object in order to conserve memory.
 	 */
@@ -649,7 +705,6 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 		private final CharSequence[] resolved;
 
 		Elements(CharSequence source, int size, int[] start, int[] end, ElementType[] type, CharSequence[] resolved) {
-			super();
 			this.source = source;
 			this.size = size;
 			this.start = start;
@@ -845,13 +900,13 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 			if (existingType == ElementType.UNIFORM && ch == '-') {
 				return ElementType.DASHED;
 			}
-			if (!isValidChar(ch, index)) {
-				if (existingType == ElementType.EMPTY && !isValidChar(Character.toLowerCase(ch), index)) {
-					return ElementType.EMPTY;
-				}
-				return ElementType.NON_UNIFORM;
+			if (isValidChar(ch, index)) {
+				return existingType;
 			}
-			return existingType;
+			if (existingType == ElementType.EMPTY && !isValidChar(Character.toLowerCase(ch), index)) {
+				return ElementType.EMPTY;
+			}
+			return ElementType.NON_UNIFORM;
 		}
 
 		private void add(int start, int end, ElementType type, Function<CharSequence, CharSequence> valueProcessor) {
@@ -915,62 +970,6 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 		private static boolean isNumeric(char ch) {
 			return ch >= '0' && ch <= '9';
-		}
-
-	}
-
-	/**
-	 * The various types of element that we can detect.
-	 */
-	private enum ElementType {
-
-		/**
-		 * The element is logically empty (contains no valid chars).
-		 */
-		EMPTY(false),
-
-		/**
-		 * The element is a uniform name (a-z, 0-9, no dashes, lowercase).
-		 */
-		UNIFORM(false),
-
-		/**
-		 * The element is almost uniform, but it contains (but does not start with) at
-		 * least one dash.
-		 */
-		DASHED(false),
-
-		/**
-		 * The element contains non uniform characters and will need to be converted.
-		 */
-		NON_UNIFORM(false),
-
-		/**
-		 * The element is non-numerically indexed.
-		 */
-		INDEXED(true),
-
-		/**
-		 * The element is numerically indexed.
-		 */
-		NUMERICALLY_INDEXED(true);
-
-		private final boolean indexed;
-
-		ElementType(boolean indexed) {
-			this.indexed = indexed;
-		}
-
-		public boolean isIndexed() {
-			return this.indexed;
-		}
-
-		public boolean allowsFastEqualityCheck() {
-			return this == UNIFORM || this == NUMERICALLY_INDEXED;
-		}
-
-		public boolean allowsDashIgnoringEqualityCheck() {
-			return allowsFastEqualityCheck() || this == DASHED;
 		}
 
 	}

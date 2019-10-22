@@ -30,6 +30,8 @@ import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Jetty {@link AbstractLifeCycle} to initialize Jasper.
@@ -38,6 +40,8 @@ import org.springframework.util.ClassUtils;
  * @author Phillip Webb
  */
 class JasperInitializer extends AbstractLifeCycle {
+
+	private static final Logger logger = LoggerFactory.getLogger(JasperInitializer.class);
 
 	private static final String[] INITIALIZER_CLASSES = { "org.eclipse.jetty.apache.jsp.JettyJasperInitializer",
 			"org.apache.jasper.servlet.JasperInitializer" };
@@ -58,6 +62,7 @@ class JasperInitializer extends AbstractLifeCycle {
 				return (ServletContainerInitializer) initializerClass.newInstance();
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}
@@ -78,6 +83,7 @@ class JasperInitializer extends AbstractLifeCycle {
 				URL.setURLStreamHandlerFactory(new WarUrlStreamHandlerFactory());
 			}
 			catch (Error ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}
@@ -102,6 +108,7 @@ class JasperInitializer extends AbstractLifeCycle {
 			this.context.getServletContext().setExtendedListenerTypes(extended);
 		}
 		catch (NoSuchMethodError ex) {
+			logger.error(ex.getMessage(), ex);
 			// Not available on Jetty 8
 		}
 	}
@@ -133,7 +140,7 @@ class JasperInitializer extends AbstractLifeCycle {
 			String path = "jar:" + spec.substring("war:".length());
 			int separator = path.indexOf("*/");
 			if (separator >= 0) {
-				path = path.substring(0, separator) + "!/" + path.substring(separator + 2);
+				path = new StringBuilder().append(path.substring(0, separator)).append("!/").append(path.substring(separator + 2)).toString();
 			}
 			setURL(u, u.getProtocol(), "", -1, null, null, path, null, null);
 		}
@@ -159,10 +166,11 @@ class JasperInitializer extends AbstractLifeCycle {
 
 		@Override
 		public void connect() throws IOException {
-			if (!this.connected) {
-				this.connection.connect();
-				this.connected = true;
+			if (this.connected) {
+				return;
 			}
+			this.connection.connect();
+			this.connected = true;
 		}
 
 		@Override

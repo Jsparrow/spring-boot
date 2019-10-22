@@ -54,7 +54,7 @@ class JerseyManagementPortTests {
 
 	@Test
 	void resourceShouldBeAvailableOnMainPort() {
-		ResponseEntity<String> entity = this.testRestTemplate.getForEntity("http://localhost:" + this.port + "/test",
+		ResponseEntity<String> entity = this.testRestTemplate.getForEntity(new StringBuilder().append("http://localhost:").append(this.port).append("/test").toString(),
 				String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).contains("test");
@@ -63,7 +63,7 @@ class JerseyManagementPortTests {
 	@Test
 	void resourceShouldNotBeAvailableOnManagementPort() {
 		ResponseEntity<String> entity = this.testRestTemplate
-				.getForEntity("http://localhost:" + this.managementPort + "/test", String.class);
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/test").toString(), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
@@ -72,12 +72,7 @@ class JerseyManagementPortTests {
 
 		@Bean
 		ResourceConfigCustomizer customizer() {
-			return new ResourceConfigCustomizer() {
-				@Override
-				public void customize(ResourceConfig config) {
-					config.register(TestEndpoint.class);
-				}
-			};
+			return (ResourceConfig config) -> config.register(TestEndpoint.class);
 		}
 
 		@Path("/test")

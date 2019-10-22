@@ -60,6 +60,12 @@ public class InnerClassProperties {
 		this.fourth = fourth;
 	}
 
+	public enum Fourth {
+
+		YES, NO
+
+	}
+
 	public static class Foo {
 
 		private String name;
@@ -91,12 +97,6 @@ public class InnerClassProperties {
 			}
 
 		}
-
-	}
-
-	public enum Fourth {
-
-		YES, NO
 
 	}
 

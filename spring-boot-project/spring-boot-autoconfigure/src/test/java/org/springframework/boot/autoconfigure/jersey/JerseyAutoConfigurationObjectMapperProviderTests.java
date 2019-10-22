@@ -67,6 +67,16 @@ class JerseyAutoConfigurationObjectMapperProviderTests {
 		assertThat(response.getBody()).isEqualTo("{\"subject\":\"Jersey\"}");
 	}
 
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@Configuration
+	@Import({ ServletWebServerFactoryAutoConfiguration.class, JacksonAutoConfiguration.class,
+			JerseyAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
+	protected @interface MinimalWebConfiguration {
+
+	}
+
 	@MinimalWebConfiguration
 	@ApplicationPath("/rest")
 	@Path("/message")
@@ -121,16 +131,6 @@ class JerseyAutoConfigurationObjectMapperProviderTests {
 		public String getFoo() {
 			return "foo";
 		}
-
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@Configuration
-	@Import({ ServletWebServerFactoryAutoConfiguration.class, JacksonAutoConfiguration.class,
-			JerseyAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
-	protected @interface MinimalWebConfiguration {
 
 	}
 

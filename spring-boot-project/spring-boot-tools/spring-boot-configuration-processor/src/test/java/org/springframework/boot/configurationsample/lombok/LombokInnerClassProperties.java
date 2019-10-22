@@ -45,6 +45,12 @@ public class LombokInnerClassProperties {
 		return this.third;
 	}
 
+	public enum Fourth {
+
+		YES, NO
+
+	}
+
 	@Data
 	public static class Foo {
 
@@ -58,12 +64,6 @@ public class LombokInnerClassProperties {
 			private String name;
 
 		}
-
-	}
-
-	public enum Fourth {
-
-		YES, NO
 
 	}
 

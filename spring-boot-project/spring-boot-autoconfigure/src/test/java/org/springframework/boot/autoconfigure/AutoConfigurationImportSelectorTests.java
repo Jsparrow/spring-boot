@@ -120,14 +120,14 @@ class AutoConfigurationImportSelectorTests {
 	@Test
 	void severalPropertyExclusionsAreApplied() {
 		this.environment.setProperty("spring.autoconfigure.exclude",
-				FreeMarkerAutoConfiguration.class.getName() + "," + MustacheAutoConfiguration.class.getName());
+				new StringBuilder().append(FreeMarkerAutoConfiguration.class.getName()).append(",").append(MustacheAutoConfiguration.class.getName()).toString());
 		testSeveralPropertyExclusionsAreApplied();
 	}
 
 	@Test
 	void severalPropertyExclusionsAreAppliedWithExtraSpaces() {
 		this.environment.setProperty("spring.autoconfigure.exclude",
-				FreeMarkerAutoConfiguration.class.getName() + " , " + MustacheAutoConfiguration.class.getName() + " ");
+				new StringBuilder().append(FreeMarkerAutoConfiguration.class.getName()).append(" , ").append(MustacheAutoConfiguration.class.getName()).append(" ").toString());
 		testSeveralPropertyExclusionsAreApplied();
 	}
 
@@ -252,7 +252,7 @@ class AutoConfigurationImportSelectorTests {
 		}
 
 		@Override
-		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		public void setBeanFactory(BeanFactory beanFactory) {
 			this.beanFactory = beanFactory;
 		}
 

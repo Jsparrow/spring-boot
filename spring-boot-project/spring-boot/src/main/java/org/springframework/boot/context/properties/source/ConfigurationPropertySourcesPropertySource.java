@@ -21,6 +21,8 @@ import org.springframework.boot.origin.OriginLookup;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.env.PropertySource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link PropertySource} that exposes {@link ConfigurationPropertySource} instances so
@@ -32,6 +34,8 @@ import org.springframework.core.env.PropertySource;
  */
 class ConfigurationPropertySourcesPropertySource extends PropertySource<Iterable<ConfigurationPropertySource>>
 		implements OriginLookup<String> {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConfigurationPropertySourcesPropertySource.class);
 
 	ConfigurationPropertySourcesPropertySource(String name, Iterable<ConfigurationPropertySource> source) {
 		super(name, source);
@@ -53,6 +57,7 @@ class ConfigurationPropertySourcesPropertySource extends PropertySource<Iterable
 			return findConfigurationProperty(ConfigurationPropertyName.of(name, true));
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

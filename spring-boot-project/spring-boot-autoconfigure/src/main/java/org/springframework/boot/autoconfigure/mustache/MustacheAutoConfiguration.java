@@ -61,13 +61,12 @@ public class MustacheAutoConfiguration {
 
 	@PostConstruct
 	public void checkTemplateLocationExists() {
-		if (this.mustache.isCheckTemplateLocation()) {
-			TemplateLocation location = new TemplateLocation(this.mustache.getPrefix());
-			if (!location.exists(this.applicationContext)) {
-				logger.warn("Cannot find template location: " + location
-						+ " (please add some templates, check your Mustache configuration, or set spring.mustache."
-						+ "check-template-location=false)");
-			}
+		if (!this.mustache.isCheckTemplateLocation()) {
+			return;
+		}
+		TemplateLocation location = new TemplateLocation(this.mustache.getPrefix());
+		if (!location.exists(this.applicationContext)) {
+			logger.warn(new StringBuilder().append("Cannot find template location: ").append(location).append(" (please add some templates, check your Mustache configuration, or set spring.mustache.").append("check-template-location=false)").toString());
 		}
 	}
 

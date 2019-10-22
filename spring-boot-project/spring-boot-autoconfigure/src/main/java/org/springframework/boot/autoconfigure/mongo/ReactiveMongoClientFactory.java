@@ -128,9 +128,7 @@ public class ReactiveMongoClientFactory {
 	}
 
 	private void customize(MongoClientSettings.Builder builder) {
-		for (MongoClientSettingsBuilderCustomizer customizer : this.builderCustomizers) {
-			customizer.customize(builder);
-		}
+		this.builderCustomizers.forEach(customizer -> customizer.customize(builder));
 	}
 
 	private boolean hasCustomAddress() {

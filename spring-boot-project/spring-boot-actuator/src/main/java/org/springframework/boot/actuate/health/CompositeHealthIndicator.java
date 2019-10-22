@@ -68,9 +68,7 @@ public class CompositeHealthIndicator implements HealthIndicator {
 	@Override
 	public Health health() {
 		Map<String, Health> healths = new LinkedHashMap<>();
-		for (Map.Entry<String, HealthIndicator> entry : this.registry.getAll().entrySet()) {
-			healths.put(entry.getKey(), entry.getValue().health());
-		}
+		this.registry.getAll().entrySet().forEach(entry -> healths.put(entry.getKey(), entry.getValue().health()));
 		return this.aggregator.aggregate(healths);
 	}
 

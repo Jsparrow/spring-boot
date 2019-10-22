@@ -79,6 +79,12 @@ class ImportAutoConfigurationTests {
 		return orderedConfigBeans;
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
+	@ImportAutoConfiguration({ ConfigC.class, ConfigA.class })
+	@interface MetaImportAutoConfiguration {
+
+	}
+
 	@ImportAutoConfiguration({ ConfigD.class, ConfigB.class })
 	@MetaImportAutoConfiguration
 	static class Config {
@@ -115,12 +121,6 @@ class ImportAutoConfigurationTests {
 
 	@ImportAutoConfiguration(exclude = ConfigD.class)
 	static class ExcludeDConfig {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@ImportAutoConfiguration({ ConfigC.class, ConfigA.class })
-	@interface MetaImportAutoConfiguration {
 
 	}
 

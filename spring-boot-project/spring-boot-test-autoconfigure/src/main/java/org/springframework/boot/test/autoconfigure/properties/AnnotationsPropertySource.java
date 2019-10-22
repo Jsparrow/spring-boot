@@ -84,10 +84,9 @@ public class AnnotationsPropertySource extends EnumerablePropertySource<Class<?>
 		if (!value.isPresent()) {
 			return;
 		}
-		if (skip == SkipPropertyMapping.ON_DEFAULT_VALUE) {
-			if (ObjectUtils.nullSafeEquals(value.get(), annotation.getDefaultValue(attribute.getName()).orElse(null))) {
-				return;
-			}
+		boolean condition = skip == SkipPropertyMapping.ON_DEFAULT_VALUE && ObjectUtils.nullSafeEquals(value.get(), annotation.getDefaultValue(attribute.getName()).orElse(null));
+		if (condition) {
+			return;
 		}
 		String name = getName(prefix, attributeMapping, attribute);
 		putProperties(name, value.get(), properties);
@@ -105,7 +104,7 @@ public class AnnotationsPropertySource extends EnumerablePropertySource<Class<?>
 		Matcher matcher = CAMEL_CASE_PATTERN.matcher(name);
 		StringBuffer result = new StringBuffer();
 		while (matcher.find()) {
-			matcher.appendReplacement(result, matcher.group(1) + '-' + StringUtils.uncapitalize(matcher.group(2)));
+			matcher.appendReplacement(result, new StringBuilder().append(matcher.group(1)).append('-').append(StringUtils.uncapitalize(matcher.group(2))).toString());
 		}
 		matcher.appendTail(result);
 		return result.toString().toLowerCase(Locale.ENGLISH);
@@ -113,7 +112,7 @@ public class AnnotationsPropertySource extends EnumerablePropertySource<Class<?>
 
 	private String dotAppend(String prefix, String postfix) {
 		if (StringUtils.hasText(prefix)) {
-			return prefix.endsWith(".") ? prefix + postfix : prefix + "." + postfix;
+			return prefix.endsWith(".") ? prefix + postfix : new StringBuilder().append(prefix).append(".").append(postfix).toString();
 		}
 		return postfix;
 	}
@@ -122,7 +121,7 @@ public class AnnotationsPropertySource extends EnumerablePropertySource<Class<?>
 		if (ObjectUtils.isArray(value)) {
 			Object[] array = ObjectUtils.toObjectArray(value);
 			for (int i = 0; i < array.length; i++) {
-				properties.put(name + "[" + i + "]", array[i]);
+				properties.put(new StringBuilder().append(name).append("[").append(i).append("]").toString(), array[i]);
 			}
 		}
 		else {

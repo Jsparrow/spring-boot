@@ -45,6 +45,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Loads bean definitions from underlying sources, including XML and JavaConfig. Acts as a
@@ -56,6 +58,8 @@ import org.springframework.util.StringUtils;
  * @see #setBeanNameGenerator(BeanNameGenerator)
  */
 class BeanDefinitionLoader {
+
+	private static final Logger logger = LoggerFactory.getLogger(BeanDefinitionLoader.class);
 
 	private final Object[] sources;
 
@@ -153,11 +157,11 @@ class BeanDefinitionLoader {
 			GroovyBeanDefinitionSource loader = BeanUtils.instantiateClass(source, GroovyBeanDefinitionSource.class);
 			load(loader);
 		}
-		if (isComponent(source)) {
-			this.annotatedReader.register(source);
-			return 1;
+		if (!isComponent(source)) {
+			return 0;
 		}
-		return 0;
+		this.annotatedReader.register(source);
+		return 1;
 	}
 
 	private int load(GroovyBeanDefinitionSource source) {
@@ -168,13 +172,13 @@ class BeanDefinitionLoader {
 	}
 
 	private int load(Resource source) {
-		if (source.getFilename().endsWith(".groovy")) {
-			if (this.groovyReader == null) {
-				throw new BeanDefinitionStoreException("Cannot load Groovy beans without Groovy on classpath");
-			}
-			return this.groovyReader.loadBeanDefinitions(source);
+		if (!source.getFilename().endsWith(".groovy")) {
+			return this.xmlReader.loadBeanDefinitions(source);
 		}
-		return this.xmlReader.loadBeanDefinitions(source);
+		if (this.groovyReader == null) {
+			throw new BeanDefinitionStoreException("Cannot load Groovy beans without Groovy on classpath");
+		}
+		return this.groovyReader.loadBeanDefinitions(source);
 	}
 
 	private int load(Package source) {
@@ -188,6 +192,7 @@ class BeanDefinitionLoader {
 			return load(ClassUtils.forName(resolvedSource, null));
 		}
 		catch (IllegalArgumentException | ClassNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
 			// swallow exception and continue
 		}
 		// Attempt as resources
@@ -208,7 +213,7 @@ class BeanDefinitionLoader {
 		if (packageResource != null) {
 			return load(packageResource);
 		}
-		throw new IllegalArgumentException("Invalid source '" + resolvedSource + "'");
+		throw new IllegalArgumentException(new StringBuilder().append("Invalid source '").append(resolvedSource).append("'").toString());
 	}
 
 	private boolean isGroovyPresent() {
@@ -225,7 +230,8 @@ class BeanDefinitionLoader {
 			return new Resource[] { loader.getResource(source) };
 		}
 		catch (IOException ex) {
-			throw new IllegalStateException("Error reading source '" + source + "'");
+			logger.error(ex.getMessage(), ex);
+			throw new IllegalStateException(new StringBuilder().append("Error reading source '").append(source).append("'").toString());
 		}
 	}
 
@@ -244,6 +250,7 @@ class BeanDefinitionLoader {
 					return Package.getPackage(path) == null;
 				}
 				catch (Exception ex) {
+					logger.error(ex.getMessage(), ex);
 					// Ignore
 				}
 			}
@@ -263,11 +270,12 @@ class BeanDefinitionLoader {
 					.getResources(ClassUtils.convertClassNameToResourcePath(source.toString()) + "/*.class");
 			for (Resource resource : resources) {
 				String className = StringUtils.stripFilenameExtension(resource.getFilename());
-				load(Class.forName(source.toString() + "." + className));
+				load(Class.forName(new StringBuilder().append(source.toString()).append(".").append(className).toString()));
 				break;
 			}
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// swallow exception and continue
 		}
 		return Package.getPackage(source.toString());

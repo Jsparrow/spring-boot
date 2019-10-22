@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Logic to extract URLs of static resource jars (those containing
@@ -38,6 +40,8 @@ import java.util.stream.Stream;
  * @author Phillip Webb
  */
 class StaticResourceJars {
+
+	private static final Logger logger = LoggerFactory.getLogger(StaticResourceJars.class);
 
 	List<URL> getUrls() {
 		ClassLoader classLoader = getClass().getClassLoader();
@@ -63,7 +67,7 @@ class StaticResourceJars {
 			return new File(classPathEntry).toURI().toURL();
 		}
 		catch (MalformedURLException ex) {
-			throw new IllegalArgumentException("URL could not be created from '" + classPathEntry + "'", ex);
+			throw new IllegalArgumentException(new StringBuilder().append("URL could not be created from '").append(classPathEntry).append("'").toString(), ex);
 		}
 	}
 
@@ -72,9 +76,11 @@ class StaticResourceJars {
 			return new File(url.toURI());
 		}
 		catch (URISyntaxException ex) {
-			throw new IllegalStateException("Failed to create File from URL '" + url + "'");
+			logger.error(ex.getMessage(), ex);
+			throw new IllegalStateException(new StringBuilder().append("Failed to create File from URL '").append(url).append("'").toString());
 		}
 		catch (IllegalArgumentException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -116,6 +122,7 @@ class StaticResourceJars {
 			return isResourcesJar(connection.getJarFile());
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}
@@ -125,6 +132,7 @@ class StaticResourceJars {
 			return isResourcesJar(new JarFile(file));
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

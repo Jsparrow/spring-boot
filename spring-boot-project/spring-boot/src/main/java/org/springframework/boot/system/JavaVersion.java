@@ -83,12 +83,7 @@ public enum JavaVersion {
 	public static JavaVersion getJavaVersion() {
 		List<JavaVersion> candidates = Arrays.asList(JavaVersion.values());
 		Collections.reverse(candidates);
-		for (JavaVersion candidate : candidates) {
-			if (candidate.available) {
-				return candidate;
-			}
-		}
-		return EIGHT;
+		return candidates.stream().filter(candidate -> candidate.available).findFirst().orElse(EIGHT);
 	}
 
 	/**

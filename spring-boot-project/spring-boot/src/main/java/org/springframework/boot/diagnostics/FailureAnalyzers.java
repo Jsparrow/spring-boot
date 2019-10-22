@@ -84,9 +84,7 @@ final class FailureAnalyzers implements SpringBootExceptionReporter {
 	}
 
 	private void prepareFailureAnalyzers(List<FailureAnalyzer> analyzers, ConfigurableApplicationContext context) {
-		for (FailureAnalyzer analyzer : analyzers) {
-			prepareAnalyzer(context, analyzer);
-		}
+		analyzers.forEach(analyzer -> prepareAnalyzer(context, analyzer));
 	}
 
 	private void prepareAnalyzer(ConfigurableApplicationContext context, FailureAnalyzer analyzer) {
@@ -114,7 +112,7 @@ final class FailureAnalyzers implements SpringBootExceptionReporter {
 			}
 			catch (Throwable ex) {
 				if (logger.isDebugEnabled()) {
-					logger.debug("FailureAnalyzer " + analyzer + " failed", ex);
+					logger.debug(new StringBuilder().append("FailureAnalyzer ").append(analyzer).append(" failed").toString(), ex);
 				}
 			}
 		}
@@ -127,9 +125,7 @@ final class FailureAnalyzers implements SpringBootExceptionReporter {
 		if (analysis == null || reporters.isEmpty()) {
 			return false;
 		}
-		for (FailureAnalysisReporter reporter : reporters) {
-			reporter.report(analysis);
-		}
+		reporters.forEach(reporter -> reporter.report(analysis));
 		return true;
 	}
 

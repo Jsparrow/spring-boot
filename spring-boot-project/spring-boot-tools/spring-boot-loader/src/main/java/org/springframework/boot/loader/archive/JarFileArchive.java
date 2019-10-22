@@ -33,6 +33,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 
 import org.springframework.boot.loader.jar.JarFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Archive} implementation backed by a {@link JarFile}.
@@ -42,6 +44,8 @@ import org.springframework.boot.loader.jar.JarFile;
  * @since 1.0.0
  */
 public class JarFileArchive implements Archive {
+
+	private static final Logger logger = LoggerFactory.getLogger(JarFileArchive.class);
 
 	private static final String UNPACK_MARKER = "UNPACK:";
 
@@ -138,12 +142,12 @@ public class JarFileArchive implements Archive {
 		int attempts = 0;
 		while (attempts++ < 1000) {
 			String fileName = new File(this.jarFile.getName()).getName();
-			File unpackFolder = new File(parent, fileName + "-spring-boot-libs-" + UUID.randomUUID());
+			File unpackFolder = new File(parent, new StringBuilder().append(fileName).append("-spring-boot-libs-").append(UUID.randomUUID()).toString());
 			if (unpackFolder.mkdirs()) {
 				return unpackFolder;
 			}
 		}
-		throw new IllegalStateException("Failed to create unpack folder in directory '" + parent + "'");
+		throw new IllegalStateException(new StringBuilder().append("Failed to create unpack folder in directory '").append(parent).append("'").toString());
 	}
 
 	private void unpack(JarEntry entry, File file) throws IOException {
@@ -164,6 +168,7 @@ public class JarFileArchive implements Archive {
 			return getUrl().toString();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return "jar archive";
 		}
 	}

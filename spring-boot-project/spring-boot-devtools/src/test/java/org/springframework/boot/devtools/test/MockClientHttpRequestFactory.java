@@ -32,6 +32,8 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.http.client.MockClientHttpRequest;
 import org.springframework.mock.http.client.MockClientHttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mock {@link ClientHttpRequestFactory}.
@@ -103,6 +105,8 @@ public class MockClientHttpRequestFactory implements ClientHttpRequestFactory {
 
 	static class Response {
 
+		private final Logger logger = LoggerFactory.getLogger(Response.class);
+
 		private final int delay;
 
 		private final byte[] payload;
@@ -133,6 +137,7 @@ public class MockClientHttpRequestFactory implements ClientHttpRequestFactory {
 					Thread.sleep(this.delay);
 				}
 				catch (InterruptedException ex) {
+					logger.error(ex.getMessage(), ex);
 					// Ignore
 				}
 			}

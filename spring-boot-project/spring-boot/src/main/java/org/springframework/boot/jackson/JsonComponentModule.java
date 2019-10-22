@@ -56,7 +56,7 @@ public class JsonComponentModule extends SimpleModule implements BeanFactoryAwar
 	private BeanFactory beanFactory;
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 
@@ -74,9 +74,7 @@ public class JsonComponentModule extends SimpleModule implements BeanFactoryAwar
 
 	private void addJsonBeans(ListableBeanFactory beanFactory) {
 		Map<String, Object> beans = beanFactory.getBeansWithAnnotation(JsonComponent.class);
-		for (Object bean : beans.values()) {
-			addJsonBean(bean);
-		}
+		beans.values().forEach(this::addJsonBean);
 	}
 
 	private void addJsonBean(Object bean) {

@@ -93,8 +93,8 @@ public final class RepositoryConfiguration {
 
 	@Override
 	public String toString() {
-		return "RepositoryConfiguration [name=" + this.name + ", uri=" + this.uri + ", snapshotsEnabled="
-				+ this.snapshotsEnabled + "]";
+		return new StringBuilder().append("RepositoryConfiguration [name=").append(this.name).append(", uri=").append(this.uri).append(", snapshotsEnabled=")
+				.append(this.snapshotsEnabled).append("]").toString();
 	}
 
 }

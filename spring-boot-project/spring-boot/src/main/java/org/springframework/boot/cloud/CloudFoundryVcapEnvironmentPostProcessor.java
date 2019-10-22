@@ -111,27 +111,28 @@ public class CloudFoundryVcapEnvironmentPostProcessor implements EnvironmentPost
 
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		if (CloudPlatform.CLOUD_FOUNDRY.isActive(environment)) {
-			Properties properties = new Properties();
-			JsonParser jsonParser = JsonParserFactory.getJsonParser();
-			addWithPrefix(properties, getPropertiesFromApplication(environment, jsonParser), "vcap.application.");
-			addWithPrefix(properties, getPropertiesFromServices(environment, jsonParser), "vcap.services.");
-			MutablePropertySources propertySources = environment.getPropertySources();
-			if (propertySources.contains(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME)) {
-				propertySources.addAfter(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME,
-						new PropertiesPropertySource("vcap", properties));
-			}
-			else {
-				propertySources.addFirst(new PropertiesPropertySource("vcap", properties));
-			}
+		if (!CloudPlatform.CLOUD_FOUNDRY.isActive(environment)) {
+			return;
+		}
+		Properties properties = new Properties();
+		JsonParser jsonParser = JsonParserFactory.getJsonParser();
+		addWithPrefix(properties, getPropertiesFromApplication(environment, jsonParser), "vcap.application.");
+		addWithPrefix(properties, getPropertiesFromServices(environment, jsonParser), "vcap.services.");
+		MutablePropertySources propertySources = environment.getPropertySources();
+		if (propertySources.contains(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME)) {
+			propertySources.addAfter(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME,
+					new PropertiesPropertySource("vcap", properties));
+		}
+		else {
+			propertySources.addFirst(new PropertiesPropertySource("vcap", properties));
 		}
 	}
 
 	private void addWithPrefix(Properties properties, Properties other, String prefix) {
-		for (String key : other.stringPropertyNames()) {
+		other.stringPropertyNames().forEach(key -> {
 			String prefixed = prefix + key;
 			properties.setProperty(prefixed, other.getProperty(key));
-		}
+		});
 	}
 
 	private Properties getPropertiesFromApplication(Environment environment, JsonParser parser) {
@@ -168,10 +169,10 @@ public class CloudFoundryVcapEnvironmentPostProcessor implements EnvironmentPost
 
 	private void extractPropertiesFromServices(Properties properties, Map<String, Object> map) {
 		if (map != null) {
-			for (Object services : map.values()) {
+			map.values().forEach(services -> {
 				@SuppressWarnings("unchecked")
 				List<Object> list = (List<Object>) services;
-				for (Object object : list) {
+				list.forEach(object -> {
 					@SuppressWarnings("unchecked")
 					Map<String, Object> service = (Map<String, Object>) object;
 					String key = (String) service.get("name");
@@ -179,8 +180,8 @@ public class CloudFoundryVcapEnvironmentPostProcessor implements EnvironmentPost
 						key = (String) service.get("label");
 					}
 					flatten(properties, service, key);
-				}
-			}
+				});
+			});
 		}
 	}
 
@@ -198,7 +199,7 @@ public class CloudFoundryVcapEnvironmentPostProcessor implements EnvironmentPost
 				properties.put(name, StringUtils.collectionToCommaDelimitedString(collection));
 				int count = 0;
 				for (Object item : collection) {
-					String itemKey = "[" + (count++) + "]";
+					String itemKey = new StringBuilder().append("[").append(count++).append("]").toString();
 					flatten(properties, Collections.singletonMap(itemKey, item), name);
 				}
 			}
@@ -224,7 +225,7 @@ public class CloudFoundryVcapEnvironmentPostProcessor implements EnvironmentPost
 		if (key.startsWith("[")) {
 			return path + key;
 		}
-		return path + "." + key;
+		return new StringBuilder().append(path).append(".").append(key).toString();
 	}
 
 }

@@ -110,7 +110,7 @@ class JerseyServerMetricsAutoConfigurationTests {
 		int port = context.getSourceApplicationContext(AnnotationConfigServletWebServerApplicationContext.class)
 				.getWebServer().getPort();
 		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getForEntity(URI.create("http://localhost:" + port + "/users/3"), String.class);
+		restTemplate.getForEntity(URI.create(new StringBuilder().append("http://localhost:").append(port).append("/users/3").toString()), String.class);
 	}
 
 	@Configuration(proxyBeanMethods = false)

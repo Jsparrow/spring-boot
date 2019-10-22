@@ -132,11 +132,12 @@ public class DefaultErrorAttributes implements ErrorAttributes {
 		if (includeStackTrace) {
 			addStackTrace(errorAttributes, error);
 		}
-		if (error instanceof BindingResult) {
-			BindingResult result = (BindingResult) error;
-			if (result.hasErrors()) {
-				errorAttributes.put("errors", result.getAllErrors());
-			}
+		if (!(error instanceof BindingResult)) {
+			return;
+		}
+		BindingResult result = (BindingResult) error;
+		if (result.hasErrors()) {
+			errorAttributes.put("errors", result.getAllErrors());
 		}
 	}
 

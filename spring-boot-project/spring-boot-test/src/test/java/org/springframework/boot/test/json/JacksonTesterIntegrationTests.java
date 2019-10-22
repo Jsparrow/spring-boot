@@ -40,6 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class JacksonTesterIntegrationTests {
 
+	private static final String JSON = "{\"name\":\"Spring\",\"age\":123}";
+
 	private JacksonTester<ExampleObject> simpleJson;
 
 	private JacksonTester<ExampleObjectWithView> jsonWithView;
@@ -51,8 +53,6 @@ class JacksonTesterIntegrationTests {
 	private JacksonTester<String> stringJson;
 
 	private ObjectMapper objectMapper;
-
-	private static final String JSON = "{\"name\":\"Spring\",\"age\":123}";
 
 	@BeforeEach
 	void setup() {
@@ -68,7 +68,7 @@ class JacksonTesterIntegrationTests {
 
 	@Test
 	void typicalListTest() throws Exception {
-		String example = "[" + JSON + "]";
+		String example = new StringBuilder().append("[").append(JSON).append("]").toString();
 		assertThat(this.listJson.parse(example)).asList().hasSize(1);
 		assertThat(this.listJson.parse(example).getObject().get(0).getName()).isEqualTo("Spring");
 	}

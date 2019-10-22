@@ -31,6 +31,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Condition} and {@link AutoConfigurationImportFilter} that checks for the
@@ -42,6 +44,8 @@ import org.springframework.util.StringUtils;
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class OnClassCondition extends FilteringSpringBootCondition {
+
+	private static final Logger logger = LoggerFactory.getLogger(OnClassCondition.class);
 
 	@Override
 	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
@@ -82,6 +86,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			return new ThreadedOutcomesResolver(outcomesResolver);
 		}
 		catch (AccessControlException ex) {
+			logger.error(ex.getMessage(), ex);
 			return outcomesResolver;
 		}
 	}
@@ -128,9 +133,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 
 	private void addAll(List<String> list, List<Object> itemsToAdd) {
 		if (itemsToAdd != null) {
-			for (Object item : itemsToAdd) {
-				Collections.addAll(list, (String[]) item);
-			}
+			itemsToAdd.forEach(item -> Collections.addAll(list, (String[]) item));
 		}
 	}
 
@@ -141,6 +144,8 @@ class OnClassCondition extends FilteringSpringBootCondition {
 	}
 
 	private static final class ThreadedOutcomesResolver implements OutcomesResolver {
+
+		private final Logger logger1 = LoggerFactory.getLogger(ThreadedOutcomesResolver.class);
 
 		private final Thread thread;
 
@@ -157,6 +162,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 				this.thread.join();
 			}
 			catch (InterruptedException ex) {
+				logger1.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 			return this.outcomes;
@@ -165,6 +171,8 @@ class OnClassCondition extends FilteringSpringBootCondition {
 	}
 
 	private final class StandardOutcomesResolver implements OutcomesResolver {
+
+		private final Logger logger1 = LoggerFactory.getLogger(StandardOutcomesResolver.class);
 
 		private final String[] autoConfigurationClasses;
 
@@ -218,6 +226,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 				}
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				// We'll get another chance later
 			}
 			return null;

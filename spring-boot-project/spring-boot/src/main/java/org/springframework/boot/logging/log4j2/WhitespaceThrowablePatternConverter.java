@@ -40,11 +40,12 @@ public final class WhitespaceThrowablePatternConverter extends ThrowablePatternC
 
 	@Override
 	public void format(LogEvent event, StringBuilder buffer) {
-		if (event.getThrown() != null) {
-			buffer.append(this.options.getSeparator());
-			super.format(event, buffer);
-			buffer.append(this.options.getSeparator());
+		if (event.getThrown() == null) {
+			return;
 		}
+		buffer.append(this.options.getSeparator());
+		super.format(event, buffer);
+		buffer.append(this.options.getSeparator());
 	}
 
 	/**

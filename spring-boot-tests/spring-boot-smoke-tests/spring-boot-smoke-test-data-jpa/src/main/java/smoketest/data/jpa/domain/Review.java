@@ -66,9 +66,6 @@ public class Review implements Serializable {
 	@Column(nullable = false, length = 5000)
 	private String details;
 
-	protected Review() {
-	}
-
 	public Review(Hotel hotel, int index, ReviewDetails details) {
 		Assert.notNull(hotel, "Hotel must not be null");
 		Assert.notNull(details, "Details must not be null");
@@ -79,6 +76,9 @@ public class Review implements Serializable {
 		this.tripType = details.getTripType();
 		this.title = details.getTitle();
 		this.details = details.getDetails();
+	}
+
+	protected Review() {
 	}
 
 	public Hotel getHotel() {

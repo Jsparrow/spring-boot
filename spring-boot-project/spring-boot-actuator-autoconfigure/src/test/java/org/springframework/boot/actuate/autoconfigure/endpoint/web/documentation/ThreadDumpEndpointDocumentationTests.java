@@ -37,6 +37,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for generating documentation describing {@link ThreadDumpEndpoint}.
@@ -44,6 +46,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Andy Wilkinson
  */
 class ThreadDumpEndpointDocumentationTests extends MockMvcEndpointDocumentationTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(ThreadDumpEndpointDocumentationTests.class);
 
 	@Test
 	void jsonThreadDump() throws Exception {
@@ -60,6 +64,7 @@ class ThreadDumpEndpointDocumentationTests extends MockMvcEndpointDocumentationT
 				}
 			}
 			catch (InterruptedException ex) {
+				logger.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 		}).start();
@@ -71,9 +76,7 @@ class ThreadDumpEndpointDocumentationTests extends MockMvcEndpointDocumentationT
 												fieldWithPath("threads.[].blockedCount").description(
 														"Total number of times that the thread has been blocked."),
 												fieldWithPath("threads.[].blockedTime").description(
-														"Time in milliseconds that the thread has spent "
-																+ "blocked. -1 if thread contention "
-																+ "monitoring is disabled."),
+														new StringBuilder().append("Time in milliseconds that the thread has spent ").append("blocked. -1 if thread contention ").append("monitoring is disabled.").toString()),
 												fieldWithPath("threads.[].daemon")
 														.description("Whether the thread is a daemon "
 																+ "thread. Only available on Java 9 or later.")
@@ -116,9 +119,7 @@ class ThreadDumpEndpointDocumentationTests extends MockMvcEndpointDocumentationT
 														.description("Identity hash code of the locked synchronizer.")
 														.optional().type(JsonFieldType.NUMBER),
 												fieldWithPath("threads.[].lockOwnerId")
-														.description("ID of the thread that owns the object on which "
-																+ "the thread is blocked. `-1` if the "
-																+ "thread is not blocked."),
+														.description(new StringBuilder().append("ID of the thread that owns the object on which ").append("the thread is blocked. `-1` if the ").append("thread is not blocked.").toString()),
 												fieldWithPath("threads.[].lockOwnerName")
 														.description("Name of the thread that owns the "
 																+ "object on which the thread is blocked, if any.")
@@ -130,36 +131,26 @@ class ThreadDumpEndpointDocumentationTests extends MockMvcEndpointDocumentationT
 												fieldWithPath("threads.[].stackTrace")
 														.description("Stack trace of the thread."),
 												fieldWithPath("threads.[].stackTrace.[].classLoaderName")
-														.description("Name of the class loader of the "
-																+ "class that contains the execution "
-																+ "point identified by this entry, if "
-																+ "any. Only available on Java 9 or later.")
+														.description(new StringBuilder().append("Name of the class loader of the ").append("class that contains the execution ").append("point identified by this entry, if ").append("any. Only available on Java 9 or later.")
+																.toString())
 														.optional().type(JsonFieldType.STRING),
 												fieldWithPath("threads.[].stackTrace.[].className")
 														.description("Name of the class that contains the "
 																+ "execution point identified by this entry."),
 												fieldWithPath("threads.[].stackTrace.[].fileName")
-														.description("Name of the source file that "
-																+ "contains the execution point "
-																+ "identified by this entry, if any.")
+														.description(new StringBuilder().append("Name of the source file that ").append("contains the execution point ").append("identified by this entry, if any.").toString())
 														.optional().type(JsonFieldType.STRING),
 												fieldWithPath("threads.[].stackTrace.[].lineNumber")
-														.description("Line number of the execution "
-																+ "point identified by this entry. "
-																+ "Negative if unknown."),
+														.description(new StringBuilder().append("Line number of the execution ").append("point identified by this entry. ").append("Negative if unknown.").toString()),
 												fieldWithPath("threads.[].stackTrace.[].methodName")
 														.description("Name of the method."),
 												fieldWithPath("threads.[].stackTrace.[].moduleName")
-														.description("Name of the module that contains "
-																+ "the execution point identified by "
-																+ "this entry, if any. Only available "
-																+ "on Java 9 or later.")
+														.description(new StringBuilder().append("Name of the module that contains ").append("the execution point identified by ").append("this entry, if any. Only available ").append("on Java 9 or later.")
+																.toString())
 														.optional().type(JsonFieldType.STRING),
 												fieldWithPath("threads.[].stackTrace.[].moduleVersion")
-														.description("Version of the module that "
-																+ "contains the execution point "
-																+ "identified by this entry, if any. "
-																+ "Only available on Java 9 or later.")
+														.description(new StringBuilder().append("Version of the module that ").append("contains the execution point ").append("identified by this entry, if any. ").append("Only available on Java 9 or later.")
+																.toString())
 														.optional().type(JsonFieldType.STRING),
 												fieldWithPath("threads.[].stackTrace.[].nativeMethod")
 														.description("Whether the execution point is a native method."),
@@ -169,15 +160,13 @@ class ThreadDumpEndpointDocumentationTests extends MockMvcEndpointDocumentationT
 												fieldWithPath("threads.[].threadName")
 														.description("Name of the thread."),
 												fieldWithPath("threads.[].threadState")
-														.description("State of the thread ("
-																+ describeEnumValues(Thread.State.class) + ")."),
+														.description(new StringBuilder().append("State of the thread (").append(describeEnumValues(Thread.State.class)).append(").")
+																.toString()),
 												fieldWithPath("threads.[].waitedCount")
 														.description("Total number of times that the thread has waited"
 																+ " for notification."),
 												fieldWithPath("threads.[].waitedTime")
-														.description("Time in milliseconds that the thread has spent "
-																+ "waiting. -1 if thread contention "
-																+ "monitoring is disabled"))));
+														.description(new StringBuilder().append("Time in milliseconds that the thread has spent ").append("waiting. -1 if thread contention ").append("monitoring is disabled").toString()))));
 		latch.countDown();
 	}
 

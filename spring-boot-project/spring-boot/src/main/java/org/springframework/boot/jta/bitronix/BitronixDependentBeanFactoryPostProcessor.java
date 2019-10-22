@@ -22,6 +22,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link BeanFactoryPostProcessor} to automatically register the recommended
@@ -35,12 +37,14 @@ import org.springframework.core.Ordered;
  */
 public class BitronixDependentBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
+	private static final Logger logger = LoggerFactory.getLogger(BitronixDependentBeanFactoryPostProcessor.class);
+
 	private static final String[] NO_BEANS = {};
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		String[] transactionManagers = beanFactory.getBeanNamesForType(TransactionManager.class, true, false);
 		for (String transactionManager : transactionManagers) {
 			addTransactionManagerDependencies(beanFactory, transactionManager);
@@ -62,6 +66,7 @@ public class BitronixDependentBeanFactoryPostProcessor implements BeanFactoryPos
 			return beanFactory.getBeanNamesForType(Class.forName(type), true, false);
 		}
 		catch (ClassNotFoundException | NoClassDefFoundError ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 		return NO_BEANS;

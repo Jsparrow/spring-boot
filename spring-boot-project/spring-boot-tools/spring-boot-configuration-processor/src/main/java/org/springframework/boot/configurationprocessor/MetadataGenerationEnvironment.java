@@ -243,12 +243,12 @@ class MetadataGenerationEnvironment {
 
 	private Object getAnnotationValue(AnnotationValue annotationValue) {
 		Object value = annotationValue.getValue();
-		if (value instanceof List) {
-			List<Object> values = new ArrayList<>();
-			((List<?>) value).forEach((v) -> values.add(((AnnotationValue) v).getValue()));
-			return values;
+		if (!(value instanceof List)) {
+			return value;
 		}
-		return value;
+		List<Object> values = new ArrayList<>();
+		((List<?>) value).forEach((v) -> values.add(((AnnotationValue) v).getValue()));
+		return values;
 	}
 
 	TypeElement getConfigurationPropertiesAnnotationElement() {
@@ -292,11 +292,7 @@ class MetadataGenerationEnvironment {
 
 	private void resolveFieldValuesFor(Map<String, Object> values, TypeElement element) {
 		try {
-			this.fieldValuesParser.getFieldValues(element).forEach((name, value) -> {
-				if (!values.containsKey(name)) {
-					values.put(name, value);
-				}
-			});
+			this.fieldValuesParser.getFieldValues(element).forEach(values::putIfAbsent);
 		}
 		catch (Exception ex) {
 			// continue

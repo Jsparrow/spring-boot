@@ -60,19 +60,19 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToRootUsingAbsoluteUrl() throws Exception {
-		URL url = new URL("jar:" + this.rootJarFile.toURI().toURL() + "!/");
+		URL url = new URL(new StringBuilder().append("jar:").append(this.rootJarFile.toURI().toURL()).append("!/").toString());
 		assertThat(JarURLConnection.get(url, this.jarFile).getContent()).isSameAs(this.jarFile);
 	}
 
 	@Test
 	void connectionToRootUsingRelativeUrl() throws Exception {
-		URL url = new URL("jar:file:" + getRelativePath() + "!/");
+		URL url = new URL(new StringBuilder().append("jar:file:").append(getRelativePath()).append("!/").toString());
 		assertThat(JarURLConnection.get(url, this.jarFile).getContent()).isSameAs(this.jarFile);
 	}
 
 	@Test
 	void connectionToEntryUsingAbsoluteUrl() throws Exception {
-		URL url = new URL("jar:" + this.rootJarFile.toURI().toURL() + "!/1.dat");
+		URL url = new URL(new StringBuilder().append("jar:").append(this.rootJarFile.toURI().toURL()).append("!/1.dat").toString());
 		try (InputStream input = JarURLConnection.get(url, this.jarFile).getInputStream()) {
 			assertThat(input).hasSameContentAs(new ByteArrayInputStream(new byte[] { 1 }));
 		}
@@ -80,7 +80,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToEntryUsingRelativeUrl() throws Exception {
-		URL url = new URL("jar:file:" + getRelativePath() + "!/1.dat");
+		URL url = new URL(new StringBuilder().append("jar:file:").append(getRelativePath()).append("!/1.dat").toString());
 		try (InputStream input = JarURLConnection.get(url, this.jarFile).getInputStream()) {
 			assertThat(input).hasSameContentAs(new ByteArrayInputStream(new byte[] { 1 }));
 		}
@@ -88,7 +88,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToEntryUsingAbsoluteUrlWithFileColonSlashSlashPrefix() throws Exception {
-		URL url = new URL("jar:" + this.rootJarFile.toURI().toURL() + "!/1.dat");
+		URL url = new URL(new StringBuilder().append("jar:").append(this.rootJarFile.toURI().toURL()).append("!/1.dat").toString());
 		try (InputStream input = JarURLConnection.get(url, this.jarFile).getInputStream()) {
 			assertThat(input).hasSameContentAs(new ByteArrayInputStream(new byte[] { 1 }));
 		}
@@ -96,7 +96,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToEntryUsingAbsoluteUrlForNestedEntry() throws Exception {
-		URL url = new URL("jar:" + this.rootJarFile.toURI().toURL() + "!/nested.jar!/3.dat");
+		URL url = new URL(new StringBuilder().append("jar:").append(this.rootJarFile.toURI().toURL()).append("!/nested.jar!/3.dat").toString());
 		JarURLConnection connection = JarURLConnection.get(url, this.jarFile);
 		try (InputStream input = connection.getInputStream()) {
 			assertThat(input).hasSameContentAs(new ByteArrayInputStream(new byte[] { 3 }));
@@ -106,7 +106,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToEntryUsingRelativeUrlForNestedEntry() throws Exception {
-		URL url = new URL("jar:file:" + getRelativePath() + "!/nested.jar!/3.dat");
+		URL url = new URL(new StringBuilder().append("jar:file:").append(getRelativePath()).append("!/nested.jar!/3.dat").toString());
 		JarURLConnection connection = JarURLConnection.get(url, this.jarFile);
 		try (InputStream input = connection.getInputStream()) {
 			assertThat(input).hasSameContentAs(new ByteArrayInputStream(new byte[] { 3 }));
@@ -116,7 +116,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToEntryUsingAbsoluteUrlForEntryFromNestedJarFile() throws Exception {
-		URL url = new URL("jar:" + this.rootJarFile.toURI().toURL() + "!/nested.jar!/3.dat");
+		URL url = new URL(new StringBuilder().append("jar:").append(this.rootJarFile.toURI().toURL()).append("!/nested.jar!/3.dat").toString());
 		try (JarFile nested = this.jarFile.getNestedJarFile(this.jarFile.getEntry("nested.jar"))) {
 			try (InputStream input = JarURLConnection.get(url, nested).getInputStream()) {
 				assertThat(input).hasSameContentAs(new ByteArrayInputStream(new byte[] { 3 }));
@@ -126,7 +126,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToEntryUsingRelativeUrlForEntryFromNestedJarFile() throws Exception {
-		URL url = new URL("jar:file:" + getRelativePath() + "!/nested.jar!/3.dat");
+		URL url = new URL(new StringBuilder().append("jar:file:").append(getRelativePath()).append("!/nested.jar!/3.dat").toString());
 		try (JarFile nested = this.jarFile.getNestedJarFile(this.jarFile.getEntry("nested.jar"))) {
 			try (InputStream input = JarURLConnection.get(url, nested).getInputStream()) {
 				assertThat(input).hasSameContentAs(new ByteArrayInputStream(new byte[] { 3 }));
@@ -147,7 +147,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToEntryWithSpaceNestedEntry() throws Exception {
-		URL url = new URL("jar:file:" + getRelativePath() + "!/space nested.jar!/3.dat");
+		URL url = new URL(new StringBuilder().append("jar:file:").append(getRelativePath()).append("!/space nested.jar!/3.dat").toString());
 		JarURLConnection connection = JarURLConnection.get(url, this.jarFile);
 		try (InputStream input = connection.getInputStream()) {
 			assertThat(input).hasSameContentAs(new ByteArrayInputStream(new byte[] { 3 }));
@@ -157,7 +157,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToEntryWithEncodedSpaceNestedEntry() throws Exception {
-		URL url = new URL("jar:file:" + getRelativePath() + "!/space%20nested.jar!/3.dat");
+		URL url = new URL(new StringBuilder().append("jar:file:").append(getRelativePath()).append("!/space%20nested.jar!/3.dat").toString());
 		JarURLConnection connection = JarURLConnection.get(url, this.jarFile);
 		try (InputStream input = connection.getInputStream()) {
 			assertThat(input).hasSameContentAs(new ByteArrayInputStream(new byte[] { 3 }));
@@ -167,7 +167,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void connectionToEntryUsingWrongAbsoluteUrlForEntryFromNestedJarFile() throws Exception {
-		URL url = new URL("jar:" + this.rootJarFile.toURI().toURL() + "!/w.jar!/3.dat");
+		URL url = new URL(new StringBuilder().append("jar:").append(this.rootJarFile.toURI().toURL()).append("!/w.jar!/3.dat").toString());
 		try (JarFile nested = this.jarFile.getNestedJarFile(this.jarFile.getEntry("nested.jar"))) {
 			assertThatExceptionOfType(FileNotFoundException.class)
 					.isThrownBy(JarURLConnection.get(url, nested)::getInputStream);
@@ -176,7 +176,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void getContentLengthReturnsLengthOfUnderlyingEntry() throws Exception {
-		URL url = new URL("jar:" + this.rootJarFile.toURI().toURL() + "!/nested.jar!/3.dat");
+		URL url = new URL(new StringBuilder().append("jar:").append(this.rootJarFile.toURI().toURL()).append("!/nested.jar!/3.dat").toString());
 		try (JarFile nested = this.jarFile.getNestedJarFile(this.jarFile.getEntry("nested.jar"))) {
 			JarURLConnection connection = JarURLConnection.get(url, nested);
 			assertThat(connection.getContentLength()).isEqualTo(1);
@@ -185,7 +185,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void getContentLengthLongReturnsLengthOfUnderlyingEntry() throws Exception {
-		URL url = new URL("jar:" + this.rootJarFile.toURI().toURL() + "!/nested.jar!/3.dat");
+		URL url = new URL(new StringBuilder().append("jar:").append(this.rootJarFile.toURI().toURL()).append("!/nested.jar!/3.dat").toString());
 		try (JarFile nested = this.jarFile.getNestedJarFile(this.jarFile.getEntry("nested.jar"))) {
 			JarURLConnection connection = JarURLConnection.get(url, nested);
 			assertThat(connection.getContentLengthLong()).isEqualTo(1);
@@ -194,7 +194,7 @@ class JarURLConnectionTests {
 
 	@Test
 	void getLastModifiedReturnsLastModifiedTimeOfJarEntry() throws Exception {
-		URL url = new URL("jar:" + this.rootJarFile.toURI().toURL() + "!/1.dat");
+		URL url = new URL(new StringBuilder().append("jar:").append(this.rootJarFile.toURI().toURL()).append("!/1.dat").toString());
 		JarURLConnection connection = JarURLConnection.get(url, this.jarFile);
 		assertThat(connection.getLastModified()).isEqualTo(connection.getJarEntry().getTime());
 	}

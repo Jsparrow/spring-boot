@@ -129,9 +129,7 @@ public final class CommandLineInvoker {
 					this.process.getErrorStream(), this.err, this.combined)));
 			this.streamReaders.add(new Thread(new StreamReadingRunnable(
 					this.process.getInputStream(), this.out, this.combined)));
-			for (Thread streamReader : this.streamReaders) {
-				streamReader.start();
-			}
+			this.streamReaders.forEach(Thread::start);
 		}
 
 		public String getOutput() {
@@ -153,11 +151,7 @@ public final class CommandLineInvoker {
 		private String postProcessLines(List<String> lines) {
 			StringWriter out = new StringWriter();
 			PrintWriter printOut = new PrintWriter(out);
-			for (String line : lines) {
-				if (!line.startsWith("Maven settings decryption failed")) {
-					printOut.println(line);
-				}
-			}
+			lines.stream().filter(line -> !line.startsWith("Maven settings decryption failed")).forEach(printOut::println);
 			return out.toString();
 		}
 

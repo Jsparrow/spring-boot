@@ -43,12 +43,7 @@ public class SampleBatchApplication {
 	@Bean
 	protected Tasklet tasklet() {
 
-		return new Tasklet() {
-			@Override
-			public RepeatStatus execute(StepContribution contribution, ChunkContext context) {
-				return RepeatStatus.FINISHED;
-			}
-		};
+		return (StepContribution contribution, ChunkContext context) -> RepeatStatus.FINISHED;
 
 	}
 

@@ -61,7 +61,7 @@ public class ReactiveWebServerApplicationContext extends GenericReactiveWebAppli
 	}
 
 	@Override
-	public final void refresh() throws BeansException, IllegalStateException {
+	public final void refresh() {
 		try {
 			super.refresh();
 		}
@@ -101,8 +101,7 @@ public class ReactiveWebServerApplicationContext extends GenericReactiveWebAppli
 					"Unable to start ReactiveWebApplicationContext due to missing ReactiveWebServerFactory bean.");
 		}
 		if (beanNames.length > 1) {
-			throw new ApplicationContextException("Unable to start ReactiveWebApplicationContext due to multiple "
-					+ "ReactiveWebServerFactory beans : " + StringUtils.arrayToCommaDelimitedString(beanNames));
+			throw new ApplicationContextException(new StringBuilder().append("Unable to start ReactiveWebApplicationContext due to multiple ").append("ReactiveWebServerFactory beans : ").append(StringUtils.arrayToCommaDelimitedString(beanNames)).toString());
 		}
 		return beanNames[0];
 	}
@@ -231,7 +230,7 @@ public class ReactiveWebServerApplicationContext extends GenericReactiveWebAppli
 			this.lazyInit = lazyInit;
 		}
 
-		private Mono<Void> handleUninitialized(ServerHttpRequest request, ServerHttpResponse response) {
+		private Mono<Void> handleUninitialized() {
 			throw new IllegalStateException("The HttpHandler has not yet been initialized");
 		}
 
@@ -253,11 +252,12 @@ public class ReactiveWebServerApplicationContext extends GenericReactiveWebAppli
 		}
 
 		static void start(ServerManager manager, Supplier<HttpHandler> handlerSupplier) {
-			if (manager != null && manager.server != null) {
-				manager.handler = manager.lazyInit ? new LazyHttpHandler(Mono.fromSupplier(handlerSupplier))
-						: handlerSupplier.get();
-				manager.server.start();
+			if (!(manager != null && manager.server != null)) {
+				return;
 			}
+			manager.handler = manager.lazyInit ? new LazyHttpHandler(Mono.fromSupplier(handlerSupplier))
+					: handlerSupplier.get();
+			manager.server.start();
 		}
 
 		static void stop(ServerManager manager) {

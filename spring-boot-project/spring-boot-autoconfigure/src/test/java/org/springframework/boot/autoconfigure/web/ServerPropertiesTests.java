@@ -389,7 +389,7 @@ class ServerPropertiesTests {
 			}
 			body.add("data", data.toString());
 			HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
-			template.postForEntity(URI.create("http://localhost:" + jetty.getPort() + "/form"), entity, Void.class);
+			template.postForEntity(URI.create(new StringBuilder().append("http://localhost:").append(jetty.getPort()).append("/form").toString()), entity, Void.class);
 			assertThat(failure.get()).isNotNull();
 			String message = failure.get().getCause().getMessage();
 			int defaultMaxPostSize = Integer.valueOf(message.substring(message.lastIndexOf(' ')).trim());

@@ -125,7 +125,7 @@ class SslConnectorCustomizer implements TomcatConnectorCustomizer {
 			protocol.setKeystoreFile(ResourceUtils.getURL(ssl.getKeyStore()).toString());
 		}
 		catch (Exception ex) {
-			throw new WebServerException("Could not load key store '" + ssl.getKeyStore() + "'", ex);
+			throw new WebServerException(new StringBuilder().append("Could not load key store '").append(ssl.getKeyStore()).append("'").toString(), ex);
 		}
 		if (ssl.getKeyStoreType() != null) {
 			protocol.setKeystoreType(ssl.getKeyStoreType());

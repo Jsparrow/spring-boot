@@ -22,10 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SampleCouchbaseApplication implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleCouchbaseApplication.class);
 	@Autowired
 	private UserRepository userRepository;
 
@@ -37,7 +40,7 @@ public class SampleCouchbaseApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		this.userRepository.deleteAll();
 		User user = saveUser();
-		System.out.println(this.userRepository.findById(user.getId()));
+		logger.info(String.valueOf(this.userRepository.findById(user.getId())));
 	}
 
 	private User saveUser() {

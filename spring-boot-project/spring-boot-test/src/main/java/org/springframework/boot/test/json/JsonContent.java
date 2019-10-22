@@ -92,7 +92,7 @@ public final class JsonContent<T> implements AssertProvider<JsonContentAssert> {
 	@Override
 	public String toString() {
 		String createdFrom = (this.type != null) ? " created from " + this.type : "";
-		return "JsonContent " + this.json + createdFrom;
+		return new StringBuilder().append("JsonContent ").append(this.json).append(createdFrom).toString();
 	}
 
 }

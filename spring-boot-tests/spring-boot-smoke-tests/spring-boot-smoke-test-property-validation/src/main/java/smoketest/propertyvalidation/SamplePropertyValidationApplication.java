@@ -21,10 +21,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.validation.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SamplePropertyValidationApplication implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(SamplePropertyValidationApplication.class);
 	private final SampleProperties properties;
 
 	public SamplePropertyValidationApplication(SampleProperties properties) {
@@ -38,10 +41,10 @@ public class SamplePropertyValidationApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		System.out.println("=========================================");
-		System.out.println("Sample host: " + this.properties.getHost());
-		System.out.println("Sample port: " + this.properties.getPort());
-		System.out.println("=========================================");
+		logger.info("=========================================");
+		logger.info("Sample host: " + this.properties.getHost());
+		logger.info("Sample port: " + this.properties.getPort());
+		logger.info("=========================================");
 	}
 
 	public static void main(String[] args) {

@@ -84,7 +84,7 @@ public class MetadataStore {
 		}
 		catch (Exception ex) {
 			throw new InvalidConfigurationMetadataException(
-					"Invalid additional meta-data in '" + METADATA_PATH + "': " + ex.getMessage(),
+					new StringBuilder().append("Invalid additional meta-data in '").append(METADATA_PATH).append("': ").append(ex.getMessage()).toString(),
 					Diagnostic.Kind.ERROR);
 		}
 		finally {
@@ -133,7 +133,7 @@ public class MetadataStore {
 		}
 		String buildFolderPath = path.substring(0, index);
 		File classOutputLocation = standardAdditionalMetadataLocation.getParentFile().getParentFile();
-		return new File(buildFolderPath, RESOURCES_FOLDER + '/' + classOutputLocation.getName());
+		return new File(buildFolderPath, new StringBuilder().append(RESOURCES_FOLDER).append('/').append(classOutputLocation.getName()).toString());
 	}
 
 }

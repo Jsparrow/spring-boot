@@ -16,6 +16,9 @@
 
 package org.springframework.boot.loader.tools.sample;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Sample annotated class with a main method.
  *
@@ -24,8 +27,10 @@ package org.springframework.boot.loader.tools.sample;
 @SomeApplication
 public class AnnotatedClassWithMainMethod {
 
+	private static final Logger logger = LoggerFactory.getLogger(AnnotatedClassWithMainMethod.class);
+
 	public void run() {
-		System.out.println("Hello World");
+		logger.info("Hello World");
 	}
 
 	public static void main(String[] args) {

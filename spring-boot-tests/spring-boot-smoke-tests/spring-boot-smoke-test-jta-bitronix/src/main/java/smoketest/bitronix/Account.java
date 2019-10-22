@@ -29,11 +29,11 @@ public class Account {
 
 	private String username;
 
-	Account() {
-	}
-
 	public Account(String username) {
 		this.username = username;
+	}
+
+	Account() {
 	}
 
 	public String getUsername() {

@@ -20,6 +20,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link OutputCapture}.
@@ -29,20 +31,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Deprecated
 public class OutputCaptureTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(OutputCaptureTests.class);
 	@Rule
 	public OutputCapture outputCapture = new OutputCapture();
 
 	@Test
 	public void toStringShouldReturnAllCapturedOutput() {
-		System.out.println("Hello World");
+		logger.info("Hello World");
 		assertThat(this.outputCapture.toString()).contains("Hello World");
 	}
 
 	@Test
 	public void reset() {
-		System.out.println("Hello");
+		logger.info("Hello");
 		this.outputCapture.reset();
-		System.out.println("World");
+		logger.info("World");
 		assertThat(this.outputCapture.toString()).doesNotContain("Hello").contains("World");
 	}
 

@@ -58,12 +58,7 @@ public final class DevToolsEnablementDeducer {
 	}
 
 	private static boolean isSkippedStackElement(StackTraceElement element) {
-		for (String skipped : SKIPPED_STACK_ELEMENTS) {
-			if (element.getClassName().startsWith(skipped)) {
-				return true;
-			}
-		}
-		return false;
+		return SKIPPED_STACK_ELEMENTS.stream().anyMatch(skipped -> element.getClassName().startsWith(skipped));
 	}
 
 }

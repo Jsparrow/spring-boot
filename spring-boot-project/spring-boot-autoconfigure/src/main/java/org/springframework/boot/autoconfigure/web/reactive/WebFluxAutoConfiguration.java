@@ -149,12 +149,13 @@ public class WebFluxAutoConfiguration {
 				customizeResourceHandlerRegistration(registration);
 			}
 			String staticPathPattern = this.webFluxProperties.getStaticPathPattern();
-			if (!registry.hasMappingForPattern(staticPathPattern)) {
-				ResourceHandlerRegistration registration = registry.addResourceHandler(staticPathPattern)
-						.addResourceLocations(this.resourceProperties.getStaticLocations());
-				configureResourceCaching(registration);
-				customizeResourceHandlerRegistration(registration);
+			if (registry.hasMappingForPattern(staticPathPattern)) {
+				return;
 			}
+			ResourceHandlerRegistration registration = registry.addResourceHandler(staticPathPattern)
+					.addResourceLocations(this.resourceProperties.getStaticLocations());
+			configureResourceCaching(registration);
+			customizeResourceHandlerRegistration(registration);
 		}
 
 		private void configureResourceCaching(ResourceHandlerRegistration registration) {

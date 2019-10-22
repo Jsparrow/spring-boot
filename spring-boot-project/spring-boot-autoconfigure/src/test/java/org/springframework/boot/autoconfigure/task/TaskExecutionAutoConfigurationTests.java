@@ -215,7 +215,7 @@ class TaskExecutionAutoConfigurationTests {
 
 		@Async
 		Future<String> echo(String text) {
-			return new AsyncResult<>(Thread.currentThread().getName() + " " + text);
+			return new AsyncResult<>(new StringBuilder().append(Thread.currentThread().getName()).append(" ").append(text).toString());
 		}
 
 	}

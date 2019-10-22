@@ -112,15 +112,15 @@ public class ErrorPage {
 		if (obj == null) {
 			return false;
 		}
-		if (obj instanceof ErrorPage) {
-			ErrorPage other = (ErrorPage) obj;
-			boolean rtn = true;
-			rtn = rtn && ObjectUtils.nullSafeEquals(getExceptionName(), other.getExceptionName());
-			rtn = rtn && ObjectUtils.nullSafeEquals(this.path, other.path);
-			rtn = rtn && this.status == other.status;
-			return rtn;
+		if (!(obj instanceof ErrorPage)) {
+			return false;
 		}
-		return false;
+		ErrorPage other = (ErrorPage) obj;
+		boolean rtn = true;
+		rtn = rtn && ObjectUtils.nullSafeEquals(getExceptionName(), other.getExceptionName());
+		rtn = rtn && ObjectUtils.nullSafeEquals(this.path, other.path);
+		rtn = rtn && this.status == other.status;
+		return rtn;
 	}
 
 	@Override

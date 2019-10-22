@@ -30,6 +30,8 @@ import org.springframework.validation.SmartValidator;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.OptionalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Validator} implementation that delegates calls to another {@link Validator}.
@@ -41,6 +43,8 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
  * @since 2.0.0
  */
 public class ValidatorAdapter implements SmartValidator, ApplicationContextAware, InitializingBean, DisposableBean {
+
+	private static final Logger logger = LoggerFactory.getLogger(ValidatorAdapter.class);
 
 	private final SmartValidator target;
 
@@ -71,7 +75,7 @@ public class ValidatorAdapter implements SmartValidator, ApplicationContextAware
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		if (!this.existingBean && this.target instanceof ApplicationContextAware) {
 			((ApplicationContextAware) this.target).setApplicationContext(applicationContext);
 		}
@@ -126,6 +130,7 @@ public class ValidatorAdapter implements SmartValidator, ApplicationContextAware
 			return new SpringValidatorAdapter(validator);
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -137,20 +142,21 @@ public class ValidatorAdapter implements SmartValidator, ApplicationContextAware
 			validator.setMessageInterpolator(factory.getObject());
 		}
 		catch (ValidationException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 		return wrap(validator, false);
 	}
 
 	private static Validator wrap(Validator validator, boolean existingBean) {
-		if (validator instanceof javax.validation.Validator) {
-			if (validator instanceof SpringValidatorAdapter) {
-				return new ValidatorAdapter((SpringValidatorAdapter) validator, existingBean);
-			}
-			return new ValidatorAdapter(new SpringValidatorAdapter((javax.validation.Validator) validator),
-					existingBean);
+		if (!(validator instanceof javax.validation.Validator)) {
+			return validator;
 		}
-		return validator;
+		if (validator instanceof SpringValidatorAdapter) {
+			return new ValidatorAdapter((SpringValidatorAdapter) validator, existingBean);
+		}
+		return new ValidatorAdapter(new SpringValidatorAdapter((javax.validation.Validator) validator),
+				existingBean);
 	}
 
 }

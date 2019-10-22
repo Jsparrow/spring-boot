@@ -32,9 +32,13 @@ import org.springframework.stereotype.Component;
 
 import static smoketest.jooq.domain.Author.AUTHOR;
 import static smoketest.jooq.domain.Book.BOOK;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JooqExamples implements CommandLineRunner {
+
+	private static final Logger logger = LoggerFactory.getLogger(JooqExamples.class);
 
 	private final DSLContext dsl;
 
@@ -57,7 +61,8 @@ public class JooqExamples implements CommandLineRunner {
 			Integer id = result.getValue(AUTHOR.ID);
 			String firstName = result.getValue(AUTHOR.FIRST_NAME);
 			String lastName = result.getValue(AUTHOR.LAST_NAME);
-			System.out.println("jOOQ Fetch " + id + " " + firstName + " " + lastName);
+			logger.info(new StringBuilder().append("jOOQ Fetch ").append(id).append(" ").append(firstName).append(" ").append(lastName)
+					.toString());
 		}
 	}
 
@@ -65,13 +70,8 @@ public class JooqExamples implements CommandLineRunner {
 		Query query = this.dsl.select(BOOK.TITLE, AUTHOR.FIRST_NAME, AUTHOR.LAST_NAME).from(BOOK).join(AUTHOR)
 				.on(BOOK.AUTHOR_ID.equal(AUTHOR.ID)).where(BOOK.PUBLISHED_IN.equal(2015));
 		Object[] bind = query.getBindValues().toArray(new Object[0]);
-		List<String> list = this.jdbc.query(query.getSQL(), bind, new RowMapper<String>() {
-			@Override
-			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return rs.getString(1) + " : " + rs.getString(2) + " " + rs.getString(3);
-			}
-		});
-		System.out.println("jOOQ SQL " + list);
+		List<String> list = this.jdbc.query(query.getSQL(), bind, (ResultSet rs, int rowNum) -> new StringBuilder().append(rs.getString(1)).append(" : ").append(rs.getString(2)).append(" ").append(rs.getString(3)).toString());
+		logger.info("jOOQ SQL " + list);
 	}
 
 }

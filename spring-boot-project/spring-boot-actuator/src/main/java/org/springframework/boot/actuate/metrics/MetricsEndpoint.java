@@ -133,7 +133,7 @@ public class MetricsEndpoint {
 	}
 
 	private BiFunction<Double, Double, Double> mergeFunction(Statistic statistic) {
-		return Statistic.MAX.equals(statistic) ? Double::max : Double::sum;
+		return Statistic.MAX == statistic ? Double::max : Double::sum;
 	}
 
 	private Map<String, Set<String>> getAvailableTags(Collection<Meter> meters) {
@@ -272,7 +272,8 @@ public class MetricsEndpoint {
 
 		@Override
 		public String toString() {
-			return "MeasurementSample{statistic=" + this.statistic + ", value=" + this.value + '}';
+			return new StringBuilder().append("MeasurementSample{statistic=").append(this.statistic).append(", value=").append(this.value).append('}')
+					.toString();
 		}
 
 	}

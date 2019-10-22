@@ -48,6 +48,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.HtmlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for {@link ErrorWebExceptionHandler} implementations.
@@ -57,6 +59,8 @@ import org.springframework.web.util.HtmlUtils;
  * @see ErrorAttributes
  */
 public abstract class AbstractErrorWebExceptionHandler implements ErrorWebExceptionHandler, InitializingBean {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(AbstractErrorWebExceptionHandler.class);
 
 	/**
 	 * Currently duplicated from Spring WebFlux HttpWebHandlerAdapter.
@@ -190,6 +194,7 @@ public abstract class AbstractErrorWebExceptionHandler implements ErrorWebExcept
 				}
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}
@@ -287,21 +292,23 @@ public abstract class AbstractErrorWebExceptionHandler implements ErrorWebExcept
 			logger.debug(request.exchange().getLogPrefix() + formatError(throwable, request));
 		}
 		if (HttpStatus.resolve(response.rawStatusCode()) != null
-				&& response.statusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR)) {
-			logger.error(request.exchange().getLogPrefix() + "500 Server Error for " + formatRequest(request),
+				&& response.statusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+			logger.error(new StringBuilder().append(request.exchange().getLogPrefix()).append("500 Server Error for ").append(formatRequest(request)).toString(),
 					throwable);
 		}
 	}
 
 	private String formatError(Throwable ex, ServerRequest request) {
-		String reason = ex.getClass().getSimpleName() + ": " + ex.getMessage();
-		return "Resolved [" + reason + "] for HTTP " + request.methodName() + " " + request.path();
+		String reason = new StringBuilder().append(ex.getClass().getSimpleName()).append(": ").append(ex.getMessage()).toString();
+		return new StringBuilder().append("Resolved [").append(reason).append("] for HTTP ").append(request.methodName()).append(" ").append(request.path())
+				.toString();
 	}
 
 	private String formatRequest(ServerRequest request) {
 		String rawQuery = request.uri().getRawQuery();
 		String query = StringUtils.hasText(rawQuery) ? "?" + rawQuery : "";
-		return "HTTP " + request.methodName() + " \"" + request.path() + query + "\"";
+		return new StringBuilder().append("HTTP ").append(request.methodName()).append(" \"").append(request.path()).append(query).append("\"")
+				.toString();
 	}
 
 	private Mono<? extends Void> write(ServerWebExchange exchange, ServerResponse response) {

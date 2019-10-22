@@ -25,6 +25,8 @@ import java.util.List;
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link AbstractFailureAnalyzer} that analyzes {@link NoSuchMethodError
@@ -34,6 +36,8 @@ import org.springframework.util.ClassUtils;
  * @author Stephane Nicoll
  */
 class NoSuchMethodFailureAnalyzer extends AbstractFailureAnalyzer<NoSuchMethodError> {
+
+	private static final Logger logger = LoggerFactory.getLogger(NoSuchMethodFailureAnalyzer.class);
 
 	@Override
 	protected FailureAnalysis analyze(Throwable rootFailure, NoSuchMethodError cause) {
@@ -100,6 +104,7 @@ class NoSuchMethodFailureAnalyzer extends AbstractFailureAnalyzer<NoSuchMethodEr
 					.getResources(ClassUtils.convertClassNameToResourcePath(className) + ".class"));
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -109,6 +114,7 @@ class NoSuchMethodFailureAnalyzer extends AbstractFailureAnalyzer<NoSuchMethodEr
 			return getClass().getClassLoader().loadClass(className).getProtectionDomain().getCodeSource().getLocation();
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -128,12 +134,12 @@ class NoSuchMethodFailureAnalyzer extends AbstractFailureAnalyzer<NoSuchMethodEr
 		writer.println(descriptor.getErrorMessage());
 		writer.println();
 		writer.println(
-				"The method's class, " + descriptor.getClassName() + ", is available from the following locations:");
+				new StringBuilder().append("The method's class, ").append(descriptor.getClassName()).append(", is available from the following locations:").toString());
 		writer.println();
-		for (URL candidate : descriptor.getCandidateLocations()) {
+		descriptor.getCandidateLocations().forEach(candidate -> {
 			writer.print("    ");
 			writer.println(candidate);
-		}
+		});
 		writer.println();
 		writer.println("It was loaded from the following location:");
 		writer.println();

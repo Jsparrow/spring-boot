@@ -106,9 +106,7 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		for (Map.Entry<String, String> entry : this.annotations.entrySet()) {
-			process(roundEnv, entry.getKey(), entry.getValue());
-		}
+		this.annotations.entrySet().forEach(entry -> process(roundEnv, entry.getKey(), entry.getValue()));
 		if (roundEnv.processingOver()) {
 			try {
 				writeProperties();
@@ -123,12 +121,12 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 	private void process(RoundEnvironment roundEnv, String propertyKey, String annotationName) {
 		TypeElement annotationType = this.processingEnv.getElementUtils().getTypeElement(annotationName);
 		if (annotationType != null) {
-			for (Element element : roundEnv.getElementsAnnotatedWith(annotationType)) {
+			roundEnv.getElementsAnnotatedWith(annotationType).forEach(element -> {
 				Element enclosingElement = element.getEnclosingElement();
 				if (enclosingElement != null && enclosingElement.getKind() == ElementKind.PACKAGE) {
 					processElement(element, propertyKey, annotationName);
 				}
-			}
+			});
 		}
 	}
 
@@ -138,7 +136,7 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 			AnnotationMirror annotation = getAnnotation(element, annotationName);
 			if (qualifiedName != null && annotation != null) {
 				List<Object> values = getValues(propertyKey, annotation);
-				this.properties.put(qualifiedName + "." + propertyKey, toCommaDelimitedString(values));
+				this.properties.put(new StringBuilder().append(qualifiedName).append(".").append(propertyKey).toString(), toCommaDelimitedString(values));
 				this.properties.put(qualifiedName, "");
 			}
 		}
@@ -160,10 +158,10 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 
 	private String toCommaDelimitedString(List<Object> list) {
 		StringBuilder result = new StringBuilder();
-		for (Object item : list) {
+		list.forEach(item -> {
 			result.append((result.length() != 0) ? "," : "");
 			result.append(item);
-		}
+		});
 		return result.toString();
 	}
 
@@ -176,12 +174,13 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 	}
 
 	private void writeProperties() throws IOException {
-		if (!this.properties.isEmpty()) {
-			FileObject file = this.processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "",
-					PROPERTIES_PATH);
-			try (OutputStream outputStream = file.openOutputStream()) {
-				this.properties.store(outputStream, null);
-			}
+		if (this.properties.isEmpty()) {
+			return;
+		}
+		FileObject file = this.processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "",
+				PROPERTIES_PATH);
+		try (OutputStream outputStream = file.openOutputStream()) {
+			this.properties.store(outputStream, null);
 		}
 	}
 

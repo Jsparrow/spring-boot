@@ -48,11 +48,9 @@ class InvalidConfigurationPropertyNameFailureAnalyzerTests {
 	}
 
 	private BeanCreationException createFailure(Class<?> configuration) {
-		try {
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
 			context.register(configuration);
 			context.refresh();
-			context.close();
 			return null;
 		}
 		catch (BeanCreationException ex) {

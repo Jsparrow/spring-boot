@@ -24,6 +24,8 @@ import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.boot.jackson.JsonComponent;
 import org.springframework.boot.test.autoconfigure.filter.StandardAnnotationCustomizableTypeExcludeFilter;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link TypeExcludeFilter} for {@link JsonTest @JsonTest}.
@@ -31,6 +33,8 @@ import org.springframework.util.ClassUtils;
  * @author Phillip Webb
  */
 class JsonExcludeFilter extends StandardAnnotationCustomizableTypeExcludeFilter<JsonTest> {
+
+	private static final Logger logger = LoggerFactory.getLogger(JsonExcludeFilter.class);
 
 	private static final String JACKSON_MODULE = "com.fasterxml.jackson.databind.Module";
 
@@ -42,6 +46,7 @@ class JsonExcludeFilter extends StandardAnnotationCustomizableTypeExcludeFilter<
 			includes.add(ClassUtils.forName(JACKSON_MODULE, null));
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 		includes.add(JsonComponent.class);
 		DEFAULT_INCLUDES = Collections.unmodifiableSet(includes);

@@ -62,6 +62,9 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.Collections;
 
 /**
  * A {@link BeanFactoryPostProcessor} used to register and inject
@@ -78,6 +81,8 @@ import org.springframework.util.StringUtils;
  */
 public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
 		implements BeanClassLoaderAware, BeanFactoryAware, BeanFactoryPostProcessor, Ordered {
+
+	private static final Logger logger = LoggerFactory.getLogger(MockitoPostProcessor.class);
 
 	private static final String BEAN_NAME = MockitoPostProcessor.class.getName();
 
@@ -115,14 +120,14 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 	}
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		Assert.isInstanceOf(ConfigurableListableBeanFactory.class, beanFactory,
 				"Mock beans can only be used with a ConfigurableListableBeanFactory");
 		this.beanFactory = beanFactory;
 	}
 
 	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		Assert.isInstanceOf(BeanDefinitionRegistry.class, beanFactory,
 				"@MockBean can only be used on bean factories that implement BeanDefinitionRegistry");
 		postProcessBeanFactory(beanFactory, (BeanDefinitionRegistry) beanFactory);
@@ -135,10 +140,10 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 			parser.parse(configurationClass);
 		}
 		Set<Definition> definitions = parser.getDefinitions();
-		for (Definition definition : definitions) {
+		definitions.forEach(definition -> {
 			Field field = parser.getField(definition);
 			register(beanFactory, registry, definition, field);
-		}
+		});
 	}
 
 	private Set<Class<?>> getConfigurationClasses(ConfigurableListableBeanFactory beanFactory) {
@@ -216,8 +221,7 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 		if (primaryCandidate != null) {
 			return primaryCandidate;
 		}
-		throw new IllegalStateException("Unable to register mock bean " + mockDefinition.getTypeToMock()
-				+ " expected a single matching bean to replace but found " + existingBeans);
+		throw new IllegalStateException(new StringBuilder().append("Unable to register mock bean ").append(mockDefinition.getTypeToMock()).append(" expected a single matching bean to replace but found ").append(existingBeans).toString());
 	}
 
 	private void copyBeanDefinitionDetails(BeanDefinition from, RootBeanDefinition to) {
@@ -239,11 +243,7 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 	private Set<String> getExistingBeans(ConfigurableListableBeanFactory beanFactory, ResolvableType type,
 			QualifierDefinition qualifier) {
 		Set<String> candidates = new TreeSet<>();
-		for (String candidate : getExistingBeans(beanFactory, type)) {
-			if (qualifier == null || qualifier.matches(beanFactory, candidate)) {
-				candidates.add(candidate);
-			}
-		}
+		getExistingBeans(beanFactory, type).stream().filter(candidate -> qualifier == null || qualifier.matches(beanFactory, candidate)).forEach(candidates::add);
 		return candidates;
 	}
 
@@ -266,6 +266,7 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 			return ScopedProxyUtils.isScopedTarget(beanName);
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}
@@ -308,7 +309,7 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 				if (primaryBeanName != null) {
 					throw new NoUniqueBeanDefinitionException(type.resolve(), candidateBeanNames.size(),
 							"more than one 'primary' bean found among candidates: "
-									+ Arrays.asList(candidateBeanNames));
+									+ Collections.singletonList(candidateBeanNames));
 				}
 				primaryBeanName = candidateBeanName;
 			}
@@ -324,7 +325,7 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 		}
 	}
 
-	protected final Object createSpyIfNecessary(Object bean, String beanName) throws BeansException {
+	protected final Object createSpyIfNecessary(Object bean, String beanName) {
 		SpyDefinition definition = this.spies.get(beanName);
 		if (definition != null) {
 			bean = definition.createSpy(beanName, bean);
@@ -334,7 +335,7 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 
 	@Override
 	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, final Object bean,
-			String beanName) throws BeansException {
+			String beanName) {
 		ReflectionUtils.doWithFields(bean.getClass(), (field) -> postProcessField(bean, field));
 		return pvs;
 	}
@@ -356,7 +357,7 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 		try {
 			field.setAccessible(true);
 			Assert.state(ReflectionUtils.getField(field, target) == null,
-					() -> "The field " + field + " cannot have an existing value");
+					() -> new StringBuilder().append("The field ").append(field).append(" cannot have an existing value").toString());
 			Object bean = this.beanFactory.getBean(beanName, field.getType());
 			if (bean instanceof ScopedObject) {
 				bean = ((ScopedObject) bean).getTargetObject();
@@ -413,15 +414,15 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 
 	private static BeanDefinition getOrAddBeanDefinition(BeanDefinitionRegistry registry,
 			Class<? extends MockitoPostProcessor> postProcessor) {
-		if (!registry.containsBeanDefinition(BEAN_NAME)) {
-			RootBeanDefinition definition = new RootBeanDefinition(postProcessor);
-			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			ConstructorArgumentValues constructorArguments = definition.getConstructorArgumentValues();
-			constructorArguments.addIndexedArgumentValue(0, new LinkedHashSet<MockDefinition>());
-			registry.registerBeanDefinition(BEAN_NAME, definition);
-			return definition;
+		if (registry.containsBeanDefinition(BEAN_NAME)) {
+			return registry.getBeanDefinition(BEAN_NAME);
 		}
-		return registry.getBeanDefinition(BEAN_NAME);
+		RootBeanDefinition definition = new RootBeanDefinition(postProcessor);
+		definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		ConstructorArgumentValues constructorArguments = definition.getConstructorArgumentValues();
+		constructorArguments.addIndexedArgumentValue(0, new LinkedHashSet<MockDefinition>());
+		registry.registerBeanDefinition(BEAN_NAME, definition);
+		return definition;
 	}
 
 	/**
@@ -445,12 +446,12 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 		}
 
 		@Override
-		public Object getEarlyBeanReference(Object bean, String beanName) throws BeansException {
+		public Object getEarlyBeanReference(Object bean, String beanName) {
 			return this.mockitoPostProcessor.createSpyIfNecessary(bean, getOriginalBeanNameIfScopedTarget(beanName));
 		}
 
 		@Override
-		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		public Object postProcessAfterInitialization(Object bean, String beanName) {
 			if (bean instanceof FactoryBean || bean instanceof ScopedObject) {
 				return bean;
 			}
@@ -465,14 +466,15 @@ public class MockitoPostProcessor extends InstantiationAwareBeanPostProcessorAda
 		}
 
 		static void register(BeanDefinitionRegistry registry) {
-			if (!registry.containsBeanDefinition(BEAN_NAME)) {
-				RootBeanDefinition definition = new RootBeanDefinition(SpyPostProcessor.class);
-				definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-				ConstructorArgumentValues constructorArguments = definition.getConstructorArgumentValues();
-				constructorArguments.addIndexedArgumentValue(0,
-						new RuntimeBeanReference(MockitoPostProcessor.BEAN_NAME));
-				registry.registerBeanDefinition(BEAN_NAME, definition);
+			if (registry.containsBeanDefinition(BEAN_NAME)) {
+				return;
 			}
+			RootBeanDefinition definition = new RootBeanDefinition(SpyPostProcessor.class);
+			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			ConstructorArgumentValues constructorArguments = definition.getConstructorArgumentValues();
+			constructorArguments.addIndexedArgumentValue(0,
+					new RuntimeBeanReference(MockitoPostProcessor.BEAN_NAME));
+			registry.registerBeanDefinition(BEAN_NAME, definition);
 		}
 
 	}

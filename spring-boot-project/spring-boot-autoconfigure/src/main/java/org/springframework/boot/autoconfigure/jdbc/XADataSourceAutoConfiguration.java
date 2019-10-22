@@ -43,6 +43,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for {@link DataSource} with XA.
@@ -60,6 +62,7 @@ import org.springframework.util.StringUtils;
 @ConditionalOnMissingBean(DataSource.class)
 public class XADataSourceAutoConfiguration implements BeanClassLoaderAware {
 
+	private static final Logger logger = LoggerFactory.getLogger(XADataSourceAutoConfiguration.class);
 	private ClassLoader classLoader;
 
 	@Bean
@@ -92,7 +95,8 @@ public class XADataSourceAutoConfiguration implements BeanClassLoaderAware {
 			return (XADataSource) instance;
 		}
 		catch (Exception ex) {
-			throw new IllegalStateException("Unable to create XADataSource instance from '" + className + "'");
+			logger.error(ex.getMessage(), ex);
+			throw new IllegalStateException(new StringBuilder().append("Unable to create XADataSource instance from '").append(className).append("'").toString());
 		}
 	}
 

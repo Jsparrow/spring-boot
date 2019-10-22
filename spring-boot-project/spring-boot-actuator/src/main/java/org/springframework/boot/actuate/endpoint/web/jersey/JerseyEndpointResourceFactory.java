@@ -56,6 +56,8 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A factory for creating Jersey {@link Resource Resources} for {@link WebOperation web
@@ -96,8 +98,8 @@ public class JerseyEndpointResourceFactory {
 		String path = requestPredicate.getPath();
 		String matchAllRemainingPathSegmentsVariable = requestPredicate.getMatchAllRemainingPathSegmentsVariable();
 		if (matchAllRemainingPathSegmentsVariable != null) {
-			path = path.replace("{*" + matchAllRemainingPathSegmentsVariable + "}",
-					"{" + matchAllRemainingPathSegmentsVariable + ": .*}");
+			path = path.replace(new StringBuilder().append("{*").append(matchAllRemainingPathSegmentsVariable).append("}").toString(),
+					new StringBuilder().append("{").append(matchAllRemainingPathSegmentsVariable).append(": .*}").toString());
 		}
 		Builder resourceBuilder = Resource.builder().path(endpointMapping.createSubPath(path));
 		resourceBuilder.addMethod(requestPredicate.getHttpMethod().name())
@@ -133,6 +135,8 @@ public class JerseyEndpointResourceFactory {
 			BODY_CONVERTERS = Collections.unmodifiableList(converters);
 		}
 
+		private final Logger logger = LoggerFactory.getLogger(OperationInflector.class);
+
 		private final WebOperation operation;
 
 		private final boolean readBody;
@@ -158,6 +162,7 @@ public class JerseyEndpointResourceFactory {
 				return convertToJaxRsResponse(response, data.getRequest().getMethod());
 			}
 			catch (InvalidEndpointRequestException ex) {
+				logger.error(ex.getMessage(), ex);
 				return Response.status(Status.BAD_REQUEST).build();
 			}
 		}
@@ -221,6 +226,7 @@ public class JerseyEndpointResourceFactory {
 						.entity(convertIfNecessary(webEndpointResponse.getBody())).build();
 			}
 			catch (IOException ex) {
+				logger.error(ex.getMessage(), ex);
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
@@ -240,6 +246,8 @@ public class JerseyEndpointResourceFactory {
 	 */
 	private static final class ResourceBodyConverter implements Function<Object, Object> {
 
+		private final Logger logger = LoggerFactory.getLogger(ResourceBodyConverter.class);
+
 		@Override
 		public Object apply(Object body) {
 			if (body instanceof org.springframework.core.io.Resource) {
@@ -247,6 +255,7 @@ public class JerseyEndpointResourceFactory {
 					return ((org.springframework.core.io.Resource) body).getInputStream();
 				}
 				catch (IOException ex) {
+					logger.error(ex.getMessage(), ex);
 					throw new IllegalStateException();
 				}
 			}

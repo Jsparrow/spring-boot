@@ -101,11 +101,11 @@ public class JettyWebServerFactoryCustomizer
 	}
 
 	private boolean getOrDeduceUseForwardHeaders() {
-		if (this.serverProperties.getForwardHeadersStrategy().equals(ServerProperties.ForwardHeadersStrategy.NONE)) {
-			CloudPlatform platform = CloudPlatform.getActive(this.environment);
-			return platform != null && platform.isUsingForwardHeaders();
+		if (this.serverProperties.getForwardHeadersStrategy() != ServerProperties.ForwardHeadersStrategy.NONE) {
+			return this.serverProperties.getForwardHeadersStrategy() == ServerProperties.ForwardHeadersStrategy.NATIVE;
 		}
-		return this.serverProperties.getForwardHeadersStrategy().equals(ServerProperties.ForwardHeadersStrategy.NATIVE);
+		CloudPlatform platform = CloudPlatform.getActive(this.environment);
+		return platform != null && platform.isUsingForwardHeaders();
 	}
 
 	private void customizeIdleTimeout(ConfigurableJettyWebServerFactory factory, Duration connectionTimeout) {
@@ -177,7 +177,7 @@ public class JettyWebServerFactoryCustomizer
 		if (properties.getCustomFormat() != null) {
 			return properties.getCustomFormat();
 		}
-		else if (ServerProperties.Jetty.Accesslog.FORMAT.EXTENDED_NCSA.equals(properties.getFormat())) {
+		else if (ServerProperties.Jetty.Accesslog.FORMAT.EXTENDED_NCSA == properties.getFormat()) {
 			return CustomRequestLog.EXTENDED_NCSA_FORMAT;
 		}
 		return CustomRequestLog.NCSA_FORMAT;

@@ -66,7 +66,7 @@ class SkipSslVerificationHttpRequestFactoryTests {
 		factory.setSsl(getSsl("password", "classpath:test.jks"));
 		this.webServer = factory.getWebServer(new ServletRegistrationBean<>(new ExampleServlet(), "/hello"));
 		this.webServer.start();
-		return "https://localhost:" + this.webServer.getPort() + "/hello";
+		return new StringBuilder().append("https://localhost:").append(this.webServer.getPort()).append("/hello").toString();
 	}
 
 	private Ssl getSsl(String keyPassword, String keyStore) {

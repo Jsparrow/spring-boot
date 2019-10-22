@@ -109,9 +109,7 @@ public class PrometheusPushGatewayManager {
 		}
 		catch (UnknownHostException ex) {
 			String host = ex.getMessage();
-			String message = "Unable to locate prometheus push gateway host"
-					+ (StringUtils.hasLength(host) ? " '" + host + "'" : "")
-					+ ". No longer attempting metrics publication to this host";
+			String message = new StringBuilder().append("Unable to locate prometheus push gateway host").append(StringUtils.hasLength(host) ? " '" + host + "'" : "").append(". No longer attempting metrics publication to this host").toString();
 			logger.error(message, ex);
 			shutdown(ShutdownOperation.NONE);
 		}
@@ -185,7 +183,7 @@ public class PrometheusPushGatewayManager {
 		}
 
 		@Override
-		public ScheduledExecutorService getScheduledExecutor() throws IllegalStateException {
+		public ScheduledExecutorService getScheduledExecutor() {
 			return Executors.newSingleThreadScheduledExecutor(this::newThread);
 		}
 

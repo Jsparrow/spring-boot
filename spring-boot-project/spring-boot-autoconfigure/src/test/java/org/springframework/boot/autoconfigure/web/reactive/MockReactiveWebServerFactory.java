@@ -72,12 +72,12 @@ public class MockReactiveWebServerFactory extends AbstractReactiveWebServerFacto
 		}
 
 		@Override
-		public void start() throws WebServerException {
+		public void start() {
 
 		}
 
 		@Override
-		public void stop() throws WebServerException {
+		public void stop() {
 
 		}
 

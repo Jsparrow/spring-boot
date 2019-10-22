@@ -48,7 +48,7 @@ public final class ConditionMessage {
 	}
 
 	private ConditionMessage(ConditionMessage prior, String message) {
-		this.message = prior.isEmpty() ? message : prior + "; " + message;
+		this.message = prior.isEmpty() ? message : new StringBuilder().append(prior).append("; ").append(message).toString();
 	}
 
 	/**
@@ -94,7 +94,7 @@ public final class ConditionMessage {
 			return new ConditionMessage(message);
 		}
 
-		return new ConditionMessage(this.message + " " + message);
+		return new ConditionMessage(new StringBuilder().append(this.message).append(" ").append(message).toString());
 	}
 
 	/**
@@ -124,7 +124,7 @@ public final class ConditionMessage {
 		Assert.notNull(condition, "Condition must not be null");
 		String detail = StringUtils.arrayToDelimitedString(details, " ");
 		if (StringUtils.hasLength(detail)) {
-			return new Builder(condition + " " + detail);
+			return new Builder(new StringBuilder().append(condition).append(" ").append(detail).toString());
 		}
 		return new Builder(condition);
 	}
@@ -191,6 +191,35 @@ public final class ConditionMessage {
 	 */
 	public static Builder forCondition(String condition, Object... details) {
 		return new ConditionMessage().andCondition(condition, details);
+	}
+
+	/**
+	 * Render styles.
+	 */
+	public enum Style {
+
+		NORMAL {
+			@Override
+			protected Object applyToItem(Object item) {
+				return item;
+			}
+		},
+
+		QUOTE {
+			@Override
+			protected String applyToItem(Object item) {
+				return (item != null) ? new StringBuilder().append("'").append(item).append("'").toString() : null;
+			}
+		};
+
+		public Collection<?> applyTo(Collection<?> items) {
+			List<Object> result = new ArrayList<>();
+			items.forEach(item -> result.add(applyToItem(item)));
+			return result;
+		}
+
+		protected abstract Object applyToItem(Object item);
+
 	}
 
 	/**
@@ -300,7 +329,8 @@ public final class ConditionMessage {
 				return new ConditionMessage(ConditionMessage.this, this.condition);
 			}
 			return new ConditionMessage(ConditionMessage.this,
-					this.condition + (StringUtils.isEmpty(this.condition) ? "" : " ") + reason);
+					new StringBuilder().append(this.condition).append(StringUtils.isEmpty(this.condition) ? "" : " ").append(reason)
+							.toString());
 		}
 
 	}
@@ -392,37 +422,6 @@ public final class ConditionMessage {
 			}
 			return this.condition.because(message.toString());
 		}
-
-	}
-
-	/**
-	 * Render styles.
-	 */
-	public enum Style {
-
-		NORMAL {
-			@Override
-			protected Object applyToItem(Object item) {
-				return item;
-			}
-		},
-
-		QUOTE {
-			@Override
-			protected String applyToItem(Object item) {
-				return (item != null) ? "'" + item + "'" : null;
-			}
-		};
-
-		public Collection<?> applyTo(Collection<?> items) {
-			List<Object> result = new ArrayList<>();
-			for (Object item : items) {
-				result.add(applyToItem(item));
-			}
-			return result;
-		}
-
-		protected abstract Object applyToItem(Object item);
 
 	}
 

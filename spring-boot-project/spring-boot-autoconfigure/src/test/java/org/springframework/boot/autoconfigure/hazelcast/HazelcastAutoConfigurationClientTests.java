@@ -48,6 +48,8 @@ class HazelcastAutoConfigurationClientTests {
 	 * Servers the test clients will connect to.
 	 */
 	private static HazelcastInstance hazelcastServer;
+	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+			.withConfiguration(AutoConfigurations.of(HazelcastAutoConfiguration.class));
 
 	@BeforeAll
 	static void init() {
@@ -60,9 +62,6 @@ class HazelcastAutoConfigurationClientTests {
 			hazelcastServer.shutdown();
 		}
 	}
-
-	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations.of(HazelcastAutoConfiguration.class));
 
 	@Test
 	void systemPropertyWithXml() {

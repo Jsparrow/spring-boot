@@ -71,7 +71,7 @@ public class MockServletWebServerFactory extends AbstractServletWebServerFactory
 		}
 
 		@Override
-		public void start() throws WebServerException {
+		public void start() {
 		}
 
 	}

@@ -43,6 +43,8 @@ import org.springframework.asm.MethodVisitor;
 import org.springframework.asm.Opcodes;
 import org.springframework.asm.SpringAsmInfo;
 import org.springframework.asm.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Finds any class with a {@code public static main} method by performing a breadth first
@@ -53,6 +55,8 @@ import org.springframework.asm.Type;
  * @since 1.0.0
  */
 public abstract class MainClassFinder {
+
+	private static final Logger logger = LoggerFactory.getLogger(MainClassFinder.class);
 
 	private static final String DOT_CLASS = ".class";
 
@@ -124,7 +128,7 @@ public abstract class MainClassFinder {
 			return null; // nothing to do
 		}
 		if (!rootFolder.isDirectory()) {
-			throw new IllegalArgumentException("Invalid root folder '" + rootFolder + "'");
+			throw new IllegalArgumentException(new StringBuilder().append("Invalid root folder '").append(rootFolder).append("'").toString());
 		}
 		String prefix = rootFolder.getAbsolutePath() + "/";
 		Deque<File> stack = new ArrayDeque<>();
@@ -257,6 +261,7 @@ public abstract class MainClassFinder {
 			return classDescriptor;
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -422,11 +427,7 @@ public abstract class MainClassFinder {
 		private String getMainClassName() {
 			Set<MainClass> matchingMainClasses = new LinkedHashSet<>();
 			if (this.annotationName != null) {
-				for (MainClass mainClass : this.mainClasses) {
-					if (mainClass.getAnnotationNames().contains(this.annotationName)) {
-						matchingMainClasses.add(mainClass);
-					}
-				}
+				this.mainClasses.stream().filter(mainClass -> mainClass.getAnnotationNames().contains(this.annotationName)).forEach(matchingMainClasses::add);
 			}
 			if (matchingMainClasses.isEmpty()) {
 				matchingMainClasses.addAll(this.mainClasses);

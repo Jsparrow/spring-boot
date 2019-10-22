@@ -196,7 +196,7 @@ class RedisAutoConfigurationJedisTests {
 		static JedisConnectionFactory connectionFactory;
 
 		@Override
-		public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		public Object postProcessBeforeInitialization(Object bean, String beanName) {
 			if (bean instanceof JedisConnectionFactory) {
 				connectionFactory = (JedisConnectionFactory) bean;
 			}

@@ -141,7 +141,7 @@ public abstract class AbstractHttpClientMockTests {
 	}
 
 	private String contentDispositionValue(String fileName) {
-		return "attachment; filename=\"" + fileName + "\"";
+		return new StringBuilder().append("attachment; filename=\"").append(fileName).append("\"").toString();
 	}
 
 	private String createJsonError(int status, String message) throws JSONException {

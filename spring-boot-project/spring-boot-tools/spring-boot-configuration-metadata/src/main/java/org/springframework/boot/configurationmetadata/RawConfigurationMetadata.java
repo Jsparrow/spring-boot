@@ -38,9 +38,7 @@ class RawConfigurationMetadata {
 		this.sources = new ArrayList<>(sources);
 		this.items = new ArrayList<>(items);
 		this.hints = new ArrayList<>(hints);
-		for (ConfigurationMetadataItem item : this.items) {
-			resolveName(item);
-		}
+		this.items.forEach(this::resolveName);
 	}
 
 	List<ConfigurationMetadataSource> getSources() {
@@ -73,14 +71,15 @@ class RawConfigurationMetadata {
 	private void resolveName(ConfigurationMetadataItem item) {
 		item.setName(item.getId()); // fallback
 		ConfigurationMetadataSource source = getSource(item);
-		if (source != null) {
-			String groupId = source.getGroupId();
-			String dottedPrefix = groupId + ".";
-			String id = item.getId();
-			if (hasLength(groupId) && id.startsWith(dottedPrefix)) {
-				String name = id.substring(dottedPrefix.length());
-				item.setName(name);
-			}
+		if (source == null) {
+			return;
+		}
+		String groupId = source.getGroupId();
+		String dottedPrefix = groupId + ".";
+		String id = item.getId();
+		if (hasLength(groupId) && id.startsWith(dottedPrefix)) {
+			String name = id.substring(dottedPrefix.length());
+			item.setName(name);
 		}
 	}
 

@@ -138,20 +138,13 @@ class ReactiveCloudFoundrySecurityServiceTests {
 
 	@Test
 	void fetchTokenKeysWhenSuccessfulShouldReturnListOfKeysFromUAA() throws Exception {
-		String tokenKeyValue = "-----BEGIN PUBLIC KEY-----\n"
-				+ "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0m59l2u9iDnMbrXHfqkO\n"
-				+ "rn2dVQ3vfBJqcDuFUK03d+1PZGbVlNCqnkpIJ8syFppW8ljnWweP7+LiWpRoz0I7\n"
-				+ "fYb3d8TjhV86Y997Fl4DBrxgM6KTJOuE/uxnoDhZQ14LgOU2ckXjOzOdTsnGMKQB\n"
-				+ "LCl0vpcXBtFLMaSbpv1ozi8h7DJyVZ6EnFQZUWGdgTMhDrmqevfx95U/16c5WBDO\n"
-				+ "kqwIn7Glry9n9Suxygbf8g5AzpWcusZgDLIIZ7JTUldBb8qU2a0Dl4mvLZOn4wPo\n"
-				+ "jfj9Cw2QICsc5+Pwf21fP+hzf+1WSRHbnYv8uanRO0gZ8ekGaghM/2H6gqJbo2nI\n"
-				+ "JwIDAQAB\n-----END PUBLIC KEY-----";
+		String tokenKeyValue = new StringBuilder().append("-----BEGIN PUBLIC KEY-----\n").append("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0m59l2u9iDnMbrXHfqkO\n").append("rn2dVQ3vfBJqcDuFUK03d+1PZGbVlNCqnkpIJ8syFppW8ljnWweP7+LiWpRoz0I7\n").append("fYb3d8TjhV86Y997Fl4DBrxgM6KTJOuE/uxnoDhZQ14LgOU2ckXjOzOdTsnGMKQB\n").append("LCl0vpcXBtFLMaSbpv1ozi8h7DJyVZ6EnFQZUWGdgTMhDrmqevfx95U/16c5WBDO\n").append("kqwIn7Glry9n9Suxygbf8g5AzpWcusZgDLIIZ7JTUldBb8qU2a0Dl4mvLZOn4wPo\n").append("jfj9Cw2QICsc5+Pwf21fP+hzf+1WSRHbnYv8uanRO0gZ8ekGaghM/2H6gqJbo2nI\n").append("JwIDAQAB\n-----END PUBLIC KEY-----")
+				.toString();
 		prepareResponse((response) -> {
 			response.setBody("{\"token_endpoint\":\"/my-uaa.com\"}");
 			response.setHeader("Content-Type", "application/json");
 		});
-		String responseBody = "{\"keys\" : [ {\"kid\":\"test-key\",\"value\" : \"" + tokenKeyValue.replace("\n", "\\n")
-				+ "\"} ]}";
+		String responseBody = new StringBuilder().append("{\"keys\" : [ {\"kid\":\"test-key\",\"value\" : \"").append(tokenKeyValue.replace("\n", "\\n")).append("\"} ]}").toString();
 		prepareResponse((response) -> {
 			response.setBody(responseBody);
 			response.setHeader("Content-Type", "application/json");
@@ -199,7 +192,7 @@ class ReactiveCloudFoundrySecurityServiceTests {
 	@Test
 	void getUaaUrlShouldCallCloudControllerInfoOnlyOnce() throws Exception {
 		prepareResponse((response) -> {
-			response.setBody("{\"token_endpoint\":\"" + UAA_URL + "\"}");
+			response.setBody(new StringBuilder().append("{\"token_endpoint\":\"").append(UAA_URL).append("\"}").toString());
 			response.setHeader("Content-Type", "application/json");
 		});
 		StepVerifier.create(this.securityService.getUaaUrl())

@@ -332,6 +332,12 @@ class BinderTests {
 		assertThat(result.isBound()).isFalse();
 	}
 
+	public enum ExampleEnum {
+
+		FOO_BAR, BAR_BAZ, BAZ_BOO
+
+	}
+
 	static class JavaBean {
 
 		private String value;
@@ -383,12 +389,6 @@ class BinderTests {
 		List<String> getItems() {
 			return this.items;
 		}
-
-	}
-
-	public enum ExampleEnum {
-
-		FOO_BAR, BAR_BAZ, BAZ_BOO
 
 	}
 
@@ -452,7 +452,7 @@ class BinderTests {
 	static class JavaBeanPropertyEditor extends PropertyEditorSupport {
 
 		@Override
-		public void setAsText(String text) throws IllegalArgumentException {
+		public void setAsText(String text) {
 			JavaBean value = new JavaBean();
 			value.setValue(text);
 			setValue(value);

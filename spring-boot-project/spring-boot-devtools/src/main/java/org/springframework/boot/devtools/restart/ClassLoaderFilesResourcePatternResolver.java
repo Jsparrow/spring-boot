@@ -158,7 +158,7 @@ final class ClassLoaderFilesResourcePatternResolver implements ResourcePatternRe
 					}
 				}
 				catch (IOException ex) {
-					throw new IllegalStateException("Failed to retrieve URI from '" + resource + "'", ex);
+					throw new IllegalStateException(new StringBuilder().append("Failed to retrieve URI from '").append(resource).append("'").toString(), ex);
 				}
 			}
 		}

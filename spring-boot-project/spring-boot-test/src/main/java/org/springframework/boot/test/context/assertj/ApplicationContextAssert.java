@@ -39,6 +39,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.Assert;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AssertJ {@link org.assertj.core.api.Assert assertions} that can be applied to an
@@ -54,6 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ApplicationContextAssert<C extends ApplicationContext>
 		extends AbstractAssert<ApplicationContextAssert<C>, C> {
 
+	private static final Logger logger = LoggerFactory.getLogger(ApplicationContextAssert.class);
 	private final Throwable startupFailure;
 
 	/**
@@ -203,6 +206,7 @@ public class ApplicationContextAssert<C extends ApplicationContext>
 					getApplicationContext(), name, bean));
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 		return this;
 	}
@@ -368,6 +372,7 @@ public class ApplicationContextAssert<C extends ApplicationContext>
 			return getApplicationContext().getBean(name);
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -520,7 +525,7 @@ public class ApplicationContextAssert<C extends ApplicationContext>
 	private static final class ContextFailedToStart<C extends ApplicationContext> extends BasicErrorMessageFactory {
 
 		private ContextFailedToStart(C context, Throwable ex, String expectationFormat, Object... arguments) {
-			super("%nExpecting:%n <%s>%n" + expectationFormat + ":%nbut context failed to start:%n%s",
+			super(new StringBuilder().append("%nExpecting:%n <%s>%n").append(expectationFormat).append(":%nbut context failed to start:%n%s").toString(),
 					combineArguments(context.toString(), ex, arguments));
 		}
 

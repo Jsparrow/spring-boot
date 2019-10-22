@@ -205,7 +205,7 @@ public class RepackageMojo extends AbstractDependencyFilterMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (this.project.getPackaging().equals("pom")) {
+		if ("pom".equals(this.project.getPackaging())) {
 			getLog().debug("repackage goal could not be applied to pom project.");
 			return;
 		}
@@ -264,7 +264,7 @@ public class RepackageMojo extends AbstractDependencyFilterMojo {
 			this.outputDirectory.mkdirs();
 		}
 		return new File(this.outputDirectory,
-				this.finalName + classifier + "." + this.project.getArtifact().getArtifactHandler().getExtension());
+				new StringBuilder().append(this.finalName).append(classifier).append(".").append(this.project.getArtifact().getArtifactHandler().getExtension()).toString());
 	}
 
 	private Repackager getRepackager(File source) {
@@ -338,31 +338,21 @@ public class RepackageMojo extends AbstractDependencyFilterMojo {
 			source.setFile(original);
 		}
 		else if (this.classifier != null) {
-			getLog().info("Creating repackaged archive " + target + " with classifier " + this.classifier);
+			getLog().info(new StringBuilder().append("Creating repackaged archive ").append(target).append(" with classifier ").append(this.classifier).toString());
 		}
 	}
 
 	private void attachArtifact(Artifact source, File target) {
 		if (this.classifier != null && !source.getFile().equals(target)) {
-			getLog().info("Attaching repackaged archive " + target + " with classifier " + this.classifier);
+			getLog().info(new StringBuilder().append("Attaching repackaged archive ").append(target).append(" with classifier ").append(this.classifier).toString());
 			this.projectHelper.attachArtifact(this.project, this.project.getPackaging(), this.classifier, target);
 		}
 		else {
 			String artifactId = (this.classifier != null) ? "artifact with classifier " + this.classifier
 					: "main artifact";
-			getLog().info("Replacing " + artifactId + " with repackaged archive");
+			getLog().info(new StringBuilder().append("Replacing ").append(artifactId).append(" with repackaged archive").toString());
 			source.setFile(target);
 		}
-	}
-
-	private class LoggingMainClassTimeoutWarningListener implements MainClassTimeoutWarningListener {
-
-		@Override
-		public void handleTimeoutWarning(long duration, String mainMethod) {
-			getLog().warn("Searching for the main-class is taking some time, "
-					+ "consider using the mainClass configuration parameter");
-		}
-
 	}
 
 	/**
@@ -403,6 +393,16 @@ public class RepackageMojo extends AbstractDependencyFilterMojo {
 
 		public Layout layout() {
 			return this.layout;
+		}
+
+	}
+
+	private class LoggingMainClassTimeoutWarningListener implements MainClassTimeoutWarningListener {
+
+		@Override
+		public void handleTimeoutWarning(long duration, String mainMethod) {
+			getLog().warn("Searching for the main-class is taking some time, "
+					+ "consider using the mainClass configuration parameter");
 		}
 
 	}

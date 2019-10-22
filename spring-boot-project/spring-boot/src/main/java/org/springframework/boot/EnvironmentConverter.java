@@ -27,6 +27,8 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.context.support.StandardServletEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for converting one type of {@link Environment} to another.
@@ -36,6 +38,8 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * @author Madhura Bhave
  */
 final class EnvironmentConverter {
+
+	private static final Logger logger = LoggerFactory.getLogger(EnvironmentConverter.class);
 
 	private static final String CONFIGURABLE_WEB_ENVIRONMENT_CLASS = "org.springframework.web.context.ConfigurableWebEnvironment";
 
@@ -90,6 +94,7 @@ final class EnvironmentConverter {
 			return type.newInstance();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return new StandardEnvironment();
 		}
 	}
@@ -109,6 +114,7 @@ final class EnvironmentConverter {
 			return webEnvironmentClass.isAssignableFrom(conversionType);
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}
@@ -118,11 +124,7 @@ final class EnvironmentConverter {
 		for (PropertySource<?> propertySource : propertySources) {
 			names.add(propertySource.getName());
 		}
-		for (String name : names) {
-			if (!isServletEnvironment || !SERVLET_ENVIRONMENT_SOURCE_NAMES.contains(name)) {
-				propertySources.remove(name);
-			}
-		}
+		names.stream().filter(name -> !isServletEnvironment || !SERVLET_ENVIRONMENT_SOURCE_NAMES.contains(name)).forEach(propertySources::remove);
 	}
 
 }

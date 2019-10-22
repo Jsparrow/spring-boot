@@ -215,7 +215,7 @@ class ElasticsearchHealthIndicatorTests {
 		private long getTimeout = -1L;
 
 		@Override
-		public ClusterHealthResponse actionGet(long timeoutMillis) throws ElasticsearchException {
+		public ClusterHealthResponse actionGet(long timeoutMillis) {
 			this.getTimeout = timeoutMillis;
 			return super.actionGet(timeoutMillis);
 		}

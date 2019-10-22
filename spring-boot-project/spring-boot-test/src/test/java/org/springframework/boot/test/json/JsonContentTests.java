@@ -84,7 +84,7 @@ class JsonContentTests {
 	void toStringWhenHasTypeShouldReturnString() {
 		JsonContent<ExampleObject> content = new JsonContent<>(getClass(), TYPE, JSON,
 				Configuration.defaultConfiguration());
-		assertThat(content.toString()).isEqualTo("JsonContent " + JSON + " created from " + TYPE);
+		assertThat(content.toString()).isEqualTo(new StringBuilder().append("JsonContent ").append(JSON).append(" created from ").append(TYPE).toString());
 	}
 
 	@Test

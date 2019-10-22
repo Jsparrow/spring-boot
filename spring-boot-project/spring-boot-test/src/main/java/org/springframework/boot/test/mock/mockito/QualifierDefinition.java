@@ -78,7 +78,7 @@ class QualifierDefinition {
 	}
 
 	static QualifierDefinition forElement(AnnotatedElement element) {
-		if (element != null && element instanceof Field) {
+		if (element instanceof Field) {
 			Field field = (Field) element;
 			Set<Annotation> annotations = getQualifierAnnotations(field);
 			if (!annotations.isEmpty()) {

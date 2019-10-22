@@ -82,9 +82,7 @@ class CompositeHealthIndicatorTests {
 		Health result = composite.health();
 		ObjectMapper mapper = new ObjectMapper();
 		assertThat(mapper.writeValueAsString(result))
-				.isEqualTo("{\"status\":\"UNKNOWN\",\"details\":{\"db\":{\"status\":\"UNKNOWN\""
-						+ ",\"details\":{\"db1\":{\"status\":\"UNKNOWN\",\"details\""
-						+ ":{\"1\":\"1\"}},\"db2\":{\"status\":\"UNKNOWN\",\"details\":{\"2\":\"2\"}}}}}}");
+				.isEqualTo(new StringBuilder().append("{\"status\":\"UNKNOWN\",\"details\":{\"db\":{\"status\":\"UNKNOWN\"").append(",\"details\":{\"db1\":{\"status\":\"UNKNOWN\",\"details\"").append(":{\"1\":\"1\"}},\"db2\":{\"status\":\"UNKNOWN\",\"details\":{\"2\":\"2\"}}}}}}").toString());
 	}
 
 }

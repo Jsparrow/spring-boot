@@ -29,6 +29,8 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
 import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convenience class for building a {@link DataSource} with common implementations and
@@ -46,6 +48,8 @@ import org.springframework.util.ClassUtils;
  */
 public final class DataSourceBuilder<T extends DataSource> {
 
+	private static final Logger logger = LoggerFactory.getLogger(DataSourceBuilder.class);
+
 	private static final String[] DATA_SOURCE_TYPE_NAMES = new String[] { "com.zaxxer.hikari.HikariDataSource",
 			"org.apache.tomcat.jdbc.pool.DataSource", "org.apache.commons.dbcp2.BasicDataSource" };
 
@@ -55,16 +59,16 @@ public final class DataSourceBuilder<T extends DataSource> {
 
 	private Map<String, String> properties = new HashMap<>();
 
+	private DataSourceBuilder(ClassLoader classLoader) {
+		this.classLoader = classLoader;
+	}
+
 	public static DataSourceBuilder<?> create() {
 		return new DataSourceBuilder<>(null);
 	}
 
 	public static DataSourceBuilder<?> create(ClassLoader classLoader) {
 		return new DataSourceBuilder<>(classLoader);
-	}
-
-	private DataSourceBuilder(ClassLoader classLoader) {
-		this.classLoader = classLoader;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -77,11 +81,12 @@ public final class DataSourceBuilder<T extends DataSource> {
 	}
 
 	private void maybeGetDriverClassName() {
-		if (!this.properties.containsKey("driverClassName") && this.properties.containsKey("url")) {
-			String url = this.properties.get("url");
-			String driverClass = DatabaseDriver.fromJdbcUrl(url).getDriverClassName();
-			this.properties.put("driverClassName", driverClass);
+		if (!(!this.properties.containsKey("driverClassName") && this.properties.containsKey("url"))) {
+			return;
 		}
+		String url = this.properties.get("url");
+		String driverClass = DatabaseDriver.fromJdbcUrl(url).getDriverClassName();
+		this.properties.put("driverClassName", driverClass);
 	}
 
 	private void bind(DataSource result) {
@@ -126,6 +131,7 @@ public final class DataSourceBuilder<T extends DataSource> {
 				return (Class<? extends DataSource>) ClassUtils.forName(name, classLoader);
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				// Swallow and continue
 			}
 		}

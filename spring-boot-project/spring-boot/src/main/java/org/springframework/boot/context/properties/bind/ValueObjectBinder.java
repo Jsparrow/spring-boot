@@ -72,9 +72,7 @@ class ValueObjectBinder implements DataObjectBinder {
 		}
 		List<ConstructorParameter> parameters = valueObject.getConstructorParameters();
 		List<Object> args = new ArrayList<>(parameters.size());
-		for (ConstructorParameter parameter : parameters) {
-			args.add(parameter.getDefaultValue(context.getConverter()));
-		}
+		parameters.forEach(parameter -> args.add(parameter.getDefaultValue(context.getConverter())));
 		return valueObject.instantiate(args);
 	}
 
@@ -129,12 +127,12 @@ class ValueObjectBinder implements DataObjectBinder {
 		private List<ConstructorParameter> parseConstructorParameters(KFunction<T> kotlinConstructor) {
 			List<KParameter> parameters = kotlinConstructor.getParameters();
 			List<ConstructorParameter> result = new ArrayList<>(parameters.size());
-			for (KParameter parameter : parameters) {
+			parameters.forEach(parameter -> {
 				String name = parameter.getName();
 				ResolvableType type = ResolvableType.forType(ReflectJvmMapping.getJavaType(parameter.getType()));
 				Annotation[] annotations = parameter.getAnnotations().toArray(new Annotation[0]);
 				result.add(new ConstructorParameter(name, type, annotations));
-			}
+			});
 			return Collections.unmodifiableList(result);
 		}
 

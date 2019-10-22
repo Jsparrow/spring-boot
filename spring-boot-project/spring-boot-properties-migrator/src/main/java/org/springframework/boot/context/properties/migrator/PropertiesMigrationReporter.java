@@ -85,11 +85,11 @@ class PropertiesMigrationReporter {
 		}
 		String target = "migrate-" + name;
 		Map<String, OriginTrackedValue> content = new LinkedHashMap<>();
-		for (PropertyMigration candidate : renamed) {
+		renamed.forEach(candidate -> {
 			OriginTrackedValue value = OriginTrackedValue.of(candidate.getProperty().getValue(),
 					candidate.getProperty().getOrigin());
 			content.put(candidate.getMetadata().getDeprecation().getReplacement(), value);
-		}
+		});
 		return new OriginTrackedMapPropertySource(target, content);
 	}
 
@@ -98,29 +98,27 @@ class PropertiesMigrationReporter {
 		MultiValueMap<String, PropertyMigration> result = new LinkedMultiValueMap<>();
 		List<ConfigurationMetadataProperty> candidates = this.allProperties.values().stream().filter(filter)
 				.collect(Collectors.toList());
-		getPropertySourcesAsMap().forEach((name, source) -> {
-			candidates.forEach((metadata) -> {
-				ConfigurationProperty configurationProperty = source
-						.getConfigurationProperty(ConfigurationPropertyName.of(metadata.getId()));
-				if (configurationProperty != null) {
-					result.add(name, new PropertyMigration(configurationProperty, metadata,
-							determineReplacementMetadata(metadata)));
-				}
-			});
-		});
+		getPropertySourcesAsMap().forEach((name, source) -> candidates.forEach((metadata) -> {
+			ConfigurationProperty configurationProperty = source
+					.getConfigurationProperty(ConfigurationPropertyName.of(metadata.getId()));
+			if (configurationProperty != null) {
+				result.add(name,
+						new PropertyMigration(configurationProperty, metadata, determineReplacementMetadata(metadata)));
+			}
+		}));
 		return result;
 	}
 
 	private ConfigurationMetadataProperty determineReplacementMetadata(ConfigurationMetadataProperty metadata) {
 		String replacementId = metadata.getDeprecation().getReplacement();
-		if (StringUtils.hasText(replacementId)) {
-			ConfigurationMetadataProperty replacement = this.allProperties.get(replacementId);
-			if (replacement != null) {
-				return replacement;
-			}
-			return detectMapValueReplacement(replacementId);
+		if (!StringUtils.hasText(replacementId)) {
+			return null;
 		}
-		return null;
+		ConfigurationMetadataProperty replacement = this.allProperties.get(replacementId);
+		if (replacement != null) {
+			return replacement;
+		}
+		return detectMapValueReplacement(replacementId);
 	}
 
 	private ConfigurationMetadataProperty detectMapValueReplacement(String fullId) {

@@ -66,11 +66,7 @@ public class ClassLoaderFiles implements ClassLoaderFileRepository, Serializable
 	 */
 	public void addAll(ClassLoaderFiles files) {
 		Assert.notNull(files, "Files must not be null");
-		for (SourceFolder folder : files.getSourceFolders()) {
-			for (Map.Entry<String, ClassLoaderFile> entry : folder.getFilesEntrySet()) {
-				addFile(folder.getName(), entry.getKey(), entry.getValue());
-			}
-		}
+		files.getSourceFolders().forEach(folder -> folder.getFilesEntrySet().forEach(entry -> addFile(folder.getName(), entry.getKey(), entry.getValue())));
 	}
 
 	/**
@@ -97,9 +93,7 @@ public class ClassLoaderFiles implements ClassLoaderFileRepository, Serializable
 	}
 
 	private void removeAll(String name) {
-		for (SourceFolder sourceFolder : this.sourceFolders.values()) {
-			sourceFolder.remove(name);
-		}
+		this.sourceFolders.values().forEach(sourceFolder -> sourceFolder.remove(name));
 	}
 
 	/**

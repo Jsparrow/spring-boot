@@ -143,9 +143,7 @@ public class ConfigurationMetadataAnnotationProcessor extends AbstractProcessor 
 		this.metadataCollector.processing(roundEnv);
 		TypeElement annotationType = this.metadataEnv.getConfigurationPropertiesAnnotationElement();
 		if (annotationType != null) { // Is @ConfigurationProperties available
-			for (Element element : roundEnv.getElementsAnnotatedWith(annotationType)) {
-				processElement(element);
-			}
+			roundEnv.getElementsAnnotatedWith(annotationType).forEach(this::processElement);
 		}
 		TypeElement endpointType = this.metadataEnv.getEndpointAnnotationElement();
 		if (endpointType != null) { // Is @Endpoint available
@@ -165,12 +163,12 @@ public class ConfigurationMetadataAnnotationProcessor extends AbstractProcessor 
 	private Map<Element, List<Element>> getElementsAnnotatedOrMetaAnnotatedWith(RoundEnvironment roundEnv,
 			TypeElement annotation) {
 		Map<Element, List<Element>> result = new LinkedHashMap<>();
-		for (Element element : roundEnv.getRootElements()) {
+		roundEnv.getRootElements().forEach(element -> {
 			List<Element> annotations = this.metadataEnv.getElementsAnnotatedOrMetaAnnotatedWith(element, annotation);
 			if (!annotations.isEmpty()) {
 				result.put(element, annotations);
 			}
-		}
+		});
 		return result;
 	}
 
@@ -199,22 +197,23 @@ public class ConfigurationMetadataAnnotationProcessor extends AbstractProcessor 
 	}
 
 	private void processExecutableElement(String prefix, ExecutableElement element) {
-		if ((!element.getModifiers().contains(Modifier.PRIVATE))
-				&& (TypeKind.VOID != element.getReturnType().getKind())) {
-			Element returns = this.processingEnv.getTypeUtils().asElement(element.getReturnType());
-			if (returns instanceof TypeElement) {
-				ItemMetadata group = ItemMetadata.newGroup(prefix,
-						this.metadataEnv.getTypeUtils().getQualifiedName(returns),
-						this.metadataEnv.getTypeUtils().getQualifiedName(element.getEnclosingElement()),
-						element.toString());
-				if (this.metadataCollector.hasSimilarGroup(group)) {
-					this.processingEnv.getMessager().printMessage(Kind.ERROR,
-							"Duplicate `@ConfigurationProperties` definition for prefix '" + prefix + "'", element);
-				}
-				else {
-					this.metadataCollector.add(group);
-					processTypeElement(prefix, (TypeElement) returns, element);
-				}
+		if (!((!element.getModifiers().contains(Modifier.PRIVATE))
+				&& (TypeKind.VOID != element.getReturnType().getKind()))) {
+			return;
+		}
+		Element returns = this.processingEnv.getTypeUtils().asElement(element.getReturnType());
+		if (returns instanceof TypeElement) {
+			ItemMetadata group = ItemMetadata.newGroup(prefix,
+					this.metadataEnv.getTypeUtils().getQualifiedName(returns),
+					this.metadataEnv.getTypeUtils().getQualifiedName(element.getEnclosingElement()),
+					element.toString());
+			if (this.metadataCollector.hasSimilarGroup(group)) {
+				this.processingEnv.getMessager().printMessage(Kind.ERROR,
+						new StringBuilder().append("Duplicate `@ConfigurationProperties` definition for prefix '").append(prefix).append("'").toString(), element);
+			}
+			else {
+				this.metadataCollector.add(group);
+				processTypeElement(prefix, (TypeElement) returns, element);
 			}
 		}
 	}
@@ -298,11 +297,11 @@ public class ConfigurationMetadataAnnotationProcessor extends AbstractProcessor 
 	protected ConfigurationMetadata writeMetaData() throws Exception {
 		ConfigurationMetadata metadata = this.metadataCollector.getMetadata();
 		metadata = mergeAdditionalMetadata(metadata);
-		if (!metadata.getItems().isEmpty()) {
-			this.metadataStore.writeMetadata(metadata);
-			return metadata;
+		if (metadata.getItems().isEmpty()) {
+			return null;
 		}
-		return null;
+		this.metadataStore.writeMetadata(metadata);
+		return metadata;
 	}
 
 	private ConfigurationMetadata mergeAdditionalMetadata(ConfigurationMetadata metadata) {

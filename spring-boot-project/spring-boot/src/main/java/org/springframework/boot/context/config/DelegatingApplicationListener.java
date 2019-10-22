@@ -60,9 +60,7 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 				return;
 			}
 			this.multicaster = new SimpleApplicationEventMulticaster();
-			for (ApplicationListener<ApplicationEvent> listener : delegates) {
-				this.multicaster.addApplicationListener(listener);
-			}
+			delegates.forEach(listener -> this.multicaster.addApplicationListener(listener));
 		}
 		if (this.multicaster != null) {
 			this.multicaster.multicastEvent(event);
@@ -81,11 +79,11 @@ public class DelegatingApplicationListener implements ApplicationListener<Applic
 				try {
 					Class<?> clazz = ClassUtils.forName(className, ClassUtils.getDefaultClassLoader());
 					Assert.isAssignable(ApplicationListener.class, clazz,
-							"class [" + className + "] must implement ApplicationListener");
+							new StringBuilder().append("class [").append(className).append("] must implement ApplicationListener").toString());
 					listeners.add((ApplicationListener<ApplicationEvent>) BeanUtils.instantiateClass(clazz));
 				}
 				catch (Exception ex) {
-					throw new ApplicationContextException("Failed to load context listener class [" + className + "]",
+					throw new ApplicationContextException(new StringBuilder().append("Failed to load context listener class [").append(className).append("]").toString(),
 							ex);
 				}
 			}

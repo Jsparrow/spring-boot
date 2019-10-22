@@ -32,12 +32,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 abstract class AbstractJerseySecureTests {
 
+	@Autowired
+	private TestRestTemplate testRestTemplate;
+
 	abstract String getPath();
 
 	abstract String getManagementPath();
-
-	@Autowired
-	private TestRestTemplate testRestTemplate;
 
 	@Test
 	void helloEndpointIsSecure() {

@@ -16,7 +16,6 @@
 
 package smoketest.actuator.ui;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -33,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 
 /**
  * Basic integration tests for demo application.
@@ -48,7 +48,7 @@ class SampleActuatorUiApplicationTests {
 	@Test
 	void testHome() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		ResponseEntity<String> entity = this.restTemplate.withBasicAuth("user", getPassword()).exchange("/",
 				HttpMethod.GET, new HttpEntity<Void>(headers), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -72,7 +72,7 @@ class SampleActuatorUiApplicationTests {
 	@Test
 	void testError() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
+		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 		ResponseEntity<String> entity = this.restTemplate.withBasicAuth("user", getPassword()).exchange("/error",
 				HttpMethod.GET, new HttpEntity<Void>(headers), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);

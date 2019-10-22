@@ -90,18 +90,18 @@ public class MongoClientFactory {
 		if (properties.getUri() != null) {
 			return createMongoClient(properties.getUri(), options);
 		}
-		if (hasCustomAddress() || hasCustomCredentials()) {
-			if (options == null) {
-				options = MongoClientOptions.builder().build();
-			}
-			MongoCredential credentials = getCredentials(properties);
-			String host = getValue(properties.getHost(), "localhost");
-			int port = getValue(properties.getPort(), MongoProperties.DEFAULT_PORT);
-			List<ServerAddress> seeds = Collections.singletonList(new ServerAddress(host, port));
-			return (credentials != null) ? new MongoClient(seeds, credentials, options)
-					: new MongoClient(seeds, options);
+		if (!(hasCustomAddress() || hasCustomCredentials())) {
+			return createMongoClient(MongoProperties.DEFAULT_URI, options);
 		}
-		return createMongoClient(MongoProperties.DEFAULT_URI, options);
+		if (options == null) {
+			options = MongoClientOptions.builder().build();
+		}
+		MongoCredential credentials = getCredentials(properties);
+		String host = getValue(properties.getHost(), "localhost");
+		int port = getValue(properties.getPort(), MongoProperties.DEFAULT_PORT);
+		List<ServerAddress> seeds = Collections.singletonList(new ServerAddress(host, port));
+		return (credentials != null) ? new MongoClient(seeds, credentials, options)
+				: new MongoClient(seeds, options);
 	}
 
 	private MongoClient createMongoClient(String uri, MongoClientOptions options) {

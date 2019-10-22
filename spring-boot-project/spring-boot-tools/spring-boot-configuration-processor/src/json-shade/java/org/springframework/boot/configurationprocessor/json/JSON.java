@@ -105,11 +105,10 @@ class JSON {
 	public static JSONException typeMismatch(Object indexOrName, Object actual,
 			String requiredType) throws JSONException {
 		if (actual == null) {
-			throw new JSONException("Value at " + indexOrName + " is null.");
+			throw new JSONException(new StringBuilder().append("Value at ").append(indexOrName).append(" is null.").toString());
 		}
-		throw new JSONException("Value " + actual + " at " + indexOrName + " of type "
-				+ actual.getClass().getName() + " cannot be converted to "
-				+ requiredType);
+		throw new JSONException(new StringBuilder().append("Value ").append(actual).append(" at ").append(indexOrName).append(" of type ").append(actual.getClass().getName())
+				.append(" cannot be converted to ").append(requiredType).toString());
 	}
 
 	public static JSONException typeMismatch(Object actual, String requiredType)
@@ -118,8 +117,8 @@ class JSON {
 			throw new JSONException("Value is null.");
 		}
 		throw new JSONException(
-				"Value " + actual + " of type " + actual.getClass().getName()
-						+ " cannot be converted to " + requiredType);
+				new StringBuilder().append("Value ").append(actual).append(" of type ").append(actual.getClass().getName()).append(" cannot be converted to ").append(requiredType)
+						.toString());
 	}
 
 }

@@ -66,6 +66,12 @@ public class ScheduledTasksEndpoint {
 		return new ScheduledTasksReport(descriptionsByType);
 	}
 
+	private enum TaskType {
+
+		CRON, CUSTOM_TRIGGER, FIXED_DELAY, FIXED_RATE
+
+	}
+
 	/**
 	 * A report of an application's scheduled {@link Task Tasks}, primarily intended for
 	 * serialization to JSON.
@@ -123,6 +129,11 @@ public class ScheduledTasksEndpoint {
 
 		private final RunnableDescription runnable;
 
+		protected TaskDescription(TaskType type, Runnable runnable) {
+			this.type = type;
+			this.runnable = new RunnableDescription(runnable);
+		}
+
 		private static TaskDescription of(Task task) {
 			return DESCRIBERS.entrySet().stream().filter((entry) -> entry.getKey().isInstance(task))
 					.map((entry) -> entry.getValue().apply(task)).findFirst().orElse(null);
@@ -133,19 +144,14 @@ public class ScheduledTasksEndpoint {
 			if (trigger instanceof CronTrigger) {
 				return new CronTaskDescription(triggerTask, (CronTrigger) trigger);
 			}
-			if (trigger instanceof PeriodicTrigger) {
-				PeriodicTrigger periodicTrigger = (PeriodicTrigger) trigger;
-				if (periodicTrigger.isFixedRate()) {
-					return new FixedRateTaskDescription(triggerTask, periodicTrigger);
-				}
-				return new FixedDelayTaskDescription(triggerTask, periodicTrigger);
+			if (!(trigger instanceof PeriodicTrigger)) {
+				return new CustomTriggerTaskDescription(triggerTask);
 			}
-			return new CustomTriggerTaskDescription(triggerTask);
-		}
-
-		protected TaskDescription(TaskType type, Runnable runnable) {
-			this.type = type;
-			this.runnable = new RunnableDescription(runnable);
+			PeriodicTrigger periodicTrigger = (PeriodicTrigger) trigger;
+			if (periodicTrigger.isFixedRate()) {
+				return new FixedRateTaskDescription(triggerTask, periodicTrigger);
+			}
+			return new FixedDelayTaskDescription(triggerTask, periodicTrigger);
 		}
 
 		private TaskType getType() {
@@ -277,7 +283,7 @@ public class ScheduledTasksEndpoint {
 		private RunnableDescription(Runnable runnable) {
 			if (runnable instanceof ScheduledMethodRunnable) {
 				Method method = ((ScheduledMethodRunnable) runnable).getMethod();
-				this.target = method.getDeclaringClass().getName() + "." + method.getName();
+				this.target = new StringBuilder().append(method.getDeclaringClass().getName()).append(".").append(method.getName()).toString();
 			}
 			else {
 				this.target = runnable.getClass().getName();
@@ -287,12 +293,6 @@ public class ScheduledTasksEndpoint {
 		public String getTarget() {
 			return this.target;
 		}
-
-	}
-
-	private enum TaskType {
-
-		CRON, CUSTOM_TRIGGER, FIXED_DELAY, FIXED_RATE
 
 	}
 

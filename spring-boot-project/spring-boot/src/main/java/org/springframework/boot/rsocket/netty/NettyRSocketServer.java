@@ -60,7 +60,7 @@ public class NettyRSocketServer implements RSocketServer {
 	}
 
 	@Override
-	public void start() throws RSocketServerException {
+	public void start() {
 		this.channel = block(this.starter, this.lifecycleTimeout);
 		logger.info("Netty RSocket started on port(s): " + address().getPort());
 		startDaemonAwaitThread(this.channel);
@@ -74,11 +74,12 @@ public class NettyRSocketServer implements RSocketServer {
 	}
 
 	@Override
-	public void stop() throws RSocketServerException {
-		if (this.channel != null) {
-			this.channel.dispose();
-			this.channel = null;
+	public void stop() {
+		if (this.channel == null) {
+			return;
 		}
+		this.channel.dispose();
+		this.channel = null;
 	}
 
 	private <T> T block(Mono<T> mono, Duration timeout) {

@@ -101,6 +101,29 @@ public class Session {
 	}
 
 	/**
+	 * Available session tracking modes (mirrors
+	 * {@link javax.servlet.SessionTrackingMode}.
+	 */
+	public enum SessionTrackingMode {
+
+		/**
+		 * Send a cookie in response to the client's first request.
+		 */
+		COOKIE,
+
+		/**
+		 * Rewrite the URL to append a session ID.
+		 */
+		URL,
+
+		/**
+		 * Use SSL build-in mechanism to track the session.
+		 */
+		SSL
+
+	}
+
+	/**
 	 * Cookie properties.
 	 */
 	public static class Cookie {
@@ -204,29 +227,6 @@ public class Session {
 		public void setMaxAge(Duration maxAge) {
 			this.maxAge = maxAge;
 		}
-
-	}
-
-	/**
-	 * Available session tracking modes (mirrors
-	 * {@link javax.servlet.SessionTrackingMode}.
-	 */
-	public enum SessionTrackingMode {
-
-		/**
-		 * Send a cookie in response to the client's first request.
-		 */
-		COOKIE,
-
-		/**
-		 * Rewrite the URL to append a session ID.
-		 */
-		URL,
-
-		/**
-		 * Use SSL build-in mechanism to track the session.
-		 */
-		SSL
 
 	}
 

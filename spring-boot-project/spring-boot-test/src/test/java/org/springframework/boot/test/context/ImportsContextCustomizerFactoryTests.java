@@ -96,6 +96,18 @@ class ImportsContextCustomizerFactoryTests {
 				.isNotNull();
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
+	@Import(ImportedBean.class)
+	@interface MetaImport {
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@SelfAnnotating
+	@interface SelfAnnotating {
+
+	}
+
 	static class TestWithNoImport {
 
 	}
@@ -139,12 +151,6 @@ class ImportsContextCustomizerFactoryTests {
 
 	}
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@Import(ImportedBean.class)
-	@interface MetaImport {
-
-	}
-
 	@Component
 	static class ImportedBean {
 
@@ -152,12 +158,6 @@ class ImportsContextCustomizerFactoryTests {
 
 	@Component
 	static class AnotherImportedBean {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@SelfAnnotating
-	@interface SelfAnnotating {
 
 	}
 

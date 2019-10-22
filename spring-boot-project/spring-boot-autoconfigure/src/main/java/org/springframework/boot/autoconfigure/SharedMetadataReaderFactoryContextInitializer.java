@@ -37,6 +37,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ApplicationContextInitializer} to create a shared
@@ -69,6 +71,8 @@ class SharedMetadataReaderFactoryContextInitializer
 	private static class CachingMetadataReaderFactoryPostProcessor
 			implements BeanDefinitionRegistryPostProcessor, PriorityOrdered {
 
+		private final Logger logger = LoggerFactory.getLogger(CachingMetadataReaderFactoryPostProcessor.class);
+
 		@Override
 		public int getOrder() {
 			// Must happen before the ConfigurationClassPostProcessor is created
@@ -76,11 +80,11 @@ class SharedMetadataReaderFactoryContextInitializer
 		}
 
 		@Override
-		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		}
 
 		@Override
-		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 			register(registry);
 			configureConfigurationClassPostProcessor(registry);
 		}
@@ -99,6 +103,7 @@ class SharedMetadataReaderFactoryContextInitializer
 				definition.getPropertyValues().add("metadataReaderFactory", new RuntimeBeanReference(BEAN_NAME));
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 

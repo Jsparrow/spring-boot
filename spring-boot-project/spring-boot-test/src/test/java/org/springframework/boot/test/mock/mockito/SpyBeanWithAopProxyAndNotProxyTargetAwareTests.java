@@ -16,8 +16,6 @@
 
 package org.springframework.boot.test.mock.mockito;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.exceptions.misusing.UnfinishedVerificationException;
@@ -38,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import java.util.Collections;
 
 /**
  * Test {@link SpyBean @SpyBean} when mixed with Spring AOP.
@@ -73,7 +72,7 @@ class SpyBeanWithAopProxyAndNotProxyTargetAwareTests {
 		@Bean
 		ConcurrentMapCacheManager cacheManager() {
 			ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager();
-			cacheManager.setCacheNames(Arrays.asList("test"));
+			cacheManager.setCacheNames(Collections.singletonList("test"));
 			return cacheManager;
 		}
 

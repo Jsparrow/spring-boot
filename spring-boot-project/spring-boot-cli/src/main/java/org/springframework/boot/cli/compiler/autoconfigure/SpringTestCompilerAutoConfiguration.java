@@ -51,17 +51,17 @@ public class SpringTestCompilerAutoConfiguration extends CompilerAutoConfigurati
 
 	@Override
 	public void apply(GroovyClassLoader loader, GroovyCompilerConfiguration configuration,
-			GeneratorContext generatorContext, SourceUnit source, ClassNode classNode)
-			throws CompilationFailedException {
-		if (!AstUtils.hasAtLeastOneAnnotation(classNode, "RunWith")) {
-			AnnotationNode runWith = new AnnotationNode(ClassHelper.make("RunWith"));
-			runWith.addMember("value", new ClassExpression(ClassHelper.make("SpringRunner")));
-			classNode.addAnnotation(runWith);
+			GeneratorContext generatorContext, SourceUnit source, ClassNode classNode) {
+		if (AstUtils.hasAtLeastOneAnnotation(classNode, "RunWith")) {
+			return;
 		}
+		AnnotationNode runWith = new AnnotationNode(ClassHelper.make("RunWith"));
+		runWith.addMember("value", new ClassExpression(ClassHelper.make("SpringRunner")));
+		classNode.addAnnotation(runWith);
 	}
 
 	@Override
-	public void applyImports(ImportCustomizer imports) throws CompilationFailedException {
+	public void applyImports(ImportCustomizer imports) {
 		imports.addStarImports("org.junit.runner", "org.springframework.boot.test",
 				"org.springframework.boot.test.context", "org.springframework.boot.test.web.client",
 				"org.springframework.http", "org.springframework.test.context.junit4",

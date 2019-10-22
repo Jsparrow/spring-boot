@@ -49,10 +49,10 @@ class OnManagementPortCondition extends SpringBootCondition {
 		ManagementPortType actualType = ManagementPortType.get(context.getEnvironment());
 		if (actualType == requiredType) {
 			return ConditionOutcome
-					.match(message.because("actual port type (" + actualType + ") matched required type"));
+					.match(message.because(new StringBuilder().append("actual port type (").append(actualType).append(") matched required type").toString()));
 		}
 		return ConditionOutcome.noMatch(message
-				.because("actual port type (" + actualType + ") did not match required type (" + requiredType + ")"));
+				.because(new StringBuilder().append("actual port type (").append(actualType).append(") did not match required type (").append(requiredType).append(")").toString()));
 	}
 
 	private boolean isWebApplicationContext(ConditionContext context) {

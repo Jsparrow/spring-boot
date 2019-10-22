@@ -95,7 +95,7 @@ public class StopMojo extends AbstractMojo {
 		}
 		catch (IOException ex) {
 			// The response won't be received as the server has died - ignoring
-			getLog().debug("Service is not reachable anymore (" + ex.getMessage() + ")");
+			getLog().debug(new StringBuilder().append("Service is not reachable anymore (").append(ex.getMessage()).append(")").toString());
 		}
 	}
 
@@ -123,8 +123,7 @@ public class StopMojo extends AbstractMojo {
 			new SpringApplicationAdminClient(connection, this.jmxName).stop();
 		}
 		catch (InstanceNotFoundException ex) {
-			throw new MojoExecutionException("Spring application lifecycle JMX bean not found (fork is " + this.fork
-					+ "). Could not stop application gracefully", ex);
+			throw new MojoExecutionException(new StringBuilder().append("Spring application lifecycle JMX bean not found (fork is ").append(this.fork).append("). Could not stop application gracefully").toString(), ex);
 		}
 	}
 

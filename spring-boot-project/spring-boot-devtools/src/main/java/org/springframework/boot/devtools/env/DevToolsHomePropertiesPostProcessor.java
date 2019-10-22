@@ -54,13 +54,14 @@ public class DevToolsHomePropertiesPostProcessor implements EnvironmentPostProce
 
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		if (DevToolsEnablementDeducer.shouldEnable(Thread.currentThread())) {
-			List<PropertySource<?>> propertySources = getPropertySources();
-			if (propertySources.isEmpty()) {
-				addPropertySource(propertySources, LEGACY_FILE_NAME, (file) -> "devtools-local");
-			}
-			propertySources.forEach(environment.getPropertySources()::addFirst);
+		if (!DevToolsEnablementDeducer.shouldEnable(Thread.currentThread())) {
+			return;
 		}
+		List<PropertySource<?>> propertySources = getPropertySources();
+		if (propertySources.isEmpty()) {
+			addPropertySource(propertySources, LEGACY_FILE_NAME, (file) -> "devtools-local");
+		}
+		propertySources.forEach(environment.getPropertySources()::addFirst);
 	}
 
 	private List<PropertySource<?>> getPropertySources() {
@@ -72,7 +73,7 @@ public class DevToolsHomePropertiesPostProcessor implements EnvironmentPostProce
 	}
 
 	private String getPropertySourceName(File file) {
-		return "devtools-local: [" + file.toURI() + "]";
+		return new StringBuilder().append("devtools-local: [").append(file.toURI()).append("]").toString();
 	}
 
 	private void addPropertySource(List<PropertySource<?>> propertySources, String fileName,

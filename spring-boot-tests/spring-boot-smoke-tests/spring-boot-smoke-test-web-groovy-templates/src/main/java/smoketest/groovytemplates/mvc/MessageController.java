@@ -77,9 +77,7 @@ public class MessageController {
 
 	private Map<String, ObjectError> getFieldErrors(BindingResult result) {
 		Map<String, ObjectError> map = new HashMap<>();
-		for (FieldError error : result.getFieldErrors()) {
-			map.put(error.getField(), error);
-		}
+		result.getFieldErrors().forEach(error -> map.put(error.getField(), error));
 		return map;
 	}
 

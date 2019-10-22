@@ -40,6 +40,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.unit.DataSize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Customization for Undertow-specific features common for both Servlet and Reactive
@@ -123,11 +125,11 @@ public class UndertowWebServerFactoryCustomizer
 	}
 
 	private boolean getOrDeduceUseForwardHeaders() {
-		if (this.serverProperties.getForwardHeadersStrategy().equals(ServerProperties.ForwardHeadersStrategy.NONE)) {
-			CloudPlatform platform = CloudPlatform.getActive(this.environment);
-			return platform != null && platform.isUsingForwardHeaders();
+		if (this.serverProperties.getForwardHeadersStrategy() != ServerProperties.ForwardHeadersStrategy.NONE) {
+			return this.serverProperties.getForwardHeadersStrategy() == ServerProperties.ForwardHeadersStrategy.NATIVE;
 		}
-		return this.serverProperties.getForwardHeadersStrategy().equals(ServerProperties.ForwardHeadersStrategy.NATIVE);
+		CloudPlatform platform = CloudPlatform.getActive(this.environment);
+		return platform != null && platform.isUsingForwardHeaders();
 	}
 
 	/**
@@ -148,12 +150,14 @@ public class UndertowWebServerFactoryCustomizer
 						lookup.put(getCanonicalName(field.getName()), option);
 					}
 					catch (IllegalAccessException ex) {
+						logger.error(ex.getMessage(), ex);
 					}
 				}
 			});
 			NAME_LOOKUP = Collections.unmodifiableMap(lookup);
 		}
 
+		private final Logger logger = LoggerFactory.getLogger(FactoryOptions.class);
 		private final ConfigurableUndertowWebServerFactory factory;
 
 		FactoryOptions(ConfigurableUndertowWebServerFactory factory) {
@@ -170,14 +174,12 @@ public class UndertowWebServerFactoryCustomizer
 
 		@SuppressWarnings("unchecked")
 		<T> Consumer<Map<String, String>> forEach(Function<Option<T>, Consumer<T>> function) {
-			return (map) -> {
-				map.forEach((key, value) -> {
-					Option<T> option = (Option<T>) NAME_LOOKUP.get(getCanonicalName(key));
-					Assert.state(option != null, "Unable to find '" + key + "' in UndertowOptions");
-					T parsed = option.parseValue(value, getClass().getClassLoader());
-					function.apply(option).accept(parsed);
-				});
-			};
+			return (map) -> map.forEach((key, value) -> {
+				Option<T> option = (Option<T>) NAME_LOOKUP.get(getCanonicalName(key));
+				Assert.state(option != null, new StringBuilder().append("Unable to find '").append(key).append("' in UndertowOptions").toString());
+				T parsed = option.parseValue(value, getClass().getClassLoader());
+				function.apply(option).accept(parsed);
+			});
 		}
 
 		private static String getCanonicalName(String name) {

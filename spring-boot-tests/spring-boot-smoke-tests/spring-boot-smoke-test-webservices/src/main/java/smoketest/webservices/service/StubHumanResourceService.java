@@ -30,7 +30,8 @@ public class StubHumanResourceService implements HumanResourceService {
 
 	@Override
 	public void bookHoliday(Date startDate, Date endDate, String name) {
-		this.logger.info("Booking holiday for [" + startDate + " - " + endDate + "] for [" + name + "]");
+		this.logger.info(new StringBuilder().append("Booking holiday for [").append(startDate).append(" - ").append(endDate).append("] for [").append(name).append("]")
+				.toString());
 	}
 
 }

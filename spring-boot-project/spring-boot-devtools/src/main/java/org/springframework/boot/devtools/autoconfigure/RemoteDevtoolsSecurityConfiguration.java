@@ -44,7 +44,7 @@ class RemoteDevtoolsSecurityConfiguration {
 		SecurityConfiguration(DevToolsProperties devToolsProperties, ServerProperties serverProperties) {
 			ServerProperties.Servlet servlet = serverProperties.getServlet();
 			String servletContextPath = (servlet.getContextPath() != null) ? servlet.getContextPath() : "";
-			this.url = servletContextPath + devToolsProperties.getRemote().getContextPath() + "/restart";
+			this.url = new StringBuilder().append(servletContextPath).append(devToolsProperties.getRemote().getContextPath()).append("/restart").toString();
 		}
 
 		@Override

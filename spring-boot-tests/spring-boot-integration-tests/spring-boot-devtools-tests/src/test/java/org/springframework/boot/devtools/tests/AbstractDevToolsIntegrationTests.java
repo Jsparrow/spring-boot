@@ -34,6 +34,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.testsupport.BuildOutput;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for DevTools integration tests.
@@ -42,15 +44,17 @@ import org.springframework.web.bind.annotation.RestController;
  */
 abstract class AbstractDevToolsIntegrationTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(AbstractDevToolsIntegrationTests.class);
+
 	protected static final BuildOutput buildOutput = new BuildOutput(AbstractDevToolsIntegrationTests.class);
+
+	@TempDir
+	protected static File temp;
 
 	protected final File serverPortFile = new File(buildOutput.getRootLocation(), "server.port");
 
 	@RegisterExtension
 	protected final JvmLauncher javaLauncher = new JvmLauncher();
-
-	@TempDir
-	protected static File temp;
 
 	protected LaunchedApplication launchedApplication;
 
@@ -70,7 +74,7 @@ abstract class AbstractDevToolsIntegrationTests {
 						ApplicationState::hasServerPort)
 				.getServerPort();
 		this.serverPortFile.delete();
-		System.out.println("Got port " + port);
+		logger.info("Got port " + port);
 		this.launchedApplication.restartRemote(port);
 		Thread.sleep(1000);
 		return port;

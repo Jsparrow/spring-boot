@@ -37,6 +37,8 @@ import org.springframework.web.context.support.StaticWebApplicationContext;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link ApplicationContextRequestMatcher}.
@@ -44,6 +46,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
  * @author Phillip Webb
  */
 class ApplicationContextRequestMatcherTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(ApplicationContextRequestMatcherTests.class);
 
 	@Test
 	void createWhenContextClassIsNullShouldThrowException() {
@@ -132,6 +136,7 @@ class ApplicationContextRequestMatcherTests {
 			thread.join(1000);
 		}
 		catch (InterruptedException ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -192,11 +197,12 @@ class ApplicationContextRequestMatcherTests {
 
 	static class ConcurrentApplicationContextRequestMatcher extends ApplicationContextRequestMatcher<Object> {
 
+		private final Logger logger1 = LoggerFactory.getLogger(ConcurrentApplicationContextRequestMatcher.class);
+		private AtomicBoolean initialized = new AtomicBoolean();
+
 		ConcurrentApplicationContextRequestMatcher() {
 			super(Object.class);
 		}
-
-		private AtomicBoolean initialized = new AtomicBoolean();
 
 		@Override
 		protected void initialized(Supplier<Object> context) {
@@ -204,6 +210,7 @@ class ApplicationContextRequestMatcherTests {
 				Thread.sleep(200);
 			}
 			catch (InterruptedException ex) {
+				logger1.error(ex.getMessage(), ex);
 			}
 			this.initialized.set(true);
 		}

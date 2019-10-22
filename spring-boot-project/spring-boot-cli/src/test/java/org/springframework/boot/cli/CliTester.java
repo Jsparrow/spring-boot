@@ -95,7 +95,7 @@ public class CliTester implements BeforeEachCallback, AfterEachCallback {
 		boolean classpathUpdated = false;
 		for (String arg : args) {
 			if (arg.startsWith("--classpath=")) {
-				arg = arg + ":" + this.buildOutput.getTestClassesLocation().getAbsolutePath();
+				arg = new StringBuilder().append(arg).append(":").append(this.buildOutput.getTestClassesLocation().getAbsolutePath()).toString();
 				classpathUpdated = true;
 			}
 			updatedArgs.add(arg);
@@ -196,11 +196,7 @@ public class CliTester implements BeforeEachCallback, AfterEachCallback {
 
 	@Override
 	public void afterEach(ExtensionContext extensionContext) {
-		for (AbstractCommand command : this.commands) {
-			if (command != null && command instanceof RunCommand) {
-				((RunCommand) command).stop();
-			}
-		}
+		this.commands.stream().filter(command -> command instanceof RunCommand).forEach(command -> ((RunCommand) command).stop());
 		System.clearProperty("disableSpringSnapshotRepos");
 		FileSystemUtils.deleteRecursively(this.temp);
 	}
@@ -212,7 +208,7 @@ public class CliTester implements BeforeEachCallback, AfterEachCallback {
 	public String getHttpOutput(String uri) {
 		try {
 			int port = Integer.parseInt(FileCopyUtils.copyToString(new FileReader(this.serverPortFile)));
-			InputStream stream = URI.create("http://localhost:" + port + uri).toURL().openStream();
+			InputStream stream = URI.create(new StringBuilder().append("http://localhost:").append(port).append(uri).toString()).toURL().openStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 			return reader.lines().collect(Collectors.joining());
 		}

@@ -30,6 +30,8 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
 import org.springframework.boot.loader.data.RandomAccessData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides access to entries from a {@link JarFile}. In order to reduce memory
@@ -47,6 +49,8 @@ import org.springframework.boot.loader.data.RandomAccessData;
  */
 class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 
+	private static final Logger logger = LoggerFactory.getLogger(JarFileEntries.class);
+
 	private static final String META_INF_PREFIX = "META-INF/";
 
 	private static final Name MULTI_RELEASE = new Name("Multi-Release");
@@ -62,6 +66,7 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 			version = (int) runtimeVersion.getClass().getMethod("major").invoke(runtimeVersion);
 		}
 		catch (Throwable ex) {
+			logger.error(ex.getMessage(), ex);
 			version = BASE_VERSION;
 		}
 		RUNTIME_VERSION = version;
@@ -152,29 +157,30 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 
 	private void sort(int left, int right) {
 		// Quick sort algorithm, uses hashCodes as the source but sorts all arrays
-		if (left < right) {
-			int pivot = this.hashCodes[left + (right - left) / 2];
-			int i = left;
-			int j = right;
-			while (i <= j) {
-				while (this.hashCodes[i] < pivot) {
-					i++;
-				}
-				while (this.hashCodes[j] > pivot) {
-					j--;
-				}
-				if (i <= j) {
-					swap(i, j);
-					i++;
-					j--;
-				}
+		if (left >= right) {
+			return;
+		}
+		int pivot = this.hashCodes[left + (right - left) / 2];
+		int i = left;
+		int j = right;
+		while (i <= j) {
+			while (this.hashCodes[i] < pivot) {
+				i++;
 			}
-			if (left < j) {
-				sort(left, j);
+			while (this.hashCodes[j] > pivot) {
+				j--;
 			}
-			if (right > i) {
-				sort(i, right);
+			if (i <= j) {
+				swap(i, j);
+				i++;
+				j--;
 			}
+		}
+		if (left < j) {
+			sort(left, j);
+		}
+		if (right > i) {
+			sort(i, right);
 		}
 	}
 
@@ -246,7 +252,7 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 			AsciiBytes nameAlias = (entry instanceof JarEntry) ? ((JarEntry) entry).getAsciiBytesName()
 					: new AsciiBytes(name.toString());
 			while (version > BASE_VERSION) {
-				T versionedEntry = doGetEntry("META-INF/versions/" + version + "/" + name, type, cacheEntry, nameAlias);
+				T versionedEntry = doGetEntry(new StringBuilder().append("META-INF/versions/").append(version).append("/").append(name).toString(), type, cacheEntry, nameAlias);
 				if (versionedEntry != null) {
 					return versionedEntry;
 				}
@@ -276,6 +282,7 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 			}
 		}
 		catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 			multiRelease = false;
 		}
 		this.multiReleaseJar = multiRelease;

@@ -35,6 +35,8 @@ import org.springframework.boot.devtools.restart.Restarter;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.ClassPathResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Application that can be used to establish a link to remotely running Spring Boot code.
@@ -47,6 +49,8 @@ import org.springframework.core.io.ClassPathResource;
  * @see RemoteClientConfiguration
  */
 public final class RemoteSpringApplication {
+
+	private static final Logger logger = LoggerFactory.getLogger(RemoteSpringApplication.class);
 
 	private RemoteSpringApplication() {
 	}
@@ -89,6 +93,7 @@ public final class RemoteSpringApplication {
 				Thread.sleep(1000);
 			}
 			catch (InterruptedException ex) {
+				logger.error(ex.getMessage(), ex);
 				Thread.currentThread().interrupt();
 			}
 		}

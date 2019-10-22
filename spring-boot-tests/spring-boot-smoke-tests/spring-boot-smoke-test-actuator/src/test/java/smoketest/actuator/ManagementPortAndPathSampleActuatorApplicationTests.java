@@ -62,14 +62,14 @@ class ManagementPortAndPathSampleActuatorApplicationTests {
 	void testMetrics() {
 		testHome(); // makes sure some requests have been made
 		ResponseEntity<Map<String, Object>> entity = asMapEntity(new TestRestTemplate()
-				.getForEntity("http://localhost:" + this.managementPort + "/admin/metrics", Map.class));
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/admin/metrics").toString(), Map.class));
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 	}
 
 	@Test
 	void testHealth() {
 		ResponseEntity<String> entity = new TestRestTemplate().withBasicAuth("user", "password")
-				.getForEntity("http://localhost:" + this.managementPort + "/admin/health", String.class);
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/admin/health").toString(), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody()).isEqualTo("{\"status\":\"UP\",\"groups\":[\"live\",\"ready\"]}");
 	}
@@ -79,14 +79,14 @@ class ManagementPortAndPathSampleActuatorApplicationTests {
 		String unknownProperty = "test-does-not-exist";
 		assertThat(this.environment.containsProperty(unknownProperty)).isFalse();
 		ResponseEntity<String> entity = new TestRestTemplate().withBasicAuth("user", "password").getForEntity(
-				"http://localhost:" + this.managementPort + "/admin/env/" + unknownProperty, String.class);
+				new StringBuilder().append("http://localhost:").append(this.managementPort).append("/admin/env/").append(unknownProperty).toString(), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
 	@Test
 	void testMissing() {
 		ResponseEntity<String> entity = new TestRestTemplate("user", "password")
-				.getForEntity("http://localhost:" + this.managementPort + "/admin/missing", String.class);
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/admin/missing").toString(), String.class);
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 		assertThat(entity.getBody()).contains("\"status\":404");
 	}
@@ -94,7 +94,7 @@ class ManagementPortAndPathSampleActuatorApplicationTests {
 	@Test
 	void testErrorPage() {
 		ResponseEntity<Map<String, Object>> entity = asMapEntity(new TestRestTemplate("user", "password")
-				.getForEntity("http://localhost:" + this.port + "/error", Map.class));
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.port).append("/error").toString(), Map.class));
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
 		assertThat(entity.getBody().get("status")).isEqualTo(999);
 	}
@@ -102,7 +102,7 @@ class ManagementPortAndPathSampleActuatorApplicationTests {
 	@Test
 	void testManagementErrorPage() {
 		ResponseEntity<Map<String, Object>> entity = asMapEntity(new TestRestTemplate("user", "password")
-				.getForEntity("http://localhost:" + this.managementPort + "/error", Map.class));
+				.getForEntity(new StringBuilder().append("http://localhost:").append(this.managementPort).append("/error").toString(), Map.class));
 		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(entity.getBody().get("status")).isEqualTo(999);
 	}

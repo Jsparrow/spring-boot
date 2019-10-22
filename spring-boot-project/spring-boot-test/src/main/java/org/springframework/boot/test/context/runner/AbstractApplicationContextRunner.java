@@ -353,14 +353,12 @@ public abstract class AbstractApplicationContextRunner<SELF extends AbstractAppl
 	 */
 	@SuppressWarnings("unchecked")
 	public SELF run(ContextConsumer<? super A> consumer) {
-		withContextClassLoader(this.classLoader, () -> {
-			this.systemProperties.applyToSystemProperties(() -> {
-				try (A context = createAssertableContext()) {
-					accept(consumer, context);
-				}
-				return null;
-			});
-		});
+		withContextClassLoader(this.classLoader, () -> this.systemProperties.applyToSystemProperties(() -> {
+			try (A context = createAssertableContext()) {
+				accept(consumer, context);
+			}
+			return null;
+		}));
 		return (SELF) this;
 	}
 

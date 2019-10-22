@@ -18,13 +18,17 @@ package smoketest.activemq;
 
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class Consumer {
 
+	private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
+
 	@JmsListener(destination = "sample.queue")
 	public void receiveQueue(String text) {
-		System.out.println(text);
+		logger.info(text);
 	}
 
 }

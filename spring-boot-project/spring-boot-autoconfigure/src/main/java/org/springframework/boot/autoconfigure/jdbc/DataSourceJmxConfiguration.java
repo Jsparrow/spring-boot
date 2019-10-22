@@ -35,6 +35,8 @@ import org.springframework.boot.jdbc.DataSourceUnwrapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jmx.export.MBeanExporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configures DataSource related MBeans.
@@ -77,6 +79,8 @@ class DataSourceJmxConfiguration {
 	@ConditionalOnSingleCandidate(DataSource.class)
 	static class TomcatDataSourceJmxConfiguration {
 
+		private final Logger logger1 = LoggerFactory.getLogger(TomcatDataSourceJmxConfiguration.class);
+
 		@Bean
 		@ConditionalOnMissingBean(name = "dataSourceMBean")
 		Object dataSourceMBean(DataSource dataSource) {
@@ -86,6 +90,7 @@ class DataSourceJmxConfiguration {
 					return dataSourceProxy.createPool().getJmxPool();
 				}
 				catch (SQLException ex) {
+					logger1.error(ex.getMessage(), ex);
 					logger.warn("Cannot expose DataSource to JMX (could not connect)");
 				}
 			}

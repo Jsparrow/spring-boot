@@ -30,6 +30,7 @@ import org.springframework.boot.cli.command.archive.ResourceMatcher.MatchedResou
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 
 /**
  * Tests for {@link ResourceMatcher}.
@@ -42,14 +43,14 @@ class ResourceMatcherTests {
 	void nonExistentRoot() throws IOException {
 		ResourceMatcher resourceMatcher = new ResourceMatcher(Arrays.asList("alpha/**", "bravo/*", "*"),
 				Arrays.asList(".*", "alpha/**/excluded"));
-		List<MatchedResource> matchedResources = resourceMatcher.find(Arrays.asList(new File("does-not-exist")));
+		List<MatchedResource> matchedResources = resourceMatcher.find(Collections.singletonList(new File("does-not-exist")));
 		assertThat(matchedResources).isEmpty();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	void defaults() {
-		ResourceMatcher resourceMatcher = new ResourceMatcher(Arrays.asList(""), Arrays.asList(""));
+		ResourceMatcher resourceMatcher = new ResourceMatcher(Collections.singletonList(""), Collections.singletonList(""));
 		Collection<String> includes = (Collection<String>) ReflectionTestUtils.getField(resourceMatcher, "includes");
 		Collection<String> excludes = (Collection<String>) ReflectionTestUtils.getField(resourceMatcher, "excludes");
 		assertThat(includes).contains("static/**");
@@ -58,13 +59,13 @@ class ResourceMatcherTests {
 
 	@Test
 	void excludedWins() throws Exception {
-		ResourceMatcher resourceMatcher = new ResourceMatcher(Arrays.asList("*"), Arrays.asList("**/*.jar"));
-		List<MatchedResource> found = resourceMatcher.find(Arrays.asList(new File("src/test/resources")));
+		ResourceMatcher resourceMatcher = new ResourceMatcher(Collections.singletonList("*"), Collections.singletonList("**/*.jar"));
+		List<MatchedResource> found = resourceMatcher.find(Collections.singletonList(new File("src/test/resources")));
 		assertThat(found).areNot(new Condition<MatchedResource>() {
 
 			@Override
 			public boolean matches(MatchedResource value) {
-				return value.getFile().getName().equals("foo.jar");
+				return "foo.jar".equals(value.getFile().getName());
 			}
 
 		});
@@ -73,7 +74,7 @@ class ResourceMatcherTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	void includedDeltas() {
-		ResourceMatcher resourceMatcher = new ResourceMatcher(Arrays.asList("-static/**"), Arrays.asList(""));
+		ResourceMatcher resourceMatcher = new ResourceMatcher(Collections.singletonList("-static/**"), Collections.singletonList(""));
 		Collection<String> includes = (Collection<String>) ReflectionTestUtils.getField(resourceMatcher, "includes");
 		assertThat(includes).contains("templates/**");
 		assertThat(includes).doesNotContain("static/**");
@@ -83,7 +84,7 @@ class ResourceMatcherTests {
 	@Test
 	void includedDeltasAndNewEntries() {
 		ResourceMatcher resourceMatcher = new ResourceMatcher(Arrays.asList("-static/**", "foo.jar"),
-				Arrays.asList("-**/*.jar"));
+				Collections.singletonList("-**/*.jar"));
 		Collection<String> includes = (Collection<String>) ReflectionTestUtils.getField(resourceMatcher, "includes");
 		Collection<String> excludes = (Collection<String>) ReflectionTestUtils.getField(resourceMatcher, "excludes");
 		assertThat(includes).contains("foo.jar");
@@ -95,21 +96,21 @@ class ResourceMatcherTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	void excludedDeltas() {
-		ResourceMatcher resourceMatcher = new ResourceMatcher(Arrays.asList(""), Arrays.asList("-**/*.jar"));
+		ResourceMatcher resourceMatcher = new ResourceMatcher(Collections.singletonList(""), Collections.singletonList("-**/*.jar"));
 		Collection<String> excludes = (Collection<String>) ReflectionTestUtils.getField(resourceMatcher, "excludes");
 		assertThat(excludes).doesNotContain("**/*.jar");
 	}
 
 	@Test
 	void jarFileAlwaysMatches() throws Exception {
-		ResourceMatcher resourceMatcher = new ResourceMatcher(Arrays.asList("*"), Arrays.asList("**/*.jar"));
+		ResourceMatcher resourceMatcher = new ResourceMatcher(Collections.singletonList("*"), Collections.singletonList("**/*.jar"));
 		List<MatchedResource> found = resourceMatcher
 				.find(Arrays.asList(new File("src/test/resources/templates"), new File("src/test/resources/foo.jar")));
 		assertThat(found).areAtLeastOne(new Condition<MatchedResource>() {
 
 			@Override
 			public boolean matches(MatchedResource value) {
-				return value.getFile().getName().equals("foo.jar") && value.isRoot();
+				return "foo.jar".equals(value.getFile().getName()) && value.isRoot();
 			}
 
 		});
@@ -124,9 +125,7 @@ class ResourceMatcherTests {
 						new File("src/test/resources/resource-matcher/two"),
 						new File("src/test/resources/resource-matcher/three")));
 		List<String> paths = new ArrayList<>();
-		for (MatchedResource resource : matchedResources) {
-			paths.add(resource.getName());
-		}
+		matchedResources.forEach(resource -> paths.add(resource.getName()));
 		assertThat(paths).containsOnly("alpha/nested/fileA", "bravo/fileC", "fileD", "bravo/fileE", "fileF", "three");
 	}
 

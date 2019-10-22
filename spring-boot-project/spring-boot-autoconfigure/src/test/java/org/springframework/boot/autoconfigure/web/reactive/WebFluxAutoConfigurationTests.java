@@ -352,12 +352,8 @@ class WebFluxAutoConfigurationTests {
 		this.contextRunner.withPropertyValues("spring.resources.cache.period:5").run((context) -> {
 			Map<PathPattern, Object> handlerMap = getHandlerMap(context);
 			assertThat(handlerMap).hasSize(2);
-			for (Object handler : handlerMap.values()) {
-				if (handler instanceof ResourceWebHandler) {
-					assertThat(((ResourceWebHandler) handler).getCacheControl())
-							.isEqualToComparingFieldByField(CacheControl.maxAge(5, TimeUnit.SECONDS));
-				}
-			}
+			handlerMap.values().stream().filter(handler -> handler instanceof ResourceWebHandler).forEach(handler -> assertThat(((ResourceWebHandler) handler).getCacheControl())
+					.isEqualToComparingFieldByField(CacheControl.maxAge(5, TimeUnit.SECONDS)));
 		});
 		Assertions.setExtractBareNamePropertyMethods(true);
 	}
@@ -369,12 +365,8 @@ class WebFluxAutoConfigurationTests {
 				"spring.resources.cache.cachecontrol.proxy-revalidate:true").run((context) -> {
 					Map<PathPattern, Object> handlerMap = getHandlerMap(context);
 					assertThat(handlerMap).hasSize(2);
-					for (Object handler : handlerMap.values()) {
-						if (handler instanceof ResourceWebHandler) {
-							assertThat(((ResourceWebHandler) handler).getCacheControl()).isEqualToComparingFieldByField(
-									CacheControl.maxAge(5, TimeUnit.SECONDS).proxyRevalidate());
-						}
-					}
+					handlerMap.values().stream().filter(handler -> handler instanceof ResourceWebHandler).forEach(handler -> assertThat(((ResourceWebHandler) handler).getCacheControl())
+							.isEqualToComparingFieldByField(CacheControl.maxAge(5, TimeUnit.SECONDS).proxyRevalidate()));
 				});
 		Assertions.setExtractBareNamePropertyMethods(true);
 	}

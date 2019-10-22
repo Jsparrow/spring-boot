@@ -32,6 +32,8 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulates a payload data sent via a HTTP tunnel.
@@ -40,6 +42,8 @@ import org.springframework.util.StringUtils;
  * @since 1.3.0
  */
 public class HttpTunnelPayload {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(HttpTunnelPayload.class);
 
 	private static final String SEQ_HEADER = "x-seq";
 
@@ -143,6 +147,7 @@ public class HttpTunnelPayload {
 			return buffer;
 		}
 		catch (InterruptedIOException ex) {
+			logger1.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

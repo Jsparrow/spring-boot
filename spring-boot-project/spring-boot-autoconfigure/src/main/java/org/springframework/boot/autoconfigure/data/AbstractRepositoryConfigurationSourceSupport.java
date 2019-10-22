@@ -107,7 +107,7 @@ public abstract class AbstractRepositoryConfigurationSourceSupport
 	}
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 

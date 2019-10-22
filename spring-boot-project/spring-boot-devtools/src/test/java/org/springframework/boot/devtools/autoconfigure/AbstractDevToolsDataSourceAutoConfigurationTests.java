@@ -161,7 +161,7 @@ abstract class AbstractDevToolsDataSourceAutoConfigurationTests {
 	static class DataSourceSpyBeanPostProcessor implements BeanPostProcessor {
 
 		@Override
-		public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		public Object postProcessBeforeInitialization(Object bean, String beanName) {
 			if (bean instanceof DataSource) {
 				bean = spy(bean);
 			}
@@ -169,7 +169,7 @@ abstract class AbstractDevToolsDataSourceAutoConfigurationTests {
 		}
 
 		@Override
-		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		public Object postProcessAfterInitialization(Object bean, String beanName) {
 			return bean;
 		}
 

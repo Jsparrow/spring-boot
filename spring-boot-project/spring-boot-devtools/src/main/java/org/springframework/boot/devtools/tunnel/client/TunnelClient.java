@@ -31,6 +31,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The client side component of a socket tunnel. Starts a {@link ServerSocket} of the
@@ -41,6 +43,8 @@ import org.springframework.util.Assert;
  * @since 1.3.0
  */
 public class TunnelClient implements SmartInitializingSingleton {
+
+	private static final Logger logger1 = LoggerFactory.getLogger(TunnelClient.class);
 
 	private static final int BUFFER_SIZE = 1024 * 100;
 
@@ -107,6 +111,7 @@ public class TunnelClient implements SmartInitializingSingleton {
 					this.serverThread.join(2000);
 				}
 				catch (InterruptedException ex) {
+					logger1.error(ex.getMessage(), ex);
 					Thread.currentThread().interrupt();
 				}
 				this.serverThread = null;
@@ -133,6 +138,8 @@ public class TunnelClient implements SmartInitializingSingleton {
 	 */
 	protected class ServerThread extends Thread {
 
+		private final Logger logger2 = LoggerFactory.getLogger(ServerThread.class);
+
 		private final ServerSocketChannel serverSocketChannel;
 
 		private boolean acceptConnections = true;
@@ -158,6 +165,7 @@ public class TunnelClient implements SmartInitializingSingleton {
 						handleConnection(socket);
 					}
 					catch (AsynchronousCloseException ex) {
+						logger2.error(ex.getMessage(), ex);
 						// Connection has been closed. Keep the server running
 					}
 				}
@@ -209,11 +217,12 @@ public class TunnelClient implements SmartInitializingSingleton {
 
 		@Override
 		public void close() throws IOException {
-			if (!this.closed) {
-				this.socketChannel.close();
-				TunnelClient.this.listeners.fireCloseEvent(this.socketChannel);
-				this.closed = true;
+			if (this.closed) {
+				return;
 			}
+			this.socketChannel.close();
+			TunnelClient.this.listeners.fireCloseEvent(this.socketChannel);
+			this.closed = true;
 		}
 
 	}

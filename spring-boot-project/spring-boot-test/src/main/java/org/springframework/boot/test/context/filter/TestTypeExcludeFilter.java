@@ -22,6 +22,8 @@ import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link TypeExcludeFilter} to exclude classes annotated with
@@ -31,6 +33,8 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
  * @author Andy Wilkinson
  */
 class TestTypeExcludeFilter extends TypeExcludeFilter {
+
+	private static final Logger logger = LoggerFactory.getLogger(TestTypeExcludeFilter.class);
 
 	private static final String[] CLASS_ANNOTATIONS = { "org.junit.runner.RunWith",
 			"org.junit.jupiter.api.extension.ExtendWith", "org.junit.platform.commons.annotation.Testable",
@@ -56,6 +60,7 @@ class TestTypeExcludeFilter extends TypeExcludeFilter {
 				}
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore
 			}
 		}

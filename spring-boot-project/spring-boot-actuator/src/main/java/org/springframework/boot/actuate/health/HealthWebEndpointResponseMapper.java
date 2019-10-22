@@ -111,12 +111,7 @@ public class HealthWebEndpointResponseMapper {
 		if (CollectionUtils.isEmpty(this.authorizedRoles)) {
 			return true;
 		}
-		for (String role : this.authorizedRoles) {
-			if (securityContext.isUserInRole(role)) {
-				return true;
-			}
-		}
-		return false;
+		return this.authorizedRoles.stream().anyMatch(securityContext::isUserInRole);
 	}
 
 }

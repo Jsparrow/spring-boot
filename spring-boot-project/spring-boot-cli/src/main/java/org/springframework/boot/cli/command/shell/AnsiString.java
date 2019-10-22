@@ -60,13 +60,13 @@ class AnsiString {
 	}
 
 	private Ansi applyCode(Ansi ansi, Code code) {
-		if (code.isColor()) {
-			if (code.isBackground()) {
-				return ansi.bg(code.getColor());
-			}
-			return ansi.fg(code.getColor());
+		if (!code.isColor()) {
+			return ansi.a(code.getAttribute());
 		}
-		return ansi.a(code.getAttribute());
+		if (code.isBackground()) {
+			return ansi.bg(code.getColor());
+		}
+		return ansi.fg(code.getColor());
 	}
 
 	private boolean isAnsiSupported() {

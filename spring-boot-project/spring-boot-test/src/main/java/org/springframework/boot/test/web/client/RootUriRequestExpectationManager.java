@@ -85,7 +85,7 @@ public class RootUriRequestExpectationManager implements RequestExpectationManag
 			String prefix = "Request URI expected:</";
 			if (message != null && message.startsWith(prefix)) {
 				throw new AssertionError(
-						"Request URI expected:<" + this.rootUri + message.substring(prefix.length() - 1));
+						new StringBuilder().append("Request URI expected:<").append(this.rootUri).append(message.substring(prefix.length() - 1)).toString());
 			}
 			throw ex;
 		}

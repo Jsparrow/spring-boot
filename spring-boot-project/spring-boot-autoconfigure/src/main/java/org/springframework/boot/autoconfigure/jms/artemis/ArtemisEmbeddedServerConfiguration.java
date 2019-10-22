@@ -67,18 +67,16 @@ class ArtemisEmbeddedServerConfiguration {
 	EmbeddedActiveMQ embeddedActiveMq(org.apache.activemq.artemis.core.config.Configuration configuration,
 			JMSConfiguration jmsConfiguration, ObjectProvider<ArtemisConfigurationCustomizer> configurationCustomizers)
 			throws Exception {
-		for (JMSQueueConfiguration queueConfiguration : jmsConfiguration.getQueueConfigurations()) {
+		jmsConfiguration.getQueueConfigurations().forEach(queueConfiguration -> {
 			String queueName = queueConfiguration.getName();
 			configuration.addAddressConfiguration(
 					new CoreAddressConfiguration().setName(queueName).addRoutingType(RoutingType.ANYCAST)
 							.addQueueConfiguration(new CoreQueueConfiguration().setAddress(queueName).setName(queueName)
 									.setFilterString(queueConfiguration.getSelector())
 									.setDurable(queueConfiguration.isDurable()).setRoutingType(RoutingType.ANYCAST)));
-		}
-		for (TopicConfiguration topicConfiguration : jmsConfiguration.getTopicConfigurations()) {
-			configuration.addAddressConfiguration(new CoreAddressConfiguration().setName(topicConfiguration.getName())
-					.addRoutingType(RoutingType.MULTICAST));
-		}
+		});
+		jmsConfiguration.getTopicConfigurations().forEach(topicConfiguration -> configuration.addAddressConfiguration(new CoreAddressConfiguration().setName(topicConfiguration.getName())
+				.addRoutingType(RoutingType.MULTICAST)));
 		configurationCustomizers.orderedStream().forEach((customizer) -> customizer.customize(configuration));
 		EmbeddedActiveMQ embeddedActiveMq = new EmbeddedActiveMQ();
 		embeddedActiveMq.setConfiguration(configuration);

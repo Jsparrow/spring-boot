@@ -67,7 +67,7 @@ public class Sanitizer {
 		if (isRegex(value)) {
 			return Pattern.compile(value, Pattern.CASE_INSENSITIVE);
 		}
-		return Pattern.compile(".*" + value + "$", Pattern.CASE_INSENSITIVE);
+		return Pattern.compile(new StringBuilder().append(".*").append(value).append("$").toString(), Pattern.CASE_INSENSITIVE);
 	}
 
 	private boolean isRegex(String value) {
@@ -105,7 +105,7 @@ public class Sanitizer {
 		Matcher matcher = URI_USERINFO_PATTERN.matcher(uriString);
 		String password = matcher.matches() ? matcher.group(1) : null;
 		if (password != null) {
-			return StringUtils.replace(uriString, ":" + password + "@", ":******@");
+			return StringUtils.replace(uriString, new StringBuilder().append(":").append(password).append("@").toString(), ":******@");
 		}
 		return value;
 	}

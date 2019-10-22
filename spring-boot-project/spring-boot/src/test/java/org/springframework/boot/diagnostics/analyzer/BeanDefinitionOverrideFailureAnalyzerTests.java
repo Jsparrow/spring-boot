@@ -38,8 +38,7 @@ class BeanDefinitionOverrideFailureAnalyzerTests {
 	void analyzeBeanDefinitionOverrideException() {
 		FailureAnalysis analysis = performAnalysis(BeanOverrideConfiguration.class);
 		String description = analysis.getDescription();
-		assertThat(description).contains("The bean 'testBean', defined in " + SecondConfiguration.class.getName()
-				+ ", could not be registered.");
+		assertThat(description).contains(new StringBuilder().append("The bean 'testBean', defined in ").append(SecondConfiguration.class.getName()).append(", could not be registered.").toString());
 		assertThat(description).contains(FirstConfiguration.class.getName());
 	}
 
@@ -50,12 +49,10 @@ class BeanDefinitionOverrideFailureAnalyzerTests {
 	}
 
 	private BeanDefinitionOverrideException createFailure(Class<?> configuration) {
-		try {
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
 			context.setAllowBeanDefinitionOverriding(false);
 			context.register(configuration);
 			context.refresh();
-			context.close();
 			return null;
 		}
 		catch (BeanDefinitionOverrideException ex) {

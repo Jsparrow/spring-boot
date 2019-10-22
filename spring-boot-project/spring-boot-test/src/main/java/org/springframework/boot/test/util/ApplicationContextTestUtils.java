@@ -32,12 +32,13 @@ public abstract class ApplicationContextTestUtils {
 	 * @param context the context to close (can be {@code null})
 	 */
 	public static void closeAll(ApplicationContext context) {
-		if (context != null) {
-			if (context instanceof ConfigurableApplicationContext) {
-				((ConfigurableApplicationContext) context).close();
-			}
-			closeAll(context.getParent());
+		if (context == null) {
+			return;
 		}
+		if (context instanceof ConfigurableApplicationContext) {
+			((ConfigurableApplicationContext) context).close();
+		}
+		closeAll(context.getParent());
 	}
 
 }

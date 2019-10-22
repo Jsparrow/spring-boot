@@ -18,6 +18,8 @@ package org.springframework.boot.web.embedded.tomcat;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link TomcatContextCustomizer} that disables Tomcat's reflective reference clearing
@@ -26,6 +28,8 @@ import org.apache.catalina.core.StandardContext;
  * @author Andy Wilkinson
  */
 class DisableReferenceClearingContextCustomizer implements TomcatContextCustomizer {
+
+	private static final Logger logger = LoggerFactory.getLogger(DisableReferenceClearingContextCustomizer.class);
 
 	@Override
 	public void customize(Context context) {
@@ -39,6 +43,7 @@ class DisableReferenceClearingContextCustomizer implements TomcatContextCustomiz
 			standardContext.setClearReferencesThreadLocals(false);
 		}
 		catch (NoSuchMethodError ex) {
+			logger.error(ex.getMessage(), ex);
 			// Earlier version of Tomcat (probably without
 			// setClearReferencesThreadLocals). Continue.
 		}

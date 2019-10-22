@@ -50,12 +50,6 @@ public class BasicJsonTester {
 	private JsonLoader loader;
 
 	/**
-	 * Create a new uninitialized {@link BasicJsonTester} instance.
-	 */
-	protected BasicJsonTester() {
-	}
-
-	/**
 	 * Create a new {@link BasicJsonTester} instance that will load resources as UTF-8.
 	 * @param resourceLoadClass the source class used to load resources
 	 */
@@ -72,6 +66,12 @@ public class BasicJsonTester {
 	public BasicJsonTester(Class<?> resourceLoadClass, Charset charset) {
 		Assert.notNull(resourceLoadClass, "ResourceLoadClass must not be null");
 		this.loader = new JsonLoader(resourceLoadClass, charset);
+	}
+
+	/**
+	 * Create a new uninitialized {@link BasicJsonTester} instance.
+	 */
+	protected BasicJsonTester() {
 	}
 
 	/**

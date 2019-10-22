@@ -99,15 +99,15 @@ public class JsonMarshaller {
 	}
 
 	private ItemDeprecation toItemDeprecation(JSONObject object) throws Exception {
-		if (object.has("deprecation")) {
-			JSONObject deprecationJsonObject = object.getJSONObject("deprecation");
-			ItemDeprecation deprecation = new ItemDeprecation();
-			deprecation.setLevel(deprecationJsonObject.optString("level", null));
-			deprecation.setReason(deprecationJsonObject.optString("reason", null));
-			deprecation.setReplacement(deprecationJsonObject.optString("replacement", null));
-			return deprecation;
+		if (!object.has("deprecation")) {
+			return object.optBoolean("deprecated") ? new ItemDeprecation() : null;
 		}
-		return object.optBoolean("deprecated") ? new ItemDeprecation() : null;
+		JSONObject deprecationJsonObject = object.getJSONObject("deprecation");
+		ItemDeprecation deprecation = new ItemDeprecation();
+		deprecation.setLevel(deprecationJsonObject.optString("level", null));
+		deprecation.setReason(deprecationJsonObject.optString("reason", null));
+		deprecation.setReplacement(deprecationJsonObject.optString("replacement", null));
+		return deprecation;
 	}
 
 	private ItemHint toItemHint(JSONObject object) throws Exception {
@@ -150,15 +150,15 @@ public class JsonMarshaller {
 	}
 
 	private Object readItemValue(Object value) throws Exception {
-		if (value instanceof JSONArray) {
-			JSONArray array = (JSONArray) value;
-			Object[] content = new Object[array.length()];
-			for (int i = 0; i < array.length(); i++) {
-				content[i] = array.get(i);
-			}
-			return content;
+		if (!(value instanceof JSONArray)) {
+			return value;
 		}
-		return value;
+		JSONArray array = (JSONArray) value;
+		Object[] content = new Object[array.length()];
+		for (int i = 0; i < array.length(); i++) {
+			content[i] = array.get(i);
+		}
+		return content;
 	}
 
 	private String toString(InputStream inputStream) throws IOException {

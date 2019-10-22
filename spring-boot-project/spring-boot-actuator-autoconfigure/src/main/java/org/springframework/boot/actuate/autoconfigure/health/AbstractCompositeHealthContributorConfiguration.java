@@ -66,7 +66,7 @@ public abstract class AbstractCompositeHealthContributorConfiguration<C, I exten
 		}
 		catch (Exception ex) {
 			throw new IllegalStateException(
-					"Unable to create health indicator " + this.indicatorType + " for bean type " + this.beanType, ex);
+					new StringBuilder().append("Unable to create health indicator ").append(this.indicatorType).append(" for bean type ").append(this.beanType).toString(), ex);
 		}
 	}
 

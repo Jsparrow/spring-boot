@@ -98,7 +98,7 @@ public final class ExitStatus {
 
 	@Override
 	public String toString() {
-		return getName() + ":" + getCode();
+		return new StringBuilder().append(getName()).append(":").append(getCode()).toString();
 	}
 
 }

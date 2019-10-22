@@ -30,6 +30,8 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyS
 import org.springframework.boot.context.properties.source.IterableConfigurationPropertySource;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.ResolvableType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link AggregateBinder} for Maps.
@@ -39,6 +41,7 @@ import org.springframework.core.ResolvableType;
  */
 class MapBinder extends AggregateBinder<Map<Object, Object>> {
 
+	private static final Logger logger = LoggerFactory.getLogger(MapBinder.class);
 	private static final Bindable<Map<String, String>> STRING_STRING_MAP = Bindable.mapOf(String.class, String.class);
 
 	MapBinder(Context context) {
@@ -98,6 +101,7 @@ class MapBinder extends AggregateBinder<Map<Object, Object>> {
 			return copyIfPossible(existingMap);
 		}
 		catch (UnsupportedOperationException ex) {
+			logger.error(ex.getMessage(), ex);
 			Map<Object, Object> result = createNewMap(additional.getClass(), existingMap);
 			result.putAll(additional);
 			return result;
@@ -109,6 +113,7 @@ class MapBinder extends AggregateBinder<Map<Object, Object>> {
 			return existing.get();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -118,6 +123,7 @@ class MapBinder extends AggregateBinder<Map<Object, Object>> {
 			return createNewMap(map.getClass(), map);
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return map;
 		}
 	}

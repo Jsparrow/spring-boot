@@ -51,7 +51,7 @@ public class SimpleClientWebSocketHandler extends TextWebSocketHandler {
 
 	@Override
 	public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-		this.logger.info("Received: " + message + " (" + this.latch.getCount() + ")");
+		this.logger.info(new StringBuilder().append("Received: ").append(message).append(" (").append(this.latch.getCount()).append(")").toString());
 		session.close();
 		this.messagePayload.set(message.getPayload());
 		this.latch.countDown();

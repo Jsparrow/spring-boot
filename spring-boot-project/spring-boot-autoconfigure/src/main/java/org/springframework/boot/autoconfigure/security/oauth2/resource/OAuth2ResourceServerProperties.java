@@ -38,12 +38,11 @@ import org.springframework.util.StreamUtils;
 public class OAuth2ResourceServerProperties {
 
 	private final Jwt jwt = new Jwt();
+	private final Opaquetoken opaqueToken = new Opaquetoken();
 
 	public Jwt getJwt() {
 		return this.jwt;
 	}
-
-	private final Opaquetoken opaqueToken = new Opaquetoken();
 
 	public Opaquetoken getOpaquetoken() {
 		return this.opaqueToken;
@@ -51,22 +50,23 @@ public class OAuth2ResourceServerProperties {
 
 	@PostConstruct
 	public void validate() {
-		if (this.getOpaquetoken().getIntrospectionUri() != null) {
-			if (this.getJwt().getJwkSetUri() != null) {
-				handleError("jwt.jwk-set-uri");
-			}
-			if (this.getJwt().getIssuerUri() != null) {
-				handleError("jwt.issuer-uri");
-			}
-			if (this.getJwt().getPublicKeyLocation() != null) {
-				handleError("jwt.public-key-location");
-			}
+		if (this.getOpaquetoken().getIntrospectionUri() == null) {
+			return;
+		}
+		if (this.getJwt().getJwkSetUri() != null) {
+			handleError("jwt.jwk-set-uri");
+		}
+		if (this.getJwt().getIssuerUri() != null) {
+			handleError("jwt.issuer-uri");
+		}
+		if (this.getJwt().getPublicKeyLocation() != null) {
+			handleError("jwt.public-key-location");
 		}
 	}
 
 	private void handleError(String property) {
 		throw new IllegalStateException(
-				"Only one of " + property + " and opaquetoken.introspection-uri should be configured.");
+				new StringBuilder().append("Only one of ").append(property).append(" and opaquetoken.introspection-uri should be configured.").toString());
 	}
 
 	public static class Jwt {

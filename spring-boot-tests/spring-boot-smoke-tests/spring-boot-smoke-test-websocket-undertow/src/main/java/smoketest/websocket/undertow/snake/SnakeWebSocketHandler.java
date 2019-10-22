@@ -36,6 +36,10 @@ public class SnakeWebSocketHandler extends TextWebSocketHandler {
 
 	private Snake snake;
 
+	public SnakeWebSocketHandler() {
+		this.id = snakeIds.getAndIncrement();
+	}
+
 	public static String getRandomHexColor() {
 		float hue = random.nextFloat();
 		// sat between 0.1 and 0.3
@@ -52,14 +56,10 @@ public class SnakeWebSocketHandler extends TextWebSocketHandler {
 	}
 
 	private static int roundByGridSize(int value) {
-		value = value + (SnakeUtils.GRID_SIZE / 2);
-		value = value / SnakeUtils.GRID_SIZE;
-		value = value * SnakeUtils.GRID_SIZE;
+		value += (SnakeUtils.GRID_SIZE / 2);
+		value /= SnakeUtils.GRID_SIZE;
+		value *= SnakeUtils.GRID_SIZE;
 		return value;
-	}
-
-	public SnakeWebSocketHandler() {
-		this.id = snakeIds.getAndIncrement();
 	}
 
 	@Override

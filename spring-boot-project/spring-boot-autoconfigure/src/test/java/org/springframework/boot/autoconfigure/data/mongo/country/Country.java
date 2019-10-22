@@ -36,11 +36,11 @@ public class Country implements Serializable {
 	@Column(nullable = false)
 	private String name;
 
-	protected Country() {
-	}
-
 	public Country(String name) {
 		this.name = name;
+	}
+
+	protected Country() {
 	}
 
 	public String getName() {

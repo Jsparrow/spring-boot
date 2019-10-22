@@ -25,6 +25,8 @@ import java.util.function.Supplier;
 
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility that can be used to map values from a supplied source to a destination.
@@ -353,6 +355,7 @@ public final class PropertyMapper {
 	 */
 	private static class NullPointerExceptionSafeSupplier<T> implements Supplier<T> {
 
+		private final Logger logger = LoggerFactory.getLogger(NullPointerExceptionSafeSupplier.class);
 		private final Supplier<T> supplier;
 
 		NullPointerExceptionSafeSupplier(Supplier<T> supplier) {
@@ -365,6 +368,7 @@ public final class PropertyMapper {
 				return this.supplier.get();
 			}
 			catch (NullPointerException ex) {
+				logger.error(ex.getMessage(), ex);
 				return null;
 			}
 		}

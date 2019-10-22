@@ -30,6 +30,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import java.util.Collections;
 
 /**
  * Tests for {@link Installer}
@@ -59,17 +60,17 @@ class InstallerTests {
 	@Test
 	void installNewDependency() throws Exception {
 		File foo = createTemporaryFile("foo.jar");
-		given(this.resolver.resolve(Arrays.asList("foo"))).willReturn(Arrays.asList(foo));
-		this.installer.install(Arrays.asList("foo"));
+		given(this.resolver.resolve(Collections.singletonList("foo"))).willReturn(Collections.singletonList(foo));
+		this.installer.install(Collections.singletonList("foo"));
 		assertThat(getNamesOfFilesInLibExt()).containsOnly("foo.jar", ".installed");
 	}
 
 	@Test
 	void installAndUninstall() throws Exception {
 		File foo = createTemporaryFile("foo.jar");
-		given(this.resolver.resolve(Arrays.asList("foo"))).willReturn(Arrays.asList(foo));
-		this.installer.install(Arrays.asList("foo"));
-		this.installer.uninstall(Arrays.asList("foo"));
+		given(this.resolver.resolve(Collections.singletonList("foo"))).willReturn(Collections.singletonList(foo));
+		this.installer.install(Collections.singletonList("foo"));
+		this.installer.uninstall(Collections.singletonList("foo"));
 		assertThat(getNamesOfFilesInLibExt()).contains(".installed");
 	}
 
@@ -78,15 +79,15 @@ class InstallerTests {
 		File alpha = createTemporaryFile("alpha.jar");
 		File bravo = createTemporaryFile("bravo.jar");
 		File charlie = createTemporaryFile("charlie.jar");
-		given(this.resolver.resolve(Arrays.asList("bravo"))).willReturn(Arrays.asList(bravo, alpha));
-		given(this.resolver.resolve(Arrays.asList("charlie"))).willReturn(Arrays.asList(charlie, alpha));
-		this.installer.install(Arrays.asList("bravo"));
+		given(this.resolver.resolve(Collections.singletonList("bravo"))).willReturn(Arrays.asList(bravo, alpha));
+		given(this.resolver.resolve(Collections.singletonList("charlie"))).willReturn(Arrays.asList(charlie, alpha));
+		this.installer.install(Collections.singletonList("bravo"));
 		assertThat(getNamesOfFilesInLibExt()).containsOnly("alpha.jar", "bravo.jar", ".installed");
-		this.installer.install(Arrays.asList("charlie"));
+		this.installer.install(Collections.singletonList("charlie"));
 		assertThat(getNamesOfFilesInLibExt()).containsOnly("alpha.jar", "bravo.jar", "charlie.jar", ".installed");
-		this.installer.uninstall(Arrays.asList("bravo"));
+		this.installer.uninstall(Collections.singletonList("bravo"));
 		assertThat(getNamesOfFilesInLibExt()).containsOnly("alpha.jar", "charlie.jar", ".installed");
-		this.installer.uninstall(Arrays.asList("charlie"));
+		this.installer.uninstall(Collections.singletonList("charlie"));
 		assertThat(getNamesOfFilesInLibExt()).containsOnly(".installed");
 	}
 
@@ -95,10 +96,10 @@ class InstallerTests {
 		File alpha = createTemporaryFile("alpha.jar");
 		File bravo = createTemporaryFile("bravo.jar");
 		File charlie = createTemporaryFile("charlie.jar");
-		given(this.resolver.resolve(Arrays.asList("bravo"))).willReturn(Arrays.asList(bravo, alpha));
-		given(this.resolver.resolve(Arrays.asList("charlie"))).willReturn(Arrays.asList(charlie, alpha));
-		this.installer.install(Arrays.asList("bravo"));
-		this.installer.install(Arrays.asList("charlie"));
+		given(this.resolver.resolve(Collections.singletonList("bravo"))).willReturn(Arrays.asList(bravo, alpha));
+		given(this.resolver.resolve(Collections.singletonList("charlie"))).willReturn(Arrays.asList(charlie, alpha));
+		this.installer.install(Collections.singletonList("bravo"));
+		this.installer.install(Collections.singletonList("charlie"));
 		assertThat(getNamesOfFilesInLibExt()).containsOnly("alpha.jar", "bravo.jar", "charlie.jar", ".installed");
 		this.installer.uninstallAll();
 		assertThat(getNamesOfFilesInLibExt()).containsOnly(".installed");

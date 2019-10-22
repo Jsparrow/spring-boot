@@ -99,7 +99,7 @@ class JarFileArchiveTests {
 	void getNestedArchive() throws Exception {
 		Entry entry = getEntriesMap(this.archive).get("nested.jar");
 		Archive nested = this.archive.getNestedArchive(entry);
-		assertThat(nested.getUrl().toString()).isEqualTo("jar:" + this.rootJarFileUrl + "!/nested.jar!/");
+		assertThat(nested.getUrl().toString()).isEqualTo(new StringBuilder().append("jar:").append(this.rootJarFileUrl).append("!/nested.jar!/").toString());
 		((JarFileArchive) nested).close();
 	}
 

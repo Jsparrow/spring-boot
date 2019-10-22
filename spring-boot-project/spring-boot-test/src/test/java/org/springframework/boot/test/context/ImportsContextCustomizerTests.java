@@ -72,6 +72,16 @@ class ImportsContextCustomizerTests {
 				.isEqualTo(new ImportsContextCustomizer(SecondSpockLangAnnotatedTestClass.class));
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface Indicator1 {
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface Indicator2 {
+
+	}
+
 	@Import(TestImportSelector.class)
 	@Indicator1
 	static class FirstImportSelectorAnnotatedClass {
@@ -123,16 +133,6 @@ class ImportsContextCustomizerTests {
 
 	@Issue("1234")
 	static class SecondSpockLangAnnotatedTestClass {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface Indicator1 {
-
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface Indicator2 {
 
 	}
 

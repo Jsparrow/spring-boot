@@ -20,6 +20,8 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide build-related information such as group and artifact.
@@ -28,6 +30,8 @@ import java.util.Properties;
  * @since 1.4.0
  */
 public class BuildProperties extends InfoProperties {
+
+	private static final Logger logger = LoggerFactory.getLogger(BuildProperties.class);
 
 	/**
 	 * Create an instance with the specified entries.
@@ -95,6 +99,7 @@ public class BuildProperties extends InfoProperties {
 				properties.setProperty(key, updatedValue);
 			}
 			catch (DateTimeException ex) {
+				logger.error(ex.getMessage(), ex);
 				// Ignore and store the original value
 			}
 		}

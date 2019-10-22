@@ -31,9 +31,7 @@ public class SampleApplicationRunner implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		for (String arg : args.getNonOptionArgs()) {
-			this.gateway.echo(arg);
-		}
+		args.getNonOptionArgs().forEach(arg -> this.gateway.echo(arg));
 	}
 
 }

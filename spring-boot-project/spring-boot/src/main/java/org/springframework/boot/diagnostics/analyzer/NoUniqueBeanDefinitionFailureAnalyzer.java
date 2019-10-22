@@ -26,6 +26,8 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link AbstractInjectionFailureAnalyzer} that performs analysis of failures caused
@@ -36,10 +38,11 @@ import org.springframework.util.StringUtils;
 class NoUniqueBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnalyzer<NoUniqueBeanDefinitionException>
 		implements BeanFactoryAware {
 
+	private static final Logger logger = LoggerFactory.getLogger(NoUniqueBeanDefinitionFailureAnalyzer.class);
 	private ConfigurableBeanFactory beanFactory;
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactory);
 		this.beanFactory = (ConfigurableBeanFactory) beanFactory;
 	}
@@ -60,9 +63,7 @@ class NoUniqueBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnal
 			buildMessage(message, beanName);
 		}
 		return new FailureAnalysis(message.toString(),
-				"Consider marking one of the beans as @Primary, updating the consumer to"
-						+ " accept multiple beans, or using @Qualifier to identify the"
-						+ " bean that should be consumed",
+				new StringBuilder().append("Consider marking one of the beans as @Primary, updating the consumer to").append(" accept multiple beans, or using @Qualifier to identify the").append(" bean that should be consumed").toString(),
 				cause);
 	}
 
@@ -72,6 +73,7 @@ class NoUniqueBeanDefinitionFailureAnalyzer extends AbstractInjectionFailureAnal
 			message.append(getDefinitionDescription(beanName, definition));
 		}
 		catch (NoSuchBeanDefinitionException ex) {
+			logger.error(ex.getMessage(), ex);
 			message.append(String.format("\t- %s: a programmatically registered singleton", beanName));
 		}
 	}

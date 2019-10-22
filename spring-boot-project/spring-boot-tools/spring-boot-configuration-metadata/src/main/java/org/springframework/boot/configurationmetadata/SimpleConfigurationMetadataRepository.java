@@ -41,9 +41,7 @@ public class SimpleConfigurationMetadataRepository implements ConfigurationMetad
 	@Override
 	public Map<String, ConfigurationMetadataProperty> getAllProperties() {
 		Map<String, ConfigurationMetadataProperty> properties = new HashMap<>();
-		for (ConfigurationMetadataGroup group : this.allGroups.values()) {
-			properties.putAll(group.getProperties());
-		}
+		this.allGroups.values().forEach(group -> properties.putAll(group.getProperties()));
 		return properties;
 	}
 
@@ -52,7 +50,7 @@ public class SimpleConfigurationMetadataRepository implements ConfigurationMetad
 	 * @param sources the sources to add
 	 */
 	public void add(Collection<ConfigurationMetadataSource> sources) {
-		for (ConfigurationMetadataSource source : sources) {
+		sources.forEach(source -> {
 			String groupId = source.getGroupId();
 			ConfigurationMetadataGroup group = this.allGroups.get(groupId);
 			if (group == null) {
@@ -63,7 +61,7 @@ public class SimpleConfigurationMetadataRepository implements ConfigurationMetad
 			if (sourceType != null) {
 				putIfAbsent(group.getSources(), sourceType, source);
 			}
-		}
+		});
 	}
 
 	/**
@@ -84,7 +82,7 @@ public class SimpleConfigurationMetadataRepository implements ConfigurationMetad
 	 * @param repository the repository to include
 	 */
 	public void include(ConfigurationMetadataRepository repository) {
-		for (ConfigurationMetadataGroup group : repository.getAllGroups().values()) {
+		repository.getAllGroups().values().forEach(group -> {
 			ConfigurationMetadataGroup existingGroup = this.allGroups.get(group.getId());
 			if (existingGroup == null) {
 				this.allGroups.put(group.getId(), group);
@@ -95,26 +93,24 @@ public class SimpleConfigurationMetadataRepository implements ConfigurationMetad
 				// Merge sources
 				group.getSources().forEach((name, value) -> putIfAbsent(existingGroup.getSources(), name, value));
 			}
-		}
+		});
 
 	}
 
 	private ConfigurationMetadataGroup getGroup(ConfigurationMetadataSource source) {
-		if (source == null) {
-			ConfigurationMetadataGroup rootGroup = this.allGroups.get(ROOT_GROUP);
-			if (rootGroup == null) {
-				rootGroup = new ConfigurationMetadataGroup(ROOT_GROUP);
-				this.allGroups.put(ROOT_GROUP, rootGroup);
-			}
-			return rootGroup;
+		if (source != null) {
+			return this.allGroups.get(source.getGroupId());
 		}
-		return this.allGroups.get(source.getGroupId());
+		ConfigurationMetadataGroup rootGroup = this.allGroups.get(ROOT_GROUP);
+		if (rootGroup == null) {
+			rootGroup = new ConfigurationMetadataGroup(ROOT_GROUP);
+			this.allGroups.put(ROOT_GROUP, rootGroup);
+		}
+		return rootGroup;
 	}
 
 	private <V> void putIfAbsent(Map<String, V> map, String key, V value) {
-		if (!map.containsKey(key)) {
-			map.put(key, value);
-		}
+		map.putIfAbsent(key, value);
 	}
 
 }

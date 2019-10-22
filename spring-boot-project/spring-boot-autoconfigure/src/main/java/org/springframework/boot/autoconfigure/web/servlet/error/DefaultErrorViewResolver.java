@@ -36,6 +36,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link ErrorViewResolver} implementation that attempts to resolve error views
@@ -56,6 +58,8 @@ import org.springframework.web.servlet.View;
  * @since 1.4.0
  */
 public class DefaultErrorViewResolver implements ErrorViewResolver, Ordered {
+
+	private static final Logger logger = LoggerFactory.getLogger(DefaultErrorViewResolver.class);
 
 	private static final Map<Series, String> SERIES_VIEWS;
 
@@ -125,6 +129,7 @@ public class DefaultErrorViewResolver implements ErrorViewResolver, Ordered {
 				}
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 		return null;

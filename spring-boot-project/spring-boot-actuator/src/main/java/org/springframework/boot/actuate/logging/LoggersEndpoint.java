@@ -113,9 +113,7 @@ public class LoggersEndpoint {
 
 	private Map<String, LoggerLevels> getLoggers(Collection<LoggerConfiguration> configurations) {
 		Map<String, LoggerLevels> loggers = new LinkedHashMap<>(configurations.size());
-		for (LoggerConfiguration configuration : configurations) {
-			loggers.put(configuration.getName(), new SingleLoggerLevels(configuration));
-		}
+		configurations.forEach(configuration -> loggers.put(configuration.getName(), new SingleLoggerLevels(configuration)));
 		return loggers;
 	}
 

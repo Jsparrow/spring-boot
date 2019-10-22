@@ -30,6 +30,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link SimpleClientHttpRequestFactory} that skips SSL certificate verification.
@@ -37,6 +39,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
  * @author Madhura Bhave
  */
 class SkipSslVerificationHttpRequestFactory extends SimpleClientHttpRequestFactory {
+
+	private static final Logger logger = LoggerFactory.getLogger(SkipSslVerificationHttpRequestFactory.class);
 
 	@Override
 	protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
@@ -52,6 +56,7 @@ class SkipSslVerificationHttpRequestFactory extends SimpleClientHttpRequestFacto
 			connection.setSSLSocketFactory(createSslSocketFactory());
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			// Ignore
 		}
 	}

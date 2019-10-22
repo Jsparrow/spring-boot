@@ -81,7 +81,7 @@ class SampleIntegrationParentApplicationTests {
 
 	private Resource[] findResources(File outputDir) throws IOException {
 		return ResourcePatternUtils.getResourcePatternResolver(new DefaultResourceLoader())
-				.getResources("file:" + outputDir.getAbsolutePath() + "/*.txt");
+				.getResources(new StringBuilder().append("file:").append(outputDir.getAbsolutePath()).append("/*.txt").toString());
 	}
 
 	private String readResources(Resource[] resources) throws IOException {

@@ -22,6 +22,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
 
 import org.springframework.beans.DirectFieldAccessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link DataSourcePoolMetadata} for a Hikari {@link DataSource}.
@@ -30,6 +32,8 @@ import org.springframework.beans.DirectFieldAccessor;
  * @since 2.0.0
  */
 public class HikariDataSourcePoolMetadata extends AbstractDataSourcePoolMetadata<HikariDataSource> {
+
+	private static final Logger logger = LoggerFactory.getLogger(HikariDataSourcePoolMetadata.class);
 
 	public HikariDataSourcePoolMetadata(HikariDataSource dataSource) {
 		super(dataSource);
@@ -41,6 +45,7 @@ public class HikariDataSourcePoolMetadata extends AbstractDataSourcePoolMetadata
 			return getHikariPool().getActiveConnections();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -51,6 +56,7 @@ public class HikariDataSourcePoolMetadata extends AbstractDataSourcePoolMetadata
 			return getHikariPool().getIdleConnections();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

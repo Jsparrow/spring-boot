@@ -39,14 +39,7 @@ public class SampleAntApplicationIT {
 	@Test
 	void runJar() throws Exception {
 		File target = new File("target");
-		File[] jarFiles = target.listFiles(new FileFilter() {
-
-			@Override
-			public boolean accept(File file) {
-				return file.getName().endsWith(".jar");
-			}
-
-		});
+		File[] jarFiles = target.listFiles((File file) -> file.getName().endsWith(".jar"));
 		assertThat(jarFiles).hasSize(1);
 		Process process = new JavaExecutable().processBuilder("-jar", jarFiles[0].getName()).directory(target).start();
 		process.waitFor(5, TimeUnit.MINUTES);

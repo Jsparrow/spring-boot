@@ -16,6 +16,9 @@
 
 package org.springframework.boot.maven.sample;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Sample class with a main method.
  *
@@ -23,8 +26,10 @@ package org.springframework.boot.maven.sample;
  */
 public class ClassWithMainMethod {
 
+	private static final Logger logger = LoggerFactory.getLogger(ClassWithMainMethod.class);
+
 	public void run() {
-		System.out.println("Hello World");
+		logger.info("Hello World");
 	}
 
 	public static void main(String[] args) {

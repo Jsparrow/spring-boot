@@ -37,6 +37,8 @@ import org.springframework.http.server.ServerHttpAsyncRequestControl;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A server that can be used to tunnel TCP traffic over HTTP. Similar in design to the
@@ -108,6 +110,8 @@ import org.springframework.util.Assert;
  */
 public class HttpTunnelServer {
 
+	private static final Logger logger1 = LoggerFactory.getLogger(HttpTunnelServer.class);
+
 	private static final long DEFAULT_LONG_POLL_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
 
 	private static final long DEFAULT_DISCONNECT_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
@@ -154,6 +158,7 @@ public class HttpTunnelServer {
 			httpConnection.waitForResponse();
 		}
 		catch (ConnectException ex) {
+			logger1.error(ex.getMessage(), ex);
 			httpConnection.respond(HttpStatus.GONE);
 		}
 	}
@@ -205,6 +210,8 @@ public class HttpTunnelServer {
 	 * The main server thread used to transfer tunnel traffic.
 	 */
 	protected class ServerThread extends Thread {
+
+		private final Logger logger2 = LoggerFactory.getLogger(ServerThread.class);
 
 		private final ByteChannel targetServer;
 
@@ -266,6 +273,7 @@ public class HttpTunnelServer {
 						this.httpConnections.wait(HttpTunnelServer.this.longPollTimeout);
 					}
 					catch (InterruptedException ex) {
+						logger2.error(ex.getMessage(), ex);
 						Thread.currentThread().interrupt();
 						closeHttpConnections();
 					}
@@ -290,11 +298,12 @@ public class HttpTunnelServer {
 		}
 
 		private void checkNotDisconnected() {
-			if (this.lastHttpRequestTime > 0) {
-				long timeout = HttpTunnelServer.this.disconnectTimeout;
-				long duration = System.currentTimeMillis() - this.lastHttpRequestTime;
-				Assert.state(duration < timeout, () -> "Disconnect timeout: " + timeout + " " + duration);
+			if (this.lastHttpRequestTime <= 0) {
+				return;
 			}
+			long timeout = HttpTunnelServer.this.disconnectTimeout;
+			long duration = System.currentTimeMillis() - this.lastHttpRequestTime;
+			Assert.state(duration < timeout, () -> new StringBuilder().append("Disconnect timeout: ").append(timeout).append(" ").append(duration).toString());
 		}
 
 		private void closeHttpConnections() {
@@ -304,6 +313,7 @@ public class HttpTunnelServer {
 						this.httpConnections.removeFirst().respond(HttpStatus.GONE);
 					}
 					catch (Exception ex) {
+						logger2.error(ex.getMessage(), ex);
 						logger.trace("Unable to close remote HTTP connection");
 					}
 				}
@@ -315,6 +325,7 @@ public class HttpTunnelServer {
 				this.targetServer.close();
 			}
 			catch (IOException ex) {
+				logger2.error(ex.getMessage(), ex);
 				logger.trace("Unable to target server connection");
 			}
 		}
@@ -358,6 +369,8 @@ public class HttpTunnelServer {
 	 */
 	protected static class HttpConnection {
 
+		private final Logger logger2 = LoggerFactory.getLogger(HttpConnection.class);
+
 		private final long createTime;
 
 		private final ServerHttpRequest request;
@@ -388,6 +401,7 @@ public class HttpTunnelServer {
 				return async;
 			}
 			catch (Exception ex) {
+				logger2.error(ex.getMessage(), ex);
 				return null;
 			}
 		}
@@ -431,6 +445,7 @@ public class HttpTunnelServer {
 						}
 					}
 					catch (InterruptedException ex) {
+						logger2.error(ex.getMessage(), ex);
 						Thread.currentThread().interrupt();
 					}
 				}

@@ -28,6 +28,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Connection details for {@link EmbeddedDatabaseType embedded databases}.
@@ -59,6 +61,8 @@ public enum EmbeddedDatabaseConnection {
 	 * HSQL Database Connection.
 	 */
 	HSQL(EmbeddedDatabaseType.HSQL, "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:%s");
+
+	private static final Logger logger = LoggerFactory.getLogger(EmbeddedDatabaseConnection.class);
 
 	private final EmbeddedDatabaseType type;
 
@@ -120,6 +124,7 @@ public enum EmbeddedDatabaseConnection {
 			return new JdbcTemplate(dataSource).execute(new IsEmbedded());
 		}
 		catch (DataAccessException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Could not connect, which means it's not embedded
 			return false;
 		}
@@ -146,7 +151,7 @@ public enum EmbeddedDatabaseConnection {
 	private static class IsEmbedded implements ConnectionCallback<Boolean> {
 
 		@Override
-		public Boolean doInConnection(Connection connection) throws SQLException, DataAccessException {
+		public Boolean doInConnection(Connection connection) throws SQLException {
 			String productName = connection.getMetaData().getDatabaseProductName();
 			if (productName == null) {
 				return false;

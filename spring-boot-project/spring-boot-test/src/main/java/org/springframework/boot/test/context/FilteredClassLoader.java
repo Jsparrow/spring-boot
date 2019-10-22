@@ -110,12 +110,8 @@ public class FilteredClassLoader extends URLClassLoader {
 
 	@Override
 	public Enumeration<URL> getResources(String name) throws IOException {
-		for (Predicate<String> filter : this.resourcesFilters) {
-			if (filter.test(name)) {
-				return Collections.emptyEnumeration();
-			}
-		}
-		return super.getResources(name);
+		return this.resourcesFilters.stream().filter(filter -> filter.test(name)).findFirst().map(filter -> Collections.emptyEnumeration())
+				.orElse(super.getResources(name));
 	}
 
 	@Override

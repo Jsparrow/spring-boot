@@ -38,7 +38,7 @@ public final class NameAndAge extends Name {
 	}
 
 	public String asKey() {
-		return this.name + " is " + this.age;
+		return new StringBuilder().append(this.name).append(" is ").append(this.age).toString();
 	}
 
 	@Override
@@ -49,14 +49,14 @@ public final class NameAndAge extends Name {
 		if (obj == null) {
 			return false;
 		}
-		if (obj instanceof NameAndAge) {
-			NameAndAge other = (NameAndAge) obj;
-			boolean rtn = true;
-			rtn = rtn && ObjectUtils.nullSafeEquals(this.name, other.name);
-			rtn = rtn && ObjectUtils.nullSafeEquals(this.age, other.age);
-			return rtn;
+		if (!(obj instanceof NameAndAge)) {
+			return super.equals(obj);
 		}
-		return super.equals(obj);
+		NameAndAge other = (NameAndAge) obj;
+		boolean rtn = true;
+		rtn = rtn && ObjectUtils.nullSafeEquals(this.name, other.name);
+		rtn = rtn && ObjectUtils.nullSafeEquals(this.age, other.age);
+		return rtn;
 	}
 
 	@Override

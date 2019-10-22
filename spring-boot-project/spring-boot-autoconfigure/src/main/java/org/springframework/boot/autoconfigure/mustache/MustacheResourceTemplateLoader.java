@@ -76,7 +76,7 @@ public class MustacheResourceTemplateLoader implements TemplateLoader, ResourceL
 
 	@Override
 	public Reader getTemplate(String name) throws Exception {
-		return new InputStreamReader(this.resourceLoader.getResource(this.prefix + name + this.suffix).getInputStream(),
+		return new InputStreamReader(this.resourceLoader.getResource(new StringBuilder().append(this.prefix).append(name).append(this.suffix).toString()).getInputStream(),
 				this.charSet);
 	}
 

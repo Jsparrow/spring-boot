@@ -92,8 +92,7 @@ class AssertProviderApplicationContextInvocationHandler implements InvocationHan
 	@Override
 	public String toString() {
 		if (this.startupFailure != null) {
-			return "Unstarted application context " + this.applicationContextType.getName() + "[startupFailure="
-					+ this.startupFailure.getClass().getName() + "]";
+			return new StringBuilder().append("Unstarted application context ").append(this.applicationContextType.getName()).append("[startupFailure=").append(this.startupFailure.getClass().getName()).append("]").toString();
 		}
 		ToStringCreator builder = new ToStringCreator(this.applicationContext)
 				.append("id", this.applicationContext.getId())

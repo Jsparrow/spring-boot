@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MimeTypeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * API versions supported for the actuator HTTP API. This enum may be injected into
@@ -40,6 +42,8 @@ public enum ApiVersion {
 	 * Version 3 (supported by Spring Boot 2.2+).
 	 */
 	V3;
+
+	private static final Logger logger = LoggerFactory.getLogger(ApiVersion.class);
 
 	private static final String MEDIA_TYPE_PREFIX = "application/vnd.spring-boot.actuator.";
 
@@ -76,6 +80,7 @@ public enum ApiVersion {
 				return valueOf(type.toUpperCase());
 			}
 			catch (IllegalArgumentException ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 		return null;

@@ -43,45 +43,31 @@ class SpringApplicationRunListeners {
 	}
 
 	void starting() {
-		for (SpringApplicationRunListener listener : this.listeners) {
-			listener.starting();
-		}
+		this.listeners.forEach(SpringApplicationRunListener::starting);
 	}
 
 	void environmentPrepared(ConfigurableEnvironment environment) {
-		for (SpringApplicationRunListener listener : this.listeners) {
-			listener.environmentPrepared(environment);
-		}
+		this.listeners.forEach(listener -> listener.environmentPrepared(environment));
 	}
 
 	void contextPrepared(ConfigurableApplicationContext context) {
-		for (SpringApplicationRunListener listener : this.listeners) {
-			listener.contextPrepared(context);
-		}
+		this.listeners.forEach(listener -> listener.contextPrepared(context));
 	}
 
 	void contextLoaded(ConfigurableApplicationContext context) {
-		for (SpringApplicationRunListener listener : this.listeners) {
-			listener.contextLoaded(context);
-		}
+		this.listeners.forEach(listener -> listener.contextLoaded(context));
 	}
 
 	void started(ConfigurableApplicationContext context) {
-		for (SpringApplicationRunListener listener : this.listeners) {
-			listener.started(context);
-		}
+		this.listeners.forEach(listener -> listener.started(context));
 	}
 
 	void running(ConfigurableApplicationContext context) {
-		for (SpringApplicationRunListener listener : this.listeners) {
-			listener.running(context);
-		}
+		this.listeners.forEach(listener -> listener.running(context));
 	}
 
 	void failed(ConfigurableApplicationContext context, Throwable exception) {
-		for (SpringApplicationRunListener listener : this.listeners) {
-			callFailedListener(listener, context, exception);
-		}
+		this.listeners.forEach(listener -> callFailedListener(listener, context, exception));
 	}
 
 	private void callFailedListener(SpringApplicationRunListener listener, ConfigurableApplicationContext context,
@@ -99,7 +85,7 @@ class SpringApplicationRunListeners {
 			else {
 				String message = ex.getMessage();
 				message = (message != null) ? message : "no error message";
-				this.log.warn("Error handling failed (" + message + ")");
+				this.log.warn(new StringBuilder().append("Error handling failed (").append(message).append(")").toString());
 			}
 		}
 	}

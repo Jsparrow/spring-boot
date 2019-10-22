@@ -82,7 +82,7 @@ class CloudFoundryWebEndpointServletHandlerMapping extends AbstractWebMvcEndpoin
 		public Map<String, Map<String, Link>> links(HttpServletRequest request, HttpServletResponse response) {
 			SecurityResponse securityResponse = CloudFoundryWebEndpointServletHandlerMapping.this.securityInterceptor
 					.preHandle(request, null);
-			if (!securityResponse.getStatus().equals(HttpStatus.OK)) {
+			if (securityResponse.getStatus() != HttpStatus.OK) {
 				sendFailureResponse(response, securityResponse);
 			}
 			AccessLevel accessLevel = (AccessLevel) request.getAttribute(AccessLevel.REQUEST_ATTRIBUTE);
@@ -93,7 +93,7 @@ class CloudFoundryWebEndpointServletHandlerMapping extends AbstractWebMvcEndpoin
 			Map<String, Link> links = CloudFoundryWebEndpointServletHandlerMapping.this.linksResolver
 					.resolveLinks(request.getRequestURL().toString());
 			filteredLinks = links.entrySet().stream()
-					.filter((e) -> e.getKey().equals("self") || accessLevel.isAccessAllowed(e.getKey()))
+					.filter((e) -> "self".equals(e.getKey()) || accessLevel.isAccessAllowed(e.getKey()))
 					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 			return Collections.singletonMap("_links", filteredLinks);
 		}
@@ -135,7 +135,7 @@ class CloudFoundryWebEndpointServletHandlerMapping extends AbstractWebMvcEndpoin
 		@Override
 		public Object handle(HttpServletRequest request, Map<String, String> body) {
 			SecurityResponse securityResponse = this.securityInterceptor.preHandle(request, this.endpointId);
-			if (!securityResponse.getStatus().equals(HttpStatus.OK)) {
+			if (securityResponse.getStatus() != HttpStatus.OK) {
 				return new ResponseEntity<Object>(securityResponse.getMessage(), securityResponse.getStatus());
 			}
 			return this.delegate.handle(request, body);

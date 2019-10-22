@@ -58,20 +58,15 @@ class CloudFoundryWebEndpointDiscovererTests {
 		load(TestConfiguration.class, (discoverer) -> {
 			Collection<ExposableWebEndpoint> endpoints = discoverer.getEndpoints();
 			assertThat(endpoints.size()).isEqualTo(2);
-			for (ExposableWebEndpoint endpoint : endpoints) {
-				if (endpoint.getEndpointId().equals(EndpointId.of("health"))) {
-					WebOperation operation = findMainReadOperation(endpoint);
-					assertThat(operation
-							.invoke(new InvocationContext(mock(SecurityContext.class), Collections.emptyMap())))
-									.isEqualTo("cf");
-				}
-			}
+			endpoints.stream().filter(endpoint -> endpoint.getEndpointId().equals(EndpointId.of("health"))).map(this::findMainReadOperation).forEach(operation -> assertThat(operation
+					.invoke(new InvocationContext(mock(SecurityContext.class), Collections.emptyMap())))
+							.isEqualTo("cf"));
 		});
 	}
 
 	private WebOperation findMainReadOperation(ExposableWebEndpoint endpoint) {
 		for (WebOperation operation : endpoint.getOperations()) {
-			if (operation.getRequestPredicate().getPath().equals("health")) {
+			if ("health".equals(operation.getRequestPredicate().getPath())) {
 				return operation;
 			}
 		}

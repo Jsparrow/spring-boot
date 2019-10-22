@@ -61,7 +61,7 @@ public class LocalHostWebConnectionHtmlUnitDriver extends WebConnectionHtmlUnitD
 	public void get(String url) {
 		if (url.startsWith("/")) {
 			String port = this.environment.getProperty("local.server.port", "8080");
-			url = "http://localhost:" + port + url;
+			url = new StringBuilder().append("http://localhost:").append(port).append(url).toString();
 		}
 		super.get(url);
 	}

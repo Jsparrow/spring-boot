@@ -47,7 +47,7 @@ class GroovyGrabDependencyResolver implements DependencyResolver {
 	}
 
 	@Override
-	public List<File> resolve(List<String> artifactIdentifiers) throws CompilationFailedException, IOException {
+	public List<File> resolve(List<String> artifactIdentifiers) throws IOException {
 		GroovyCompiler groovyCompiler = new GroovyCompiler(this.configuration);
 		List<File> artifactFiles = new ArrayList<>();
 		if (!artifactIdentifiers.isEmpty()) {
@@ -55,9 +55,7 @@ class GroovyGrabDependencyResolver implements DependencyResolver {
 			groovyCompiler.compile(createSources(artifactIdentifiers));
 			List<URL> artifactUrls = getClassPathUrls(groovyCompiler);
 			artifactUrls.removeAll(initialUrls);
-			for (URL artifactUrl : artifactUrls) {
-				artifactFiles.add(toFile(artifactUrl));
-			}
+			artifactUrls.forEach(artifactUrl -> artifactFiles.add(toFile(artifactUrl)));
 		}
 		return artifactFiles;
 	}
@@ -71,7 +69,7 @@ class GroovyGrabDependencyResolver implements DependencyResolver {
 		file.deleteOnExit();
 		try (OutputStreamWriter stream = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
 			for (String artifactIdentifier : artifactIdentifiers) {
-				stream.write("@Grab('" + artifactIdentifier + "')");
+				stream.write(new StringBuilder().append("@Grab('").append(artifactIdentifier).append("')").toString());
 			}
 			// Dummy class to force compiler to do grab
 			stream.write("class Installer {}");

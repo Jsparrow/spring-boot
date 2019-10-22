@@ -37,7 +37,7 @@ public class ConnectorStartFailedException extends WebServerException {
 	 * @param port the port
 	 */
 	public ConnectorStartFailedException(int port) {
-		super("Connector configured to listen on port " + port + " failed to start", null);
+		super(new StringBuilder().append("Connector configured to listen on port ").append(port).append(" failed to start").toString(), null);
 		this.port = port;
 	}
 

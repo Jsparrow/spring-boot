@@ -71,9 +71,7 @@ class ErrorMvcAutoConfigurationTests {
 					true);
 			errorView.render(errorAttributes.getErrorAttributes(webRequest, true), webRequest.getRequest(),
 					webRequest.getResponse());
-			assertThat(output).contains("Cannot render error page for request [/path] "
-					+ "and exception [Exception message] as the response has "
-					+ "already been committed. As a result, the response may have the wrong status code.");
+			assertThat(output).contains(new StringBuilder().append("Cannot render error page for request [/path] ").append("and exception [Exception message] as the response has ").append("already been committed. As a result, the response may have the wrong status code.").toString());
 		});
 	}
 

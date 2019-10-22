@@ -53,8 +53,7 @@ public class ReactiveElasticsearchRepositoriesAutoConfigurationTests {
 	private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(ReactiveRestClientAutoConfiguration.class,
 					ReactiveElasticsearchRepositoriesAutoConfiguration.class, ElasticsearchDataAutoConfiguration.class))
-			.withPropertyValues("spring.data.elasticsearch.client.reactive.endpoints="
-					+ elasticsearch.getContainerIpAddress() + ":" + elasticsearch.getFirstMappedPort());
+			.withPropertyValues(new StringBuilder().append("spring.data.elasticsearch.client.reactive.endpoints=").append(elasticsearch.getContainerIpAddress()).append(":").append(elasticsearch.getFirstMappedPort()).toString());
 
 	@Test
 	void testDefaultRepositoryConfiguration() {

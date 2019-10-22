@@ -38,7 +38,7 @@ class ConfigurationPropertiesBeanDefinitionValidator implements BeanFactoryPostP
 	private static final String BEAN_NAME = ConfigurationPropertiesBeanDefinitionValidator.class.getName();
 
 	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
 			if (!(definition instanceof ConfigurationPropertiesValueObjectBeanDefinition)) {
@@ -56,8 +56,7 @@ class ConfigurationPropertiesBeanDefinitionValidator implements BeanFactoryPostP
 		Class<?> beanClass = beanFactory.getType(beanName, false);
 		if (beanClass != null && BindMethod.forClass(beanClass) == BindMethod.VALUE_OBJECT) {
 			throw new BeanCreationException(beanName,
-					"@EnableConfigurationProperties or @ConfigurationPropertiesScan must be used to add "
-							+ "@ConstructorBinding type " + beanClass.getName());
+					new StringBuilder().append("@EnableConfigurationProperties or @ConfigurationPropertiesScan must be used to add ").append("@ConstructorBinding type ").append(beanClass.getName()).toString());
 		}
 	}
 

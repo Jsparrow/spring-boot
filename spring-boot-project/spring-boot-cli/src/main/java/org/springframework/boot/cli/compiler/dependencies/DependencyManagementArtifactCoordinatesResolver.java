@@ -55,13 +55,13 @@ public class DependencyManagementArtifactCoordinatesResolver implements Artifact
 			String[] tokens = id.split(":");
 			return new Dependency(tokens[0], tokens[1], tokens[2]);
 		}
-		if (id != null) {
-			if (id.startsWith("spring-boot")) {
-				return new Dependency("org.springframework.boot", id, this.dependencyManagement.getSpringBootVersion());
-			}
-			return this.dependencyManagement.find(id);
+		if (id == null) {
+			return null;
 		}
-		return null;
+		if (id.startsWith("spring-boot")) {
+			return new Dependency("org.springframework.boot", id, this.dependencyManagement.getSpringBootVersion());
+		}
+		return this.dependencyManagement.find(id);
 	}
 
 	@Override

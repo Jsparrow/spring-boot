@@ -74,21 +74,22 @@ public class NettyWebServer implements WebServer {
 	}
 
 	@Override
-	public void start() throws WebServerException {
-		if (this.disposableServer == null) {
-			try {
-				this.disposableServer = startHttpServer();
-			}
-			catch (Exception ex) {
-				ChannelBindException bindException = findBindException(ex);
-				if (bindException != null) {
-					throw new PortInUseException(bindException.localPort());
-				}
-				throw new WebServerException("Unable to start Netty", ex);
-			}
-			logger.info("Netty started on port(s): " + getPort());
-			startDaemonAwaitThread(this.disposableServer);
+	public void start() {
+		if (this.disposableServer != null) {
+			return;
 		}
+		try {
+			this.disposableServer = startHttpServer();
+		}
+		catch (Exception ex) {
+			ChannelBindException bindException = findBindException(ex);
+			if (bindException != null) {
+				throw new PortInUseException(bindException.localPort());
+			}
+			throw new WebServerException("Unable to start Netty", ex);
+		}
+		logger.info("Netty started on port(s): " + getPort());
+		startDaemonAwaitThread(this.disposableServer);
 	}
 
 	private DisposableServer startHttpServer() {
@@ -138,16 +139,17 @@ public class NettyWebServer implements WebServer {
 	}
 
 	@Override
-	public void stop() throws WebServerException {
-		if (this.disposableServer != null) {
-			if (this.lifecycleTimeout != null) {
-				this.disposableServer.disposeNow(this.lifecycleTimeout);
-			}
-			else {
-				this.disposableServer.disposeNow();
-			}
-			this.disposableServer = null;
+	public void stop() {
+		if (this.disposableServer == null) {
+			return;
 		}
+		if (this.lifecycleTimeout != null) {
+			this.disposableServer.disposeNow(this.lifecycleTimeout);
+		}
+		else {
+			this.disposableServer.disposeNow();
+		}
+		this.disposableServer = null;
 	}
 
 	@Override

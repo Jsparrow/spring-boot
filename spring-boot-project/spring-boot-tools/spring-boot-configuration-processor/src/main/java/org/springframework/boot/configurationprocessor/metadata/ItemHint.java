@@ -50,12 +50,12 @@ public class ItemHint implements Comparable<ItemHint> {
 
 	private String toCanonicalName(String name) {
 		int dot = name.lastIndexOf('.');
-		if (dot != -1) {
-			String prefix = name.substring(0, dot);
-			String originalName = name.substring(dot);
-			return prefix + ConfigurationMetadata.toDashedCase(originalName);
+		if (!(dot != -1)) {
+			return ConfigurationMetadata.toDashedCase(name);
 		}
-		return ConfigurationMetadata.toDashedCase(name);
+		String prefix = name.substring(0, dot);
+		String originalName = name.substring(dot);
+		return prefix + ConfigurationMetadata.toDashedCase(originalName);
 	}
 
 	public String getName() {
@@ -81,7 +81,8 @@ public class ItemHint implements Comparable<ItemHint> {
 
 	@Override
 	public String toString() {
-		return "ItemHint{name='" + this.name + "', values=" + this.values + ", providers=" + this.providers + '}';
+		return new StringBuilder().append("ItemHint{name='").append(this.name).append("', values=").append(this.values).append(", providers=")
+				.append(this.providers).append('}').toString();
 	}
 
 	/**
@@ -108,7 +109,8 @@ public class ItemHint implements Comparable<ItemHint> {
 
 		@Override
 		public String toString() {
-			return "ValueHint{value=" + this.value + ", description='" + this.description + '\'' + '}';
+			return new StringBuilder().append("ValueHint{value=").append(this.value).append(", description='").append(this.description).append('\'')
+					.append('}').toString();
 		}
 
 	}
@@ -137,7 +139,8 @@ public class ItemHint implements Comparable<ItemHint> {
 
 		@Override
 		public String toString() {
-			return "ValueProvider{name='" + this.name + "', parameters=" + this.parameters + '}';
+			return new StringBuilder().append("ValueProvider{name='").append(this.name).append("', parameters=").append(this.parameters).append('}')
+					.toString();
 		}
 
 	}

@@ -95,16 +95,6 @@ class JolokiaEndpointAutoConfigurationIntegrationTests {
 		assertThat(response.getBody()).contains("NonHeapMemoryUsage");
 	}
 
-	@Configuration(proxyBeanMethods = false)
-	@MinimalWebConfiguration
-	@Import({ JacksonAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class,
-			JolokiaEndpointAutoConfiguration.class, EndpointAutoConfiguration.class, WebEndpointAutoConfiguration.class,
-			ServletManagementContextAutoConfiguration.class, ManagementContextAutoConfiguration.class,
-			ServletEndpointManagementContextConfiguration.class })
-	static class Application {
-
-	}
-
 	@Target(ElementType.TYPE)
 	@Retention(RetentionPolicy.RUNTIME)
 	@Documented
@@ -112,6 +102,16 @@ class JolokiaEndpointAutoConfigurationIntegrationTests {
 			ValidationAutoConfiguration.class, WebMvcAutoConfiguration.class, JacksonAutoConfiguration.class,
 			ErrorMvcAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
 	protected @interface MinimalWebConfiguration {
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	@MinimalWebConfiguration
+	@Import({ JacksonAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class,
+			JolokiaEndpointAutoConfiguration.class, EndpointAutoConfiguration.class, WebEndpointAutoConfiguration.class,
+			ServletManagementContextAutoConfiguration.class, ManagementContextAutoConfiguration.class,
+			ServletEndpointManagementContextConfiguration.class })
+	static class Application {
 
 	}
 

@@ -24,6 +24,8 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.data.redis.RedisConnectionFailureException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link SampleRedisApplication}.
@@ -32,6 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @ExtendWith(OutputCaptureExtension.class)
 class SampleRedisApplicationTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(SampleRedisApplicationTests.class);
 
 	@Test
 	void testDefaultSettings(CapturedOutput output) {
@@ -47,7 +51,7 @@ class SampleRedisApplicationTests {
 	}
 
 	private boolean redisServerRunning(Throwable ex) {
-		System.out.println(ex.getMessage());
+		logger.info(ex.getMessage());
 		if (ex instanceof RedisConnectionFailureException) {
 			return false;
 		}

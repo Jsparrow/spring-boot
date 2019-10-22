@@ -40,6 +40,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Integration tests for endpoints over JMX.
@@ -49,6 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class JmxEndpointIntegrationTests {
 
+	private static final Logger logger = LoggerFactory.getLogger(JmxEndpointIntegrationTests.class);
 	private final WebApplicationContextRunner contextRunner = new WebApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(JmxAutoConfiguration.class, EndpointAutoConfiguration.class,
 					JmxEndpointAutoConfiguration.class, HealthContributorAutoConfiguration.class,
@@ -102,6 +105,7 @@ class JmxEndpointIntegrationTests {
 			return true;
 		}
 		catch (InstanceNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 	}

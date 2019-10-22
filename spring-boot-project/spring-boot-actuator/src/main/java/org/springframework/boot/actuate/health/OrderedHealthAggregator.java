@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.util.Assert;
+import java.util.stream.Collectors;
 
 /**
  * Default {@link HealthAggregator} implementation that aggregates {@link Health}
@@ -71,11 +72,7 @@ public class OrderedHealthAggregator extends AbstractHealthAggregator {
 	protected Status aggregateStatus(List<Status> candidates) {
 		// Only sort those status instances that we know about
 		List<Status> filteredCandidates = new ArrayList<>();
-		for (Status candidate : candidates) {
-			if (this.statusOrder.contains(candidate.getCode())) {
-				filteredCandidates.add(candidate);
-			}
-		}
+		filteredCandidates.addAll(candidates.stream().filter(candidate -> this.statusOrder.contains(candidate.getCode())).collect(Collectors.toList()));
 		// If no status is given return UNKNOWN
 		if (filteredCandidates.isEmpty()) {
 			return Status.UNKNOWN;

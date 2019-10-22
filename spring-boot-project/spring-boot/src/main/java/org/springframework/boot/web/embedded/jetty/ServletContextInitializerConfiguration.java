@@ -24,6 +24,8 @@ import org.eclipse.jetty.webapp.WebAppContext;
 
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Jetty {@link Configuration} that calls {@link ServletContextInitializer}s.
@@ -34,6 +36,7 @@ import org.springframework.util.Assert;
  */
 public class ServletContextInitializerConfiguration extends AbstractConfiguration {
 
+	private static final Logger logger = LoggerFactory.getLogger(ServletContextInitializerConfiguration.class);
 	private final ServletContextInitializer[] initializers;
 
 	/**
@@ -75,6 +78,7 @@ public class ServletContextInitializerConfiguration extends AbstractConfiguratio
 			context.getServletContext().setExtendedListenerTypes(extended);
 		}
 		catch (NoSuchMethodError ex) {
+			logger.error(ex.getMessage(), ex);
 			// Not available on Jetty 8
 		}
 	}

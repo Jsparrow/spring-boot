@@ -44,8 +44,7 @@ class TokenTests {
 		String header = "{\"alg\": \"RS256\", \"kid\": \"key-id\", \"typ\": \"JWT\"}";
 		String claims = "invalid-claims";
 		assertThatExceptionOfType(CloudFoundryAuthorizationException.class)
-				.isThrownBy(() -> new Token(Base64Utils.encodeToString(header.getBytes()) + "."
-						+ Base64Utils.encodeToString(claims.getBytes())))
+				.isThrownBy(() -> new Token(new StringBuilder().append(Base64Utils.encodeToString(header.getBytes())).append(".").append(Base64Utils.encodeToString(claims.getBytes())).toString()))
 				.satisfies(reasonRequirement(Reason.INVALID_TOKEN));
 	}
 
@@ -54,8 +53,7 @@ class TokenTests {
 		String header = "invalid-header";
 		String claims = "{\"exp\": 2147483647, \"iss\": \"http://localhost:8080/uaa/oauth/token\"}";
 		assertThatExceptionOfType(CloudFoundryAuthorizationException.class)
-				.isThrownBy(() -> new Token(Base64Utils.encodeToString(header.getBytes()) + "."
-						+ Base64Utils.encodeToString(claims.getBytes())))
+				.isThrownBy(() -> new Token(new StringBuilder().append(Base64Utils.encodeToString(header.getBytes())).append(".").append(Base64Utils.encodeToString(claims.getBytes())).toString()))
 				.satisfies(reasonRequirement(Reason.INVALID_TOKEN));
 	}
 
@@ -71,10 +69,9 @@ class TokenTests {
 	void validJwt() {
 		String header = "{\"alg\": \"RS256\",  \"kid\": \"key-id\", \"typ\": \"JWT\"}";
 		String claims = "{\"exp\": 2147483647, \"iss\": \"http://localhost:8080/uaa/oauth/token\"}";
-		String content = Base64Utils.encodeToString(header.getBytes()) + "."
-				+ Base64Utils.encodeToString(claims.getBytes());
+		String content = new StringBuilder().append(Base64Utils.encodeToString(header.getBytes())).append(".").append(Base64Utils.encodeToString(claims.getBytes())).toString();
 		String signature = Base64Utils.encodeToString("signature".getBytes());
-		Token token = new Token(content + "." + signature);
+		Token token = new Token(new StringBuilder().append(content).append(".").append(signature).toString());
 		assertThat(token.getExpiry()).isEqualTo(2147483647);
 		assertThat(token.getIssuer()).isEqualTo("http://localhost:8080/uaa/oauth/token");
 		assertThat(token.getSignatureAlgorithm()).isEqualTo("RS256");
@@ -121,8 +118,8 @@ class TokenTests {
 
 	private Token createToken(String header, String claims) {
 		Token token = new Token(
-				Base64Utils.encodeToString(header.getBytes()) + "." + Base64Utils.encodeToString(claims.getBytes())
-						+ "." + Base64Utils.encodeToString("signature".getBytes()));
+				new StringBuilder().append(Base64Utils.encodeToString(header.getBytes())).append(".").append(Base64Utils.encodeToString(claims.getBytes())).append(".").append(Base64Utils.encodeToString("signature".getBytes()))
+						.toString());
 		return token;
 	}
 

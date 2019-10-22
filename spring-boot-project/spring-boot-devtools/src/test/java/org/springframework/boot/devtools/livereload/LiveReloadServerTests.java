@@ -79,7 +79,7 @@ class LiveReloadServerTests {
 	@Disabled
 	void servesLivereloadJs() throws Exception {
 		RestTemplate template = new RestTemplate();
-		URI uri = new URI("http://localhost:" + this.port + "/livereload.js");
+		URI uri = new URI(new StringBuilder().append("http://localhost:").append(this.port).append("/livereload.js").toString());
 		String script = template.getForObject(uri, String.class);
 		assertThat(script).contains("livereload.com/protocols/official-7");
 	}
@@ -126,7 +126,7 @@ class LiveReloadServerTests {
 	private LiveReloadWebSocketHandler connect() throws Exception {
 		WebSocketClient client = new StandardWebSocketClient(new WsWebSocketContainer());
 		LiveReloadWebSocketHandler handler = new LiveReloadWebSocketHandler();
-		client.doHandshake(handler, "ws://localhost:" + this.port + "/livereload");
+		client.doHandshake(handler, new StringBuilder().append("ws://localhost:").append(this.port).append("/livereload").toString());
 		handler.awaitHello();
 		return handler;
 	}

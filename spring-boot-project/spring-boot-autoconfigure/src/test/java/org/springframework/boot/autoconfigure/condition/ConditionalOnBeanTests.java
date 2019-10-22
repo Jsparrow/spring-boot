@@ -221,6 +221,13 @@ class ConditionalOnBeanTests {
 		};
 	}
 
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@interface TestAnnotation {
+
+	}
+
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnBean(name = "foo")
 	static class OnBeanNameConfiguration {
@@ -501,13 +508,6 @@ class ConditionalOnBeanTests {
 		OtherExampleBean() {
 			super("other subclass");
 		}
-
-	}
-
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@interface TestAnnotation {
 
 	}
 

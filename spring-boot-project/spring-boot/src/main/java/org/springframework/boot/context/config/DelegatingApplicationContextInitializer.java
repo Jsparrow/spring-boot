@@ -75,7 +75,7 @@ public class DelegatingApplicationContextInitializer
 			return initializerClass;
 		}
 		catch (ClassNotFoundException ex) {
-			throw new ApplicationContextException("Failed to load context initializer class [" + className + "]", ex);
+			throw new ApplicationContextException(new StringBuilder().append("Failed to load context initializer class [").append(className).append("]").toString(), ex);
 		}
 	}
 

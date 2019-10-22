@@ -147,7 +147,7 @@ public final class WebOperationRequestPredicate {
 
 	@Override
 	public String toString() {
-		StringBuilder result = new StringBuilder(this.httpMethod + " to path '" + this.path + "'");
+		StringBuilder result = new StringBuilder(new StringBuilder().append(this.httpMethod).append(" to path '").append(this.path).append("'").toString());
 		if (!CollectionUtils.isEmpty(this.consumes)) {
 			result.append(" consumes: ").append(StringUtils.collectionToCommaDelimitedString(this.consumes));
 		}

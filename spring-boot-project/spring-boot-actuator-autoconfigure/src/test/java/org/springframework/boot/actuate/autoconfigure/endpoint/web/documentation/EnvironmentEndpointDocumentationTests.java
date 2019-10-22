@@ -112,12 +112,11 @@ class EnvironmentEndpointDocumentationTests extends MockMvcEndpointDocumentation
 		try {
 			Map<String, Object> payload = objectMapper.readValue(content, Map.class);
 			List<Map<String, Object>> propertySources = (List<Map<String, Object>>) payload.get("propertySources");
-			for (Map<String, Object> propertySource : propertySources) {
-				Map<String, String> properties = (Map<String, String>) propertySource.get("properties");
+			propertySources.stream().map(propertySource -> (Map<String, String>) propertySource.get("properties")).forEach(properties -> {
 				Set<String> filteredKeys = properties.keySet().stream().filter(this::retainKey).limit(3)
 						.collect(Collectors.toSet());
 				properties.keySet().retainAll(filteredKeys);
-			}
+			});
 			return objectMapper.writeValueAsBytes(payload);
 		}
 		catch (IOException ex) {
@@ -126,7 +125,7 @@ class EnvironmentEndpointDocumentationTests extends MockMvcEndpointDocumentation
 	}
 
 	private boolean retainKey(String key) {
-		return key.startsWith("java.") || key.equals("JAVA_HOME") || key.startsWith("com.example");
+		return key.startsWith("java.") || "JAVA_HOME".equals(key) || key.startsWith("com.example");
 	}
 
 	@Configuration(proxyBeanMethods = false)

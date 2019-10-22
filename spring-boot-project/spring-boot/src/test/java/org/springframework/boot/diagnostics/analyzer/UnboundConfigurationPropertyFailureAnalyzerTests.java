@@ -74,12 +74,10 @@ class UnboundConfigurationPropertyFailureAnalyzerTests {
 	}
 
 	private BeanCreationException createFailure(Class<?> configuration, String... environment) {
-		try {
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
 			addEnvironment(context, environment);
 			context.register(configuration);
 			context.refresh();
-			context.close();
 			return null;
 		}
 		catch (BeanCreationException ex) {

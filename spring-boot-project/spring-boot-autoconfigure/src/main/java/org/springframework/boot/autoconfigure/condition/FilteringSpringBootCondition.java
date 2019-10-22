@@ -29,6 +29,7 @@ import org.springframework.boot.autoconfigure.AutoConfigurationImportFilter;
 import org.springframework.boot.autoconfigure.AutoConfigurationMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for a {@link SpringBootCondition} that also implements
@@ -64,7 +65,7 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 			AutoConfigurationMetadata autoConfigurationMetadata);
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 
@@ -87,11 +88,7 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 			return Collections.emptyList();
 		}
 		List<String> matches = new ArrayList<>(classNames.size());
-		for (String candidate : classNames) {
-			if (classNameFilter.matches(candidate, classLoader)) {
-				matches.add(candidate);
-			}
-		}
+		matches.addAll(classNames.stream().filter(candidate -> classNameFilter.matches(candidate, classLoader)).collect(Collectors.toList()));
 		return matches;
 	}
 

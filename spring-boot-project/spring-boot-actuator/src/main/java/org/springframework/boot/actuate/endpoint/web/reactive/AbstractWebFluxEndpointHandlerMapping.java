@@ -121,11 +121,7 @@ public abstract class AbstractWebFluxEndpointHandlerMapping extends RequestMappi
 
 	@Override
 	protected void initHandlerMethods() {
-		for (ExposableWebEndpoint endpoint : this.endpoints) {
-			for (WebOperation operation : endpoint.getOperations()) {
-				registerMappingForOperation(endpoint, operation);
-			}
-		}
+		this.endpoints.forEach(endpoint -> endpoint.getOperations().forEach(operation -> registerMappingForOperation(endpoint, operation)));
 		if (this.shouldRegisterLinksMapping) {
 			registerLinksMapping();
 		}
@@ -367,7 +363,7 @@ public abstract class AbstractWebFluxEndpointHandlerMapping extends RequestMappi
 
 		@Override
 		public String toString() {
-			return "Actuator web endpoint '" + this.operation.getId() + "'";
+			return new StringBuilder().append("Actuator web endpoint '").append(this.operation.getId()).append("'").toString();
 		}
 
 	}

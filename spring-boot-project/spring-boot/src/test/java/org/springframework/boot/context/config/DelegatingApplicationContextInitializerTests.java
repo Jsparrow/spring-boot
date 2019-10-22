@@ -44,7 +44,7 @@ class DelegatingApplicationContextInitializerTests {
 	void orderedInitialize() {
 		StaticApplicationContext context = new StaticApplicationContext();
 		TestPropertySourceUtils.addInlinedPropertiesToEnvironment(context,
-				"context.initializer.classes=" + MockInitB.class.getName() + "," + MockInitA.class.getName());
+				new StringBuilder().append("context.initializer.classes=").append(MockInitB.class.getName()).append(",").append(MockInitA.class.getName()).toString());
 		this.initializer.initialize(context);
 		assertThat(context.getBeanFactory().getSingleton("a")).isEqualTo("a");
 		assertThat(context.getBeanFactory().getSingleton("b")).isEqualTo("b");

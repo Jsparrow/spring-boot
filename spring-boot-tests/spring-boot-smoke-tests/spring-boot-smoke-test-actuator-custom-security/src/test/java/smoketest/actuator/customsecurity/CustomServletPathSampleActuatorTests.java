@@ -43,12 +43,12 @@ class CustomServletPathSampleActuatorTests extends AbstractSampleActuatorCustomS
 
 	@Override
 	String getPath() {
-		return "http://localhost:" + this.port + "/example";
+		return new StringBuilder().append("http://localhost:").append(this.port).append("/example").toString();
 	}
 
 	@Override
 	String getManagementPath() {
-		return "http://localhost:" + this.port + "/example";
+		return new StringBuilder().append("http://localhost:").append(this.port).append("/example").toString();
 	}
 
 	@Override

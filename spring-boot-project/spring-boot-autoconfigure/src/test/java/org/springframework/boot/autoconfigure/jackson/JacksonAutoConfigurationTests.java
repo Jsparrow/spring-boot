@@ -374,7 +374,7 @@ class JacksonAutoConfigurationTests {
 			DateTime dateTime = new DateTime(1988, 6, 25, 20, 30, DateTimeZone.UTC);
 			String expected = FormatConfig.DEFAULT_DATETIME_PRINTER.rawFormatter().withZone(DateTimeZone.UTC)
 					.print(dateTime);
-			assertThat(mapper.writeValueAsString(dateTime)).isEqualTo("\"" + expected + "\"");
+			assertThat(mapper.writeValueAsString(dateTime)).isEqualTo(new StringBuilder().append("\"").append(expected).append("\"").toString());
 		});
 	}
 

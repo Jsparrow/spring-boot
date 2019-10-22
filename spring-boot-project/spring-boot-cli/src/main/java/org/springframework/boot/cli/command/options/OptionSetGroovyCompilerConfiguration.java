@@ -41,15 +41,15 @@ public class OptionSetGroovyCompilerConfiguration implements GroovyCompilerConfi
 
 	private final List<RepositoryConfiguration> repositoryConfiguration;
 
-	protected OptionSetGroovyCompilerConfiguration(OptionSet optionSet, CompilerOptionHandler compilerOptionHandler) {
-		this(optionSet, compilerOptionHandler, RepositoryConfigurationFactory.createDefaultRepositoryConfiguration());
-	}
-
 	public OptionSetGroovyCompilerConfiguration(OptionSet optionSet, CompilerOptionHandler compilerOptionHandler,
 			List<RepositoryConfiguration> repositoryConfiguration) {
 		this.options = optionSet;
 		this.optionHandler = compilerOptionHandler;
 		this.repositoryConfiguration = repositoryConfiguration;
+	}
+
+	protected OptionSetGroovyCompilerConfiguration(OptionSet optionSet, CompilerOptionHandler compilerOptionHandler) {
+		this(optionSet, compilerOptionHandler, RepositoryConfigurationFactory.createDefaultRepositoryConfiguration());
 	}
 
 	protected OptionSet getOptions() {

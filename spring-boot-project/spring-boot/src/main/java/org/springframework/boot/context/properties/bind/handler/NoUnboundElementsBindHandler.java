@@ -30,6 +30,8 @@ import org.springframework.boot.context.properties.source.ConfigurationProperty;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.boot.context.properties.source.IterableConfigurationPropertySource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link BindHandler} to enforce that all configuration properties under the root name
@@ -41,13 +43,11 @@ import org.springframework.boot.context.properties.source.IterableConfigurationP
  */
 public class NoUnboundElementsBindHandler extends AbstractBindHandler {
 
+	private static final Logger logger = LoggerFactory.getLogger(NoUnboundElementsBindHandler.class);
+
 	private final Set<ConfigurationPropertyName> boundNames = new HashSet<>();
 
 	private final Function<ConfigurationPropertySource, Boolean> filter;
-
-	NoUnboundElementsBindHandler() {
-		this(BindHandler.DEFAULT, (configurationPropertySource) -> true);
-	}
 
 	public NoUnboundElementsBindHandler(BindHandler parent) {
 		this(parent, (configurationPropertySource) -> true);
@@ -56,6 +56,10 @@ public class NoUnboundElementsBindHandler extends AbstractBindHandler {
 	public NoUnboundElementsBindHandler(BindHandler parent, Function<ConfigurationPropertySource, Boolean> filter) {
 		super(parent);
 		this.filter = filter;
+	}
+
+	NoUnboundElementsBindHandler() {
+		this(BindHandler.DEFAULT, (configurationPropertySource) -> true);
 	}
 
 	@Override
@@ -93,6 +97,7 @@ public class NoUnboundElementsBindHandler extends AbstractBindHandler {
 						source.filter((candidate) -> isUnbound(name, candidate)).getConfigurationProperty(unboundName));
 			}
 			catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 	}
@@ -106,11 +111,11 @@ public class NoUnboundElementsBindHandler extends AbstractBindHandler {
 
 	private boolean isOverriddenCollectionElement(ConfigurationPropertyName candidate) {
 		int lastIndex = candidate.getNumberOfElements() - 1;
-		if (candidate.isNumericIndex(lastIndex)) {
-			ConfigurationPropertyName propertyName = candidate.chop(lastIndex);
-			return this.boundNames.contains(propertyName);
+		if (!candidate.isNumericIndex(lastIndex)) {
+			return false;
 		}
-		return false;
+		ConfigurationPropertyName propertyName = candidate.chop(lastIndex);
+		return this.boundNames.contains(propertyName);
 	}
 
 }

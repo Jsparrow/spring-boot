@@ -20,9 +20,12 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SampleJob extends QuartzJobBean {
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleJob.class);
 	private String name;
 
 	// Invoked if a Job data map entry with that name
@@ -32,7 +35,7 @@ public class SampleJob extends QuartzJobBean {
 
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-		System.out.println(String.format("Hello %s!", this.name));
+		logger.info(String.format("Hello %s!", this.name));
 	}
 
 }

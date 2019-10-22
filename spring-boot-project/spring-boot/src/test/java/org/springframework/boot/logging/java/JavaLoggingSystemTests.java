@@ -61,7 +61,7 @@ class JavaLoggingSystemTests extends AbstractLoggingSystemTests {
 	private Locale defaultLocale;
 
 	@BeforeEach
-	void init() throws SecurityException {
+	void init() {
 		this.logger = Logger.getLogger(getClass().getName());
 		this.defaultLocale = Locale.getDefault();
 		Locale.setDefault(Locale.ENGLISH);

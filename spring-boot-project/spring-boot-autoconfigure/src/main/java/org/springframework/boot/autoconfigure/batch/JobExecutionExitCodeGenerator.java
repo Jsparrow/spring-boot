@@ -40,12 +40,7 @@ public class JobExecutionExitCodeGenerator implements ApplicationListener<JobExe
 
 	@Override
 	public int getExitCode() {
-		for (JobExecution execution : this.executions) {
-			if (execution.getStatus().ordinal() > 0) {
-				return execution.getStatus().ordinal();
-			}
-		}
-		return 0;
+		return this.executions.stream().filter(execution -> execution.getStatus().ordinal() > 0).findFirst().map(execution -> execution.getStatus().ordinal()).orElse(0);
 	}
 
 }

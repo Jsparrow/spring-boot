@@ -32,6 +32,7 @@ import org.springframework.boot.cli.compiler.RepositoryConfigurationFactory;
 import org.springframework.boot.cli.compiler.grape.RepositoryConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 
 /**
  * Tests for {@link GroovyGrabDependencyResolver}.
@@ -87,21 +88,21 @@ class GroovyGrabDependencyResolverTests {
 
 	@Test
 	void resolveArtifactWithNoDependencies() throws Exception {
-		List<File> resolved = this.resolver.resolve(Arrays.asList("commons-logging:commons-logging:1.1.3"));
+		List<File> resolved = this.resolver.resolve(Collections.singletonList("commons-logging:commons-logging:1.1.3"));
 		assertThat(resolved).hasSize(1);
 		assertThat(getNames(resolved)).containsOnly("commons-logging-1.1.3.jar");
 	}
 
 	@Test
 	void resolveArtifactWithDependencies() throws Exception {
-		List<File> resolved = this.resolver.resolve(Arrays.asList("org.springframework:spring-core:4.1.1.RELEASE"));
+		List<File> resolved = this.resolver.resolve(Collections.singletonList("org.springframework:spring-core:4.1.1.RELEASE"));
 		assertThat(resolved).hasSize(2);
 		assertThat(getNames(resolved)).containsOnly("commons-logging-1.1.3.jar", "spring-core-4.1.1.RELEASE.jar");
 	}
 
 	@Test
 	void resolveShorthandArtifactWithDependencies() throws Exception {
-		List<File> resolved = this.resolver.resolve(Arrays.asList("spring-beans"));
+		List<File> resolved = this.resolver.resolve(Collections.singletonList("spring-beans"));
 		assertThat(resolved).hasSize(3);
 		Set<String> names = getNames(resolved);
 		assertThat(names).anyMatch((name) -> name.startsWith("spring-core-"));
@@ -120,9 +121,7 @@ class GroovyGrabDependencyResolverTests {
 
 	Set<String> getNames(Collection<File> files) {
 		Set<String> names = new HashSet<>(files.size());
-		for (File file : files) {
-			names.add(file.getName());
-		}
+		files.forEach(file -> names.add(file.getName()));
 		return names;
 	}
 

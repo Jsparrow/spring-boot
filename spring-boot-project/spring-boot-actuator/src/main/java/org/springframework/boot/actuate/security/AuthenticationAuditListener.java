@@ -95,17 +95,18 @@ public class AuthenticationAuditListener extends AbstractAuthenticationAuditList
 	private static class WebAuditListener {
 
 		void process(AuthenticationAuditListener listener, AbstractAuthenticationEvent input) {
-			if (listener != null) {
-				AuthenticationSwitchUserEvent event = (AuthenticationSwitchUserEvent) input;
-				Map<String, Object> data = new HashMap<>();
-				if (event.getAuthentication().getDetails() != null) {
-					data.put("details", event.getAuthentication().getDetails());
-				}
-				if (event.getTargetUser() != null) {
-					data.put("target", event.getTargetUser().getUsername());
-				}
-				listener.publish(new AuditEvent(event.getAuthentication().getName(), AUTHENTICATION_SWITCH, data));
+			if (listener == null) {
+				return;
 			}
+			AuthenticationSwitchUserEvent event = (AuthenticationSwitchUserEvent) input;
+			Map<String, Object> data = new HashMap<>();
+			if (event.getAuthentication().getDetails() != null) {
+				data.put("details", event.getAuthentication().getDetails());
+			}
+			if (event.getTargetUser() != null) {
+				data.put("target", event.getTargetUser().getUsername());
+			}
+			listener.publish(new AuditEvent(event.getAuthentication().getName(), AUTHENTICATION_SWITCH, data));
 
 		}
 

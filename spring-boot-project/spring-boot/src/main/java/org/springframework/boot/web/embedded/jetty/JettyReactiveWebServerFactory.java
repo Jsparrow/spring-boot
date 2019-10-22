@@ -180,9 +180,7 @@ public class JettyReactiveWebServerFactory extends AbstractReactiveWebServerFact
 		if (getSsl() != null && getSsl().isEnabled()) {
 			customizeSsl(server, address);
 		}
-		for (JettyServerCustomizer customizer : getServerCustomizers()) {
-			customizer.customize(server);
-		}
+		getServerCustomizers().forEach(customizer -> customizer.customize(server));
 		if (this.useForwardHeaders) {
 			new ForwardHeadersCustomizer().customize(server);
 		}
@@ -201,12 +199,7 @@ public class JettyReactiveWebServerFactory extends AbstractReactiveWebServerFact
 		}
 		connector.setHost(address.getHostString());
 		connector.setPort(address.getPort());
-		for (ConnectionFactory connectionFactory : connector.getConnectionFactories()) {
-			if (connectionFactory instanceof HttpConfiguration.ConnectionFactory) {
-				((HttpConfiguration.ConnectionFactory) connectionFactory).getHttpConfiguration()
-						.setSendServerVersion(false);
-			}
-		}
+		connector.getConnectionFactories().stream().filter(connectionFactory -> connectionFactory instanceof HttpConfiguration.ConnectionFactory).forEach(connectionFactory -> ((HttpConfiguration.ConnectionFactory) connectionFactory).getHttpConfiguration().setSendServerVersion(false));
 		return connector;
 	}
 

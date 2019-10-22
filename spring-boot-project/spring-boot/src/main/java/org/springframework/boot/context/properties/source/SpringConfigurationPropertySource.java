@@ -28,6 +28,8 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ConfigurationPropertySource} backed by a non-enumerable Spring
@@ -52,6 +54,8 @@ import org.springframework.util.ObjectUtils;
  * @see SpringIterableConfigurationPropertySource
  */
 class SpringConfigurationPropertySource implements ConfigurationPropertySource {
+
+	private static final Logger logger = LoggerFactory.getLogger(SpringConfigurationPropertySource.class);
 
 	private static final ConfigurationPropertyName RANDOM = ConfigurationPropertyName.of("random");
 
@@ -168,6 +172,7 @@ class SpringConfigurationPropertySource implements ConfigurationPropertySource {
 				((Map<?, ?>) rootSource.getSource()).size();
 			}
 			catch (UnsupportedOperationException ex) {
+				logger.error(ex.getMessage(), ex);
 				return false;
 			}
 		}
@@ -204,6 +209,8 @@ class SpringConfigurationPropertySource implements ConfigurationPropertySource {
 
 		private static final PropertyMapping[] NONE = {};
 
+		private final Logger logger1 = LoggerFactory.getLogger(DelegatingPropertyMapper.class);
+
 		private final PropertyMapper first;
 
 		private final PropertyMapper second;
@@ -229,6 +236,7 @@ class SpringConfigurationPropertySource implements ConfigurationPropertySource {
 				return (mapper != null) ? mapper.map(configurationPropertyName) : NONE;
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				return NONE;
 			}
 		}
@@ -245,6 +253,7 @@ class SpringConfigurationPropertySource implements ConfigurationPropertySource {
 				return (mapper != null) ? mapper.map(propertySourceName) : NONE;
 			}
 			catch (Exception ex) {
+				logger1.error(ex.getMessage(), ex);
 				return NONE;
 			}
 		}

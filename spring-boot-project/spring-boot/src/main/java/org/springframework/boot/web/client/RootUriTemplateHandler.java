@@ -37,12 +37,6 @@ public class RootUriTemplateHandler implements UriTemplateHandler {
 
 	private final UriTemplateHandler handler;
 
-	protected RootUriTemplateHandler(UriTemplateHandler handler) {
-		Assert.notNull(handler, "Handler must not be null");
-		this.rootUri = null;
-		this.handler = handler;
-	}
-
 	/**
 	 * Create a new {@link RootUriTemplateHandler} instance.
 	 * @param rootUri the root URI to be used to prefix relative URLs
@@ -60,6 +54,12 @@ public class RootUriTemplateHandler implements UriTemplateHandler {
 		Assert.notNull(rootUri, "RootUri must not be null");
 		Assert.notNull(handler, "Handler must not be null");
 		this.rootUri = rootUri;
+		this.handler = handler;
+	}
+
+	protected RootUriTemplateHandler(UriTemplateHandler handler) {
+		Assert.notNull(handler, "Handler must not be null");
+		this.rootUri = null;
 		this.handler = handler;
 	}
 

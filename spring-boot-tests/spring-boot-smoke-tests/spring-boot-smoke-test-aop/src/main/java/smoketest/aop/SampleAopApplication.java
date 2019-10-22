@@ -22,18 +22,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 public class SampleAopApplication implements CommandLineRunner {
 
 	// Simple example shows how an application can spy on itself with AOP
 
+	private static final Logger logger = LoggerFactory.getLogger(SampleAopApplication.class);
 	@Autowired
 	private HelloWorldService helloWorldService;
 
 	@Override
 	public void run(String... args) {
-		System.out.println(this.helloWorldService.getHelloMessage());
+		logger.info(this.helloWorldService.getHelloMessage());
 	}
 
 	public static void main(String[] args) {

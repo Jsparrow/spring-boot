@@ -81,13 +81,13 @@ class ServiceCapabilitiesReportGenerator {
 		report.append("Available dependencies:").append(NEW_LINE);
 		report.append("-----------------------").append(NEW_LINE);
 		List<Dependency> dependencies = getSortedDependencies(metadata);
-		for (Dependency dependency : dependencies) {
+		dependencies.forEach(dependency -> {
 			report.append(dependency.getId()).append(" - ").append(dependency.getName());
 			if (dependency.getDescription() != null) {
 				report.append(": ").append(dependency.getDescription());
 			}
 			report.append(NEW_LINE);
-		}
+		});
 	}
 
 	private List<Dependency> getSortedDependencies(InitializrServiceMetadata metadata) {
@@ -101,7 +101,7 @@ class ServiceCapabilitiesReportGenerator {
 		report.append("------------------------").append(NEW_LINE);
 		SortedSet<Entry<String, ProjectType>> entries = new TreeSet<>(Comparator.comparing(Entry::getKey));
 		entries.addAll(metadata.getProjectTypes().entrySet());
-		for (Entry<String, ProjectType> entry : entries) {
+		entries.forEach(entry -> {
 			ProjectType type = entry.getValue();
 			report.append(entry.getKey()).append(" -  ").append(type.getName());
 			if (!type.getTags().isEmpty()) {
@@ -111,7 +111,7 @@ class ServiceCapabilitiesReportGenerator {
 				report.append(" (default)");
 			}
 			report.append(NEW_LINE);
-		}
+		});
 	}
 
 	private void reportTags(StringBuilder report, ProjectType type) {
@@ -133,10 +133,10 @@ class ServiceCapabilitiesReportGenerator {
 		report.append("---------").append(NEW_LINE);
 		List<String> defaultsKeys = new ArrayList<>(metadata.getDefaults().keySet());
 		Collections.sort(defaultsKeys);
-		for (String defaultsKey : defaultsKeys) {
+		defaultsKeys.forEach(defaultsKey -> {
 			String defaultsValue = metadata.getDefaults().get(defaultsKey);
 			report.append(defaultsKey).append(": ").append(defaultsValue).append(NEW_LINE);
-		}
+		});
 	}
 
 	private static String repeat(String s, int count) {

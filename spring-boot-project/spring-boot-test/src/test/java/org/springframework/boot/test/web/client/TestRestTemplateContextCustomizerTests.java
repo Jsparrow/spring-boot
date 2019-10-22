@@ -58,7 +58,7 @@ class TestRestTemplateContextCustomizerTests {
 		private final ConfigurableListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 
 		@Override
-		protected void refreshBeanFactory() throws BeansException, IllegalStateException {
+		protected void refreshBeanFactory() {
 		}
 
 		@Override
@@ -67,7 +67,7 @@ class TestRestTemplateContextCustomizerTests {
 		}
 
 		@Override
-		public ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException {
+		public ConfigurableListableBeanFactory getBeanFactory() {
 			return this.beanFactory;
 		}
 

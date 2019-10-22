@@ -309,11 +309,11 @@ public final class MimeMappings implements Iterable<MimeMappings.Mapping> {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof MimeMappings) {
-			MimeMappings other = (MimeMappings) obj;
-			return this.map.equals(other.map);
+		if (!(obj instanceof MimeMappings)) {
+			return false;
 		}
-		return false;
+		MimeMappings other = (MimeMappings) obj;
+		return this.map.equals(other.map);
 	}
 
 	@Override
@@ -363,11 +363,11 @@ public final class MimeMappings implements Iterable<MimeMappings.Mapping> {
 			if (obj == this) {
 				return true;
 			}
-			if (obj instanceof Mapping) {
-				Mapping other = (Mapping) obj;
-				return this.extension.equals(other.extension) && this.mimeType.equals(other.mimeType);
+			if (!(obj instanceof Mapping)) {
+				return false;
 			}
-			return false;
+			Mapping other = (Mapping) obj;
+			return this.extension.equals(other.extension) && this.mimeType.equals(other.mimeType);
 		}
 
 		@Override
@@ -377,7 +377,8 @@ public final class MimeMappings implements Iterable<MimeMappings.Mapping> {
 
 		@Override
 		public String toString() {
-			return "Mapping [extension=" + this.extension + ", mimeType=" + this.mimeType + "]";
+			return new StringBuilder().append("Mapping [extension=").append(this.extension).append(", mimeType=").append(this.mimeType).append("]")
+					.toString();
 		}
 
 	}

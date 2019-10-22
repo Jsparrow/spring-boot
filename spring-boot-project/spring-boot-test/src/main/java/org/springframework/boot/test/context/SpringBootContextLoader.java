@@ -88,9 +88,7 @@ public class SpringBootContextLoader extends AbstractContextLoader {
 		Class<?>[] configClasses = config.getClasses();
 		String[] configLocations = config.getLocations();
 		Assert.state(!ObjectUtils.isEmpty(configClasses) || !ObjectUtils.isEmpty(configLocations),
-				() -> "No configuration classes or locations found in @SpringApplicationConfiguration. "
-						+ "For default configuration detection to work you need Spring 4.0.3 or better (found "
-						+ SpringVersion.getVersion() + ").");
+				() -> new StringBuilder().append("No configuration classes or locations found in @SpringApplicationConfiguration. ").append("For default configuration detection to work you need Spring 4.0.3 or better (found ").append(SpringVersion.getVersion()).append(").").toString());
 		SpringApplication application = getSpringApplication();
 		application.setMainApplicationClass(config.getTestClass());
 		application.addPrimarySources(Arrays.asList(configClasses));
@@ -200,9 +198,7 @@ public class SpringBootContextLoader extends AbstractContextLoader {
 	protected List<ApplicationContextInitializer<?>> getInitializers(MergedContextConfiguration config,
 			SpringApplication application) {
 		List<ApplicationContextInitializer<?>> initializers = new ArrayList<>();
-		for (ContextCustomizer contextCustomizer : config.getContextCustomizers()) {
-			initializers.add(new ContextCustomizerAdapter(contextCustomizer, config));
-		}
+		config.getContextCustomizers().forEach(contextCustomizer -> initializers.add(new ContextCustomizerAdapter(contextCustomizer, config)));
 		initializers.addAll(application.getInitializers());
 		for (Class<? extends ApplicationContextInitializer<?>> initializerClass : config
 				.getContextInitializerClasses()) {
@@ -222,10 +218,11 @@ public class SpringBootContextLoader extends AbstractContextLoader {
 	@Override
 	public void processContextConfiguration(ContextConfigurationAttributes configAttributes) {
 		super.processContextConfiguration(configAttributes);
-		if (!configAttributes.hasResources()) {
-			Class<?>[] defaultConfigClasses = detectDefaultConfigurationClasses(configAttributes.getDeclaringClass());
-			configAttributes.setClasses(defaultConfigClasses);
+		if (configAttributes.hasResources()) {
+			return;
 		}
+		Class<?>[] defaultConfigClasses = detectDefaultConfigurationClasses(configAttributes.getDeclaringClass());
+		configAttributes.setClasses(defaultConfigClasses);
 	}
 
 	/**

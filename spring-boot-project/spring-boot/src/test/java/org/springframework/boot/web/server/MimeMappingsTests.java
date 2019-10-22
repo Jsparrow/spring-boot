@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link MimeMappings}.
@@ -32,6 +34,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * @author Phillip Webb
  */
 class MimeMappingsTests {
+
+	private static final Logger logger = LoggerFactory.getLogger(MimeMappingsTests.class);
 
 	@Test
 	void defaultsCannotBeModified() {
@@ -129,6 +133,7 @@ class MimeMappingsTests {
 			unmodifiable.remove("foo");
 		}
 		catch (UnsupportedOperationException ex) {
+			logger.error(ex.getMessage(), ex);
 			// Expected
 		}
 		mappings.remove("foo");

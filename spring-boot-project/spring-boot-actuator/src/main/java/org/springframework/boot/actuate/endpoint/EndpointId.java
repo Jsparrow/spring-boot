@@ -152,7 +152,7 @@ public final class EndpointId {
 
 	private static void logWarning(String value) {
 		if (logger.isWarnEnabled() && loggedWarnings.add(value)) {
-			logger.warn("Endpoint ID '" + value + "' contains invalid characters, please migrate to a valid format.");
+			logger.warn(new StringBuilder().append("Endpoint ID '").append(value).append("' contains invalid characters, please migrate to a valid format.").toString());
 		}
 	}
 

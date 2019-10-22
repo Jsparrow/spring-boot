@@ -54,7 +54,7 @@ public class User {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ":" + this.id;
+		return new StringBuilder().append(getClass().getSimpleName()).append(":").append(this.id).toString();
 	}
 
 }

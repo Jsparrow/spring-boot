@@ -89,6 +89,15 @@ class FilterAnnotationsTests {
 		return filterAnnotations.anyMatches(metadataReader, metadataReaderFactory);
 	}
 
+	@Target({ ElementType.TYPE })
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@interface Filters {
+
+		Filter[] value();
+
+	}
+
 	@Filters(@Filter(Service.class))
 	static class FilterByAnnotation {
 
@@ -111,15 +120,6 @@ class FilterAnnotationsTests {
 
 	@Filters(@Filter(type = FilterType.REGEX, pattern = ".*ExampleWithoutAnnotation"))
 	static class FilterByRegex {
-
-	}
-
-	@Target({ ElementType.TYPE })
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@interface Filters {
-
-		Filter[] value();
 
 	}
 

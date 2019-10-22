@@ -68,7 +68,7 @@ final class DetailedProgressReporterTests {
 				.build();
 		this.session.getTransferListener().transferSucceeded(completedEvent);
 		String message = new String(this.baos.toByteArray()).replace("\\", "/");
-		assertThat(message).startsWith("Downloaded: " + REPOSITORY + ARTIFACT);
+		assertThat(message).startsWith(new StringBuilder().append("Downloaded: ").append(REPOSITORY).append(ARTIFACT).toString());
 		assertThat(message).contains("4KB at");
 		assertThat(message).contains("KB/sec");
 		assertThat(message).endsWith("\n");

@@ -110,12 +110,12 @@ public class DataSourcePoolMetricsAutoConfiguration {
 
 		@Autowired
 		void bindMetricsRegistryToHikariDataSources(Collection<DataSource> dataSources) {
-			for (DataSource dataSource : dataSources) {
+			dataSources.forEach(dataSource -> {
 				HikariDataSource hikariDataSource = DataSourceUnwrapper.unwrap(dataSource, HikariDataSource.class);
 				if (hikariDataSource != null) {
 					bindMetricsRegistryToHikariDataSource(hikariDataSource);
 				}
-			}
+			});
 		}
 
 		private void bindMetricsRegistryToHikariDataSource(HikariDataSource hikari) {

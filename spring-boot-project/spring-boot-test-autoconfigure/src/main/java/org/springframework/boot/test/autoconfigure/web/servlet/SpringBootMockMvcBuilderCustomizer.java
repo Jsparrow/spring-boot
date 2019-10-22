@@ -267,14 +267,13 @@ public class SpringBootMockMvcBuilderCustomizer implements MockMvcBuilderCustomi
 
 		@Override
 		public void write(List<String> lines) {
-			if (logger.isDebugEnabled()) {
-				StringWriter stringWriter = new StringWriter();
-				PrintWriter printWriter = new PrintWriter(stringWriter);
-				for (String line : lines) {
-					printWriter.println(line);
-				}
-				logger.debug("MvcResult details:\n" + stringWriter);
+			if (!logger.isDebugEnabled()) {
+				return;
 			}
+			StringWriter stringWriter = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(stringWriter);
+			lines.forEach(printWriter::println);
+			logger.debug("MvcResult details:\n" + stringWriter);
 		}
 
 	}
@@ -293,9 +292,7 @@ public class SpringBootMockMvcBuilderCustomizer implements MockMvcBuilderCustomi
 		@Override
 		public void write(List<String> lines) {
 			PrintStream printStream = getPrintStream();
-			for (String line : lines) {
-				printStream.println(line);
-			}
+			lines.forEach(printStream::println);
 		}
 
 		private PrintStream getPrintStream() {

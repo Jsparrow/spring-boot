@@ -138,8 +138,7 @@ class SocketTargetServerConnectionTests {
 
 			@Override
 			public void run() {
-				try {
-					SocketChannel channel = MockServer.this.serverSocket.accept();
+				try (SocketChannel channel = MockServer.this.serverSocket.accept()) {
 					Thread.sleep(MockServer.this.delay);
 					if (MockServer.this.send != null) {
 						ByteBuffer buffer = ByteBuffer.wrap(MockServer.this.send);
@@ -154,7 +153,6 @@ class SocketTargetServerConnectionTests {
 						}
 						MockServer.this.actualRead = buffer;
 					}
-					channel.close();
 				}
 				catch (Exception ex) {
 					throw new RuntimeException(ex);

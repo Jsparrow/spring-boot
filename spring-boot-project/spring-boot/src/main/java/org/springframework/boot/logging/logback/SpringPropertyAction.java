@@ -59,11 +59,11 @@ class SpringPropertyAction extends Action {
 	}
 
 	private String getValue(String source, String defaultValue) {
-		if (this.environment == null) {
-			addWarn("No Spring Environment available to resolve " + source);
-			return defaultValue;
+		if (this.environment != null) {
+			return this.environment.getProperty(source, defaultValue);
 		}
-		return this.environment.getProperty(source, defaultValue);
+		addWarn("No Spring Environment available to resolve " + source);
+		return defaultValue;
 	}
 
 	@Override

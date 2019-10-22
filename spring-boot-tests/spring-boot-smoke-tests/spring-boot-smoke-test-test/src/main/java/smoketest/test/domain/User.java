@@ -40,14 +40,14 @@ public class User {
 
 	private VehicleIdentificationNumber vin;
 
-	protected User() {
-	}
-
 	public User(String username, VehicleIdentificationNumber vin) {
 		Assert.hasLength(username, "Username must not be empty");
 		Assert.notNull(vin, "VIN must not be null");
 		this.username = username;
 		this.vin = vin;
+	}
+
+	protected User() {
 	}
 
 	public Long getId() {

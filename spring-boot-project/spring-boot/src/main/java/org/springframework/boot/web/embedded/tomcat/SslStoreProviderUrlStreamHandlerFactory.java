@@ -40,11 +40,11 @@ class SslStoreProviderUrlStreamHandlerFactory implements URLStreamHandlerFactory
 
 	private static final String KEY_STORE_PATH = "keyStore";
 
-	static final String KEY_STORE_URL = PROTOCOL + ":" + KEY_STORE_PATH;
+	static final String KEY_STORE_URL = new StringBuilder().append(PROTOCOL).append(":").append(KEY_STORE_PATH).toString();
 
 	private static final String TRUST_STORE_PATH = "trustStore";
 
-	static final String TRUST_STORE_URL = PROTOCOL + ":" + TRUST_STORE_PATH;
+	static final String TRUST_STORE_URL = new StringBuilder().append(PROTOCOL).append(":").append(TRUST_STORE_PATH).toString();
 
 	private final SslStoreProvider sslStoreProvider;
 

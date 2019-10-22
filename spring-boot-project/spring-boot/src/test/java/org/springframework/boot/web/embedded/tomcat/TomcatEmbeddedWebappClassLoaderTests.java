@@ -88,7 +88,7 @@ class TomcatEmbeddedWebappClassLoaderTests {
 	}
 
 	private String webInfClassesUrlString(File war) {
-		return "jar:file:" + war.getAbsolutePath() + "!/WEB-INF/classes/";
+		return new StringBuilder().append("jar:file:").append(war.getAbsolutePath()).append("!/WEB-INF/classes/").toString();
 	}
 
 	private File createWar() throws IOException {

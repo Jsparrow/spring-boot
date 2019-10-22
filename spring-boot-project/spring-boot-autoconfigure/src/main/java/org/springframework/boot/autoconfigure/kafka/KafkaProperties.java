@@ -799,20 +799,6 @@ public class KafkaProperties {
 
 	public static class Listener {
 
-		public enum Type {
-
-			/**
-			 * Invokes the endpoint with one ConsumerRecord at a time.
-			 */
-			SINGLE,
-
-			/**
-			 * Invokes the endpoint with a batch of ConsumerRecords.
-			 */
-			BATCH
-
-		}
-
 		/**
 		 * Listener type.
 		 */
@@ -974,6 +960,20 @@ public class KafkaProperties {
 			this.missingTopicsFatal = missingTopicsFatal;
 		}
 
+		public enum Type {
+
+			/**
+			 * Invokes the endpoint with one ConsumerRecord at a time.
+			 */
+			SINGLE,
+
+			/**
+			 * Invokes the endpoint with a batch of ConsumerRecords.
+			 */
+			BATCH
+
+		}
+
 	}
 
 	public static class Ssl {
@@ -1103,7 +1103,7 @@ public class KafkaProperties {
 				return resource.getFile().getAbsolutePath();
 			}
 			catch (IOException ex) {
-				throw new IllegalStateException("Resource '" + resource + "' must be on a file system", ex);
+				throw new IllegalStateException(new StringBuilder().append("Resource '").append(resource).append("' must be on a file system").toString(), ex);
 			}
 		}
 

@@ -116,7 +116,7 @@ public class ServletListenerRegistrationBean<T extends EventListener> extends Re
 			servletContext.addListener(this.listener);
 		}
 		catch (RuntimeException ex) {
-			throw new IllegalStateException("Failed to add listener '" + this.listener + "' to servlet context", ex);
+			throw new IllegalStateException(new StringBuilder().append("Failed to add listener '").append(this.listener).append("' to servlet context").toString(), ex);
 		}
 	}
 

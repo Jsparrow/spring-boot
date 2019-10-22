@@ -105,16 +105,16 @@ public final class Dependency {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() == obj.getClass()) {
-			Dependency other = (Dependency) obj;
-			boolean result = true;
-			result = result && this.groupId.equals(other.groupId);
-			result = result && this.artifactId.equals(other.artifactId);
-			result = result && this.version.equals(other.version);
-			result = result && this.exclusions.equals(other.exclusions);
-			return result;
+		if (getClass() != obj.getClass()) {
+			return false;
 		}
-		return false;
+		Dependency other = (Dependency) obj;
+		boolean result = true;
+		result = result && this.groupId.equals(other.groupId);
+		result = result && this.artifactId.equals(other.artifactId);
+		result = result && this.version.equals(other.version);
+		result = result && this.exclusions.equals(other.exclusions);
+		return result;
 	}
 
 	@Override
@@ -130,7 +130,8 @@ public final class Dependency {
 
 	@Override
 	public String toString() {
-		return this.groupId + ":" + this.artifactId + ":" + this.version;
+		return new StringBuilder().append(this.groupId).append(":").append(this.artifactId).append(":")
+				.append(this.version).toString();
 	}
 
 	/**
@@ -173,14 +174,14 @@ public final class Dependency {
 			if (obj == null) {
 				return false;
 			}
-			if (getClass() == obj.getClass()) {
-				Exclusion other = (Exclusion) obj;
-				boolean result = true;
-				result = result && this.groupId.equals(other.groupId);
-				result = result && this.artifactId.equals(other.artifactId);
-				return result;
+			if (getClass() != obj.getClass()) {
+				return false;
 			}
-			return false;
+			Exclusion other = (Exclusion) obj;
+			boolean result = true;
+			result = result && this.groupId.equals(other.groupId);
+			result = result && this.artifactId.equals(other.artifactId);
+			return result;
 		}
 
 		@Override
@@ -190,7 +191,7 @@ public final class Dependency {
 
 		@Override
 		public String toString() {
-			return this.groupId + ":" + this.artifactId;
+			return new StringBuilder().append(this.groupId).append(":").append(this.artifactId).toString();
 		}
 
 	}

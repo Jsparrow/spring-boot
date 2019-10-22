@@ -22,6 +22,8 @@ import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Condition} that checks that a {@link Restarter} is available and initialized.
@@ -30,6 +32,8 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * @see ConditionalOnInitializedRestarter
  */
 class OnInitializedRestarterCondition extends SpringBootCondition {
+
+	private static final Logger logger = LoggerFactory.getLogger(OnInitializedRestarterCondition.class);
 
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -49,6 +53,7 @@ class OnInitializedRestarterCondition extends SpringBootCondition {
 			return Restarter.getInstance();
 		}
 		catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			return null;
 		}
 	}

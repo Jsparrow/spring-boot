@@ -129,8 +129,7 @@ public abstract class AbstractLoggingSystem extends LoggingSystem {
 		String[] locations = getStandardConfigLocations();
 		for (int i = 0; i < locations.length; i++) {
 			String extension = StringUtils.getFilenameExtension(locations[i]);
-			locations[i] = locations[i].substring(0, locations[i].length() - extension.length() - 1) + "-spring."
-					+ extension;
+			locations[i] = new StringBuilder().append(locations[i].substring(0, locations[i].length() - extension.length() - 1)).append("-spring.").append(extension).toString();
 		}
 		return locations;
 	}
@@ -168,7 +167,7 @@ public abstract class AbstractLoggingSystem extends LoggingSystem {
 	protected final String getPackagedConfigFile(String fileName) {
 		String defaultPath = ClassUtils.getPackageName(getClass());
 		defaultPath = defaultPath.replace('.', '/');
-		defaultPath = defaultPath + "/" + fileName;
+		defaultPath = new StringBuilder().append(defaultPath).append("/").append(fileName).toString();
 		defaultPath = "classpath:" + defaultPath;
 		return defaultPath;
 	}

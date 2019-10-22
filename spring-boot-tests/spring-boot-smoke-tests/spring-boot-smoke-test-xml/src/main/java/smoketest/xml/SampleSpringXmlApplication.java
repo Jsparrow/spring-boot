@@ -23,8 +23,12 @@ import smoketest.xml.service.HelloWorldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SampleSpringXmlApplication implements CommandLineRunner {
+
+	private static final Logger logger = LoggerFactory.getLogger(SampleSpringXmlApplication.class);
 
 	private static final String CONTEXT_XML = "classpath:/META-INF/application-context.xml";
 
@@ -33,7 +37,7 @@ public class SampleSpringXmlApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		System.out.println(this.helloWorldService.getHelloMessage());
+		logger.info(this.helloWorldService.getHelloMessage());
 	}
 
 	public static void main(String[] args) {

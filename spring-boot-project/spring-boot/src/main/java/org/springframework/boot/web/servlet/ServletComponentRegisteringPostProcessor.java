@@ -61,24 +61,17 @@ class ServletComponentRegisteringPostProcessor implements BeanFactoryPostProcess
 	}
 
 	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		if (isRunningInEmbeddedWebServer()) {
-			ClassPathScanningCandidateComponentProvider componentProvider = createComponentProvider();
-			for (String packageToScan : this.packagesToScan) {
-				scanPackage(componentProvider, packageToScan);
-			}
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		if (!isRunningInEmbeddedWebServer()) {
+			return;
 		}
+		ClassPathScanningCandidateComponentProvider componentProvider = createComponentProvider();
+		this.packagesToScan.forEach(packageToScan -> scanPackage(componentProvider, packageToScan));
 	}
 
 	private void scanPackage(ClassPathScanningCandidateComponentProvider componentProvider, String packageToScan) {
-		for (BeanDefinition candidate : componentProvider.findCandidateComponents(packageToScan)) {
-			if (candidate instanceof ScannedGenericBeanDefinition) {
-				for (ServletComponentHandler handler : HANDLERS) {
-					handler.handle(((ScannedGenericBeanDefinition) candidate),
-							(BeanDefinitionRegistry) this.applicationContext);
-				}
-			}
-		}
+		componentProvider.findCandidateComponents(packageToScan).stream().filter(candidate -> candidate instanceof ScannedGenericBeanDefinition).forEach(candidate -> HANDLERS.forEach(handler -> handler.handle(((ScannedGenericBeanDefinition) candidate),
+				(BeanDefinitionRegistry) this.applicationContext)));
 	}
 
 	private boolean isRunningInEmbeddedWebServer() {
@@ -91,9 +84,7 @@ class ServletComponentRegisteringPostProcessor implements BeanFactoryPostProcess
 				false);
 		componentProvider.setEnvironment(this.applicationContext.getEnvironment());
 		componentProvider.setResourceLoader(this.applicationContext);
-		for (ServletComponentHandler handler : HANDLERS) {
-			componentProvider.addIncludeFilter(handler.getTypeFilter());
-		}
+		HANDLERS.forEach(handler -> componentProvider.addIncludeFilter(handler.getTypeFilter()));
 		return componentProvider;
 	}
 
@@ -102,7 +93,7 @@ class ServletComponentRegisteringPostProcessor implements BeanFactoryPostProcess
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 

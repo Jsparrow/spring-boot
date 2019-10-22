@@ -63,7 +63,7 @@ public final class ObjectContent<T> implements AssertProvider<ObjectContentAsser
 	@Override
 	public String toString() {
 		String createdFrom = (this.type != null) ? " created from " + this.type : "";
-		return "ObjectContent " + this.object + createdFrom;
+		return new StringBuilder().append("ObjectContent ").append(this.object).append(createdFrom).toString();
 	}
 
 }
